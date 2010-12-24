@@ -2,9 +2,12 @@
 
 """
 import os
+print 'OS IMPORTED'
 from svmutil import *
+print 'IMPORTED SVM UTIL'
 import decimal
 from vectorhandlingtools import *
+print 'IMPORTED VectorHANDLING'
 
 class SVMTE(object): 
     

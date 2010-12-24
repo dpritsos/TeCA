@@ -3,11 +3,12 @@
 """
 import os
 from vectorhandlingtools import *
-import experiments
 import sys
 sys.path.append('../../synergeticprocessing/src')
 from synergeticpool import *
 from experiments import *
+
+
 
 lower_case = True
 
@@ -27,8 +28,12 @@ for g in genres:
 print( "Global Index Size: %s\n" % len(gterm_index))
 #gterm_index = merge_global_dicts(corpus_dict, corpus_dict2) #, corpus_dict3, corpus_dict4)
 
-pool = SynergeticPool({})
-pool.register_mod(["experiments", "trainevaloneclssvm", "vectorhandlingtools"])
+pool = SynergeticPool( { '192.168.1.65':(40000,'123456'), '192.168.1.68':(40000,'123456') } )
+print "Registering"
+pool.register_mod(['experiments'])   
+pool.register_mod(['trainevaloneclssvm'])
+pool.register_mod(['vectorhandlingtools'])
+print "Regitered OK"
 exp = SVMExperiments()
 vform = TermVectorFormat()
 

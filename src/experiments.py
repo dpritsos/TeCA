@@ -2,9 +2,11 @@
 
 """
 import os
+print 'os imported'
 from vectorhandlingtools import *
-from termvectorgenerator import VectGen
+print 'VGEN IMPORTED' 
 from svmutil import *
+print 'SVM IMPORTED'
 from trainevaloneclssvm import *
  
 
@@ -56,5 +58,4 @@ class SVMExperiments(object):
         fobj.close()
 
 
-print "Thank you and Goodbye!"
 
