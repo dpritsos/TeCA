@@ -7,8 +7,7 @@ import sys
 sys.path.append('../../synergeticprocessing/src')
 from synergeticpool import *
 from experiments import *
-
-
+import testclass
 
 lower_case = True
 
@@ -28,11 +27,9 @@ for g in genres:
 print( "Global Index Size: %s\n" % len(gterm_index))
 #gterm_index = merge_global_dicts(corpus_dict, corpus_dict2) #, corpus_dict3, corpus_dict4)
 
-pool = SynergeticPool( { '192.168.1.65':(40000,'123456'), '192.168.1.68':(40000,'123456') } )
+pool = SynergeticPool( { '192.168.1.65':(40000,'123456'), '192.168.1.68':(40000,'123456') } ) 
 print "Registering"
-pool.register_mod(['experiments'])   
-pool.register_mod(['trainevaloneclssvm'])
-pool.register_mod(['vectorhandlingtools'])
+pool.register_mod( ['experiments', 'vectorhandlingtools', 'trainevaloneclssvm'] )  
 print "Regitered OK"
 exp = SVMExperiments()
 vform = TermVectorFormat()
@@ -49,7 +46,7 @@ for g in genres:
             rest_genres.append(rst_g)
     vform.glob_vect_l( rest_genres, gterm_index, 1000, wpsl_genre, vectl_genre, True)
     print len(wpsl_genre), len(vectl_genre)
-    pool.dispatch(exp.set1, (base_filepath, g, vectl_genre, genres) )
+    pool.dispatch(exp.set1, base_filepath, g, vectl_genre, genres )
     
     
 print "Thank you and Goodbye!"

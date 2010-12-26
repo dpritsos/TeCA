@@ -4,8 +4,8 @@
 
 import eventlet
 import codecs
-from multiprocessing import Process
 #from scgenrelerner_svmbased import *
+print 'Vector Handling Tools Imported ALL'
 
 ################################################ MULTI-PROCESSING INDEXING #########################################################    
 def make_libsvm_sparse_vect(self, webpg_vect_l):
