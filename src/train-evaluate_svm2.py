@@ -180,7 +180,6 @@ for g in genres:
     gterm_index = merge_global_dicts(gterm_index, corpus_dict)
     print("%s merged to Global Term Index" % g)
 print( "Global Index Size: %s\n" % len(gterm_index))
-#gterm_index = merge_global_dicts(corpus_dict, corpus_dict2) #, corpus_dict3, corpus_dict4)
 
 genres = [ "news" , "product_companies", "forum", "blogs", "wiki_pages"] 
 base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/"

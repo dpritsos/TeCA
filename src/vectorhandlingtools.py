@@ -7,44 +7,18 @@ import codecs
 #from scgenrelerner_svmbased import *
 print 'Vector Handling Tools Imported ALL'
 
-################################################ MULTI-PROCESSING INDEXING #########################################################    
-def make_libsvm_sparse_vect(self, webpg_vect_l):
-    #set_terms.sort()
-    new_webpg_vect_l = list()
-    chunck_wp_l =list()
-    webpg_vect_l_size = len(webpg_vect_l)
-    chnk_size = webpg_vect_l_size/12
-    chnk_remain = webpg_vect_l_size%12
-    pre_i = 0
-    for i in range(chnk_size, webpg_vect_l_size, chnk_size):
-        chunck_wp_l.append( webpg_vect_l[ pre_i : i ] )
-        pre_i = i
-    if chnk_remain != 0 :
-        chunck_wp_l[11].extend( webpg_vect_l[ len(chunck_wp_l) : (len(chunck_wp_l) + chnk_remain) ] ) 
-    print("Chuncking Done!")
-    labeling_ps = list()
-    for i in xrange(len(chunck_wp_l)):  
-    ##    labeling_ps.append( Process(target=label_properly, args=(chunck_wp_l[i],vect_l_chnk)) ) 
-        pass
-    for lbl_p in labeling_ps:
-        lbl_p.start()
-    print("Starting Done!")
-    for i in xrange(len(chunck_wp_l)):
-        new_webpg_vect_l.extend(vect_l_chnk.get())
-    print("concatenation Done!")
-    for lbl_pp in labeling_ps:
-        lbl_pp.join()
-        print("Process End")
-    print("Processing Done!")
-    print("make_libsvm_sparse_vect: Second Part Done")
-    return (new_webpg_vect_l)
-################################################
-
+def keep_most_terms(terms_d, terms_amout):
+    terms_l = [(v, k) for (k, v) in terms_d.iteritems()]
+    terms_l.sort()
+    terms_l.reverse()
+    most_terms_l = terms_l[0: terms_amout]
+    terms_d = dict( [ (k, v) for (v, k) in most_terms_l ] )
+    return terms_d    
+        
 def merge_global_dicts(*gdicts):
     gterm_index = dict()
     gterm_list = list()
     for gdict in gdicts:
-        print("Corpus index len: %s" % len(gdict.keys()) )
         gterm_list.extend( gdict.keys() )
     gterm_list.sort() #Remove it if it is too slow
     idx_no = 0
@@ -52,7 +26,6 @@ def merge_global_dicts(*gdicts):
         if not gterm_list[i] in gterm_index:
             idx_no += 1
             gterm_index[ gterm_list[i] ] = idx_no
-    print("Global Term index len: %s" % len(gterm_index) ) 
     return gterm_index
 
 def gterm_d_gen(webpg_vect_l):
@@ -141,7 +114,8 @@ def load_dict_l(filepath, filename, g_terms_d=None, force_lower_case=False, page
                             vect_dict[ g_terms_d[ decomp_term[0] ] ] = float( decomp_term[1] )
                     except:
                         #if you cannot find the term in the global dictionary just drop the term
-                        print("Term \" %s \"not found in the Global Dictionary/Index - Dropped!" % decomp_term[0])
+                        #print("Term \" %s \"not found in the Global Dictionary/Index - Dropped!" % decomp_term[0])
+                        pass
             vect_l.append( vect_dict )
             #If a limited number of HTML page vector is needed then stop loading when this number is reached 
             if len(vect_l) == page_num:

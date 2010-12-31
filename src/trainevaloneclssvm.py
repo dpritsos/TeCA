@@ -12,7 +12,7 @@ print 'IMPORTED VectorHANDLING'
 class SVMTE(object): 
     
     @staticmethod
-    def train_svm(self, fobj, training_vectors, nu, class_tags=None):
+    def train_svm(fobj, training_vectors, nu, class_tags=None):
         if class_tags == None:
             class_tags = [0]*len(training_vectors)
         print(len(class_tags))
@@ -26,7 +26,7 @@ class SVMTE(object):
         return class_tags, svm_m
     
     @staticmethod
-    def evaluate_svm(self, fobj, svm_m, vectl_genre, trained_genre, genres):
+    def evaluate_svm(fobj, svm_m, vectl_genre, trained_genre, genres):
         c1 = decimal.Decimal('0')
         c2 = decimal.Decimal('0')
         tp = decimal.Decimal('0') 
@@ -147,9 +147,7 @@ class TermVectorFormat(object):
         return global_vect_l
 
     @staticmethod
-    def glob_vect_l(genres, gterm_index, pg_num=None, wpsl_genre={}, vectl_genre={}, lower_case=False):
-        vectors_d = "/corpus_webpage_vectors/"
-        base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/"
+    def glob_vect_l(base_filepath, vectors_d, genres, gterm_index, pg_num=None, wpsl_genre={}, vectl_genre={}, lower_case=False):
         if pg_num == None:
             pg_num = 0
         for g in genres:
