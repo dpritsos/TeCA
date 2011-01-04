@@ -25,7 +25,7 @@ class SVMExperiments(object):
                 cdicts_flist = cdicts_flist[0]
                 corpus_dict = merge_to_global_dict(cdicts_flist, filepath, force_lower_case=lower_case)
                 print("%s Dictionary has been loaded" % g )
-                corpus_dict = keep_most_terms(corpus_dict, 1000)
+                corpus_dict = keep_most_terms(corpus_dict, 250)
                 gterm_index = merge_global_dicts( corpus_dict )
                 base_filepath = base
                 break
@@ -63,7 +63,7 @@ class SVMExperiments(object):
                 for grn in genres:
                     vectl_genre[ grn ] = self.vform.tf2tfnorm(vectl_genre[ grn ], div_by_max=True)
             elif i == 4:
-                fobj.write("**** Normilised by Total Sum ****\n")
+                fobj.write("**** Normalised by Total Sum ****\n")
                 for grn in genres:
                     vectl_genre[ grn ] = self.vform.tf2tfnorm(vectl_genre[ grn ], div_by_max=False)             
             #########Invert TF
