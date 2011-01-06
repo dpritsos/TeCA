@@ -1,13 +1,23 @@
 """
 """
 import re
+import os
+import codecs
 import lxml.etree 
 import lxml.html
-import codecs
 from lxml.html.clean import Cleaner
-import time
 import unicodedata
-    
+import vectorhandlingtools as vht
+import sys
+sys.path.append('../../synergeticprocessing/src')
+import synergeticpool as sp_mod
+import multiprocessing
+
+#Define a local Synergetic Pool with One process for each available CPU
+cpu_num = multiprocessing.cpu_count()
+#spool = sp_mod.SynergeticPool( local_workers=cpu_num, syn_listener_port=51000 )
+
+
 class VectGen(object): 
 
     def __init__(self):
@@ -35,30 +45,113 @@ class VectGen(object):
         ##Symbol term decomposer 
         self.fredsb_clean = re.compile(r'^[^\w]+|[^\w%]+$', re.U) #front-end-symbol-cleaning => fredsb_clean
         ##Find proper number
-        self.proper_num = re.compile(r'(^[0-9]+$)|(^[0-9]+[,][0-9]+$)|(^[0-9]+[.][0-9]+$)|(^[0-9]{1,3}(?:[.][0-9]{3})+[,][0-9]+$)|(^[0-9]{1,3}(?:[,][0-9]{3})+[.][0-9]+$)') 
+        self.proper_num = re.compile(r'(^[0-9]+$)|(^[0-9]+[,][0-9]+$)|(^[0-9]+[.][0-9]+$)|(^[0-9]{1,3}(?:[.][0-9]{3})+[,][0-9]+$)|(^[0-9]{1,3}(?:[,][0-9]{3})+[.][0-9]+$)')
         
-    def gen_ngram_vect(self, xhtml_d, ngram_size=3):
+    def ngrams_vects_from_path(self, genre, base_filepath, ng_size=3, multiproc=True):
+        #spool = sp_mod.SynergeticPool( local_workers=cpu_num, syn_listener_port=51000 )
+        for base in base_filepath:
+            filepath = base + genre  
+            xhtmlfiles_l = [files for path, dirs, files in os.walk(filepath)]
+            if xhtmlfiles_l:
+                xhtmlfiles_l = xhtmlfiles_l[0]
+                break
+        f_ng_sets = [ ( (filepath + "/"  + file), ng_size ) for file in xhtmlfiles_l ] 
+        if multiproc:
+            print "SPOOL MAP"
+            #vect_ll = spool.map(self.gen_ngram_vect, f_ng_sets)
+        else:
+            print "MAP MAP"
+            print filepath
+            vect_ll = map(self.gen_ngram_vect, f_ng_sets)
+        ###
+        for vect_l in vect_ll:
+            if vect_l == [None, None, None]:
+                vect_ll.remove(vect_l)
+        ###
+        webpg_l = [ i for i, j in vect_ll] 
+        ngram_vect_l = [ j for i, j in vect_ll]
+        ###
+        idx_l = list()
+        for i, wp_vect in enumerate(ngram_vect_l):
+            if not wp_vect:
+                idx_l.append( i )
+        c = -1
+        for i in idx_l:
+            c += 1
+            del ngram_vect_l[ (i - c) ]
+            del webpg_l[ (i - c) ]
+        ### 
+        print(len(webpg_l), len(ngram_vect_l))
+        ###
+        global_ngram_dict = vht.gterm_d_gen(ngram_vect_l)
+        ###
+        #spool.join_all() 
+        ### 
+        return (genre, global_ngram_dict, webpg_l, ngram_vect_l)
+    
+    def term_vects_from_path(self, genre, base_filepath, multiproc=True):
+        for base in base_filepath:
+            filepath = base + genre  
+            xhtmlfiles_l = [files for path, dirs, files in os.walk(filepath)]
+            if xhtmlfiles_l:
+                xhtmlfiles_l = xhtmlfiles_l[0] 
+        if multiproc:
+            pass
+            #vect_ll = spool.map(self.gen_term_vect, xhtmlfiles_l, cpu_num)
+        else:
+            vect_ll = map(self.gen_term_vect, xhtmlfiles_l, cpu_num)
+        ###
+        for vect_l in vect_ll:
+            if vect_l == [None, None]:
+                vect_ll.remove(vect_l)
+        ###
+        webpg_l = [ i for i, j, k in vect_ll] 
+        webpg_vect_l = [ k for i, j, k in vect_ll]
+        ###
+        idx_l = list()
+        for i, wp_vect in enumerate(webpg_vect_l):
+            if not wp_vect:
+                idx_l.append( i )
+        c = -1
+        for i in idx_l:
+            c += 1
+            del webpg_vect_l[ (i - c) ]
+            del webpg_l[ (i - c) ]
+        ### 
+        print(len(webpg_l), len(webpg_vect_l))
+        ###
+        global_term_dict = vht.gterm_d_gen(webpg_vect_l)
+        ###
+        #spool.join_all()
+        ### 
+        return (genre, global_term_dict, webpg_l, webpg_vect_l)    
+    
+    def gen_ngram_vect(self, args):
+        xhtml, ngram_size = args
         ##Export Ngrams => 3Grams
         reg_ng_size = r'.{' + str(ngram_size) + '}'
         self.ngrams = re.compile( reg_ng_size )
-        xhtml_t = lxml.html.parse( open(xhtml_d['filepath'] + xhtml_d['filename'], "r") )
-        print "etree"
+        print xhtml
+        xhtml_t = lxml.html.parse( codecs.open(xhtml, 'r', 'utf8', 'ignore') ) 
         if xhtml_t.getroot() == None:
             print "NONE"
-            return [None, None, None]
+            return [None, None]
         #print xhtml_t
         #xcharset = xhtml_d['charset']
         #if not xcharset:
-        xcharset = "utf8"
+        #xcharset = "utf8"
         #Get the Text of the XHTML in a list of document lines
         try: 
-            xhtml_text_l = self.extract_txt(xhtml_t)
+            xhtml_text_l = xhtml_t.xpath("/html/body//text()") #self.extract_txt(xhtml_t)  
         except:
             print "None"
-            return [None, None, None]
+            return [None, None]
         #Normalise Unicode String for consistency in text attributes extraction among all corpus' web pages 
         for i in range(len(xhtml_text_l)):
-            xhtml_text_l[i] = unicodedata.normalize('NFKC', xhtml_text_l[i].decode()) 
+            try:
+                xhtml_text_l[i] = unicodedata.normalize('NFKC', xhtml_text_l[i].decode())
+            except:
+                xhtml_text_l[i] = unicodedata.normalize('NFKC', xhtml_text_l[i])
         #Create the Ngramms Frequency Vectors
         xhtml_NgF = dict()
         #Define the term list that will be used for putting the Terms before we start counting them
@@ -75,16 +168,15 @@ class VectGen(object):
                         xhtml_NgF[tri_g] += 1
                     elif tri_g: #None empty strings are accepted 
                         xhtml_NgF[tri_g] = 1
-        del xhtml_d ### I DONT THINK THAT THIS IS THE SOLUTION FOR PREVENTING MEMORY LEAKAGE
-        return [ xhtml_d['filename'], xhtml_NgF ]
+        del xhtml_t ### I DONT THINK THAT THIS IS THE SOLUTION FOR PREVENTING MEMORY LEAKAGE
+        return [ xhtml.split('/')[-1], xhtml_NgF ]
         
-    def gen_term_vect(self, xhtml_d):
-        #From here it starts the analysis of the page
-        xhtml_t = lxml.html.parse( open(xhtml_d['filepath'] + xhtml_d['filename'], "r") )
+    def gen_term_vect(self, xhtml):
+        xhtml_t = lxml.html.parse( open(xhtml, "r") ) 
         print "etree"
         if xhtml_t.getroot() == None:
             print "NONE"
-            return [None, None, None]
+            return [None, None]
         #print xhtml_t
         #xcharset = xhtml_d['charset']
         #if not xcharset:
@@ -94,7 +186,7 @@ class VectGen(object):
             xhtml_text_l = self.extract_txt(xhtml_t)
         except:
             print "None"
-            return [None, None, None]
+            return [None, None]
         #Normalise Unicode String for consistency in text attributes extraction among all corpus' web pages 
         for i in range(len(xhtml_text_l)):
             xhtml_text_l[i] = unicodedata.normalize('NFKC', xhtml_text_l[i].decode()) 
@@ -124,7 +216,7 @@ class VectGen(object):
         #self.webpg_l.append( xhtml_d['filename'] )
         print "etree : Filters Done!"
         del xhtml_t ### I DONT THINK THAT THIS IS THE SOLUTION FOR PREVENTING MEMORY LEAKAGE
-        return [ xhtml_d['filename'], xhtml_TF] 
+        return [ xhtml.split('/')[-1], xhtml_TF] 
     
     def get_proper_numbers(self, terms_l, xhtml_TF):
         num_free_tl = list()

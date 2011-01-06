@@ -69,7 +69,7 @@ def load_resaults(filepath, filename):
     #Return the TF Vector    
     return (titles, vformat_d)
 
-def plot_resaults(titles, vformat_d, figure_num): #
+def plot_resaults(titles, vformat_d, figure_num):
     color = ['r', 'g', 'b', 'y', 'm']
     ylbl = ['F1', 'Prec', 'Recall']
     plt.figure( figure_num )

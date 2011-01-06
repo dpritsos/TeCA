@@ -25,7 +25,7 @@ class SVMExperiments(object):
                 cdicts_flist = cdicts_flist[0]
                 corpus_dict = merge_to_global_dict(cdicts_flist, filepath, force_lower_case=lower_case)
                 print("%s Dictionary has been loaded" % g )
-                corpus_dict = keep_most_terms(corpus_dict, 250)
+                corpus_dict = keep_most_terms(corpus_dict, 50)
                 gterm_index = merge_global_dicts( corpus_dict )
                 base_filepath = base
                 break
@@ -45,7 +45,7 @@ class SVMExperiments(object):
         fobj.write("---- for Genre= " + g + " ----\n")
         for i in [1,2,3]:
             ######
-            TFREQ = 5
+            TFREQ = 2
             lower_case = True
             #########Keep TF above Threshold
             #global_vect_l = tf_abv_thrld(global_vect_l, tf_threshold=TFREQ)
