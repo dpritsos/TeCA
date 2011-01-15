@@ -146,25 +146,4 @@ class TermVectorFormat(object):
                     line[key] = 0
         return global_vect_l
 
-    @staticmethod
-    def glob_vect_l(base_filepath, vectors_d, genres, gterm_index, pg_num=None, wpsl_genre={}, vectl_genre={}, lower_case=False):
-        if pg_num == None:
-            pg_num = 0
-        for g in genres:
-            filepath = base_filepath + g + vectors_d
-            vect_flist = [files for path, dirs, files in os.walk(filepath)]
-            vect_flist = vect_flist[0] 
-            global_wps_l = list()
-            global_vect_l = list()
-            for filename in vect_flist:
-                wps_l, vect_l = load_dict_l(filepath, filename, gterm_index, force_lower_case=lower_case, page_num=pg_num)
-                global_wps_l.extend( wps_l )
-                global_vect_l.extend( vect_l )
-                print("%s global_vect_l len: %s" % (g, len(global_vect_l)))
-            #CLEAN VECTOR LIST
-            for i, line in enumerate(global_vect_l):
-                if line < 50:
-                    del global_vect_l[i]
-                    del global_wps_l[i]
-            wpsl_genre[ g ] = global_wps_l
-            vectl_genre[ g ] = global_vect_l
+    

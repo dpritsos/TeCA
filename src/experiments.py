@@ -25,12 +25,12 @@ class SVMExperiments(object):
                 cdicts_flist = cdicts_flist[0]
                 corpus_dict = merge_to_global_dict(cdicts_flist, filepath, force_lower_case=lower_case)
                 print("%s Dictionary has been loaded" % g )
-                corpus_dict = keep_most_terms(corpus_dict, 50)
+                corpus_dict = keep_most_terms(corpus_dict, 5000)
                 gterm_index = merge_global_dicts( corpus_dict )
                 base_filepath = base
                 break
         print 'gterms len = ', len(gterm_index)
-        
+    
         wpsl_genre = dict() 
         vectl_genre = dict()
         self.vform.glob_vect_l(base_filepath, vectors_d, [ g ] , gterm_index, None, wpsl_genre, vectl_genre, True)

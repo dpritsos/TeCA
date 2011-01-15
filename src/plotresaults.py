@@ -95,6 +95,7 @@ if __name__ == '__main__':
     plot_l = list()
     for z, file in enumerate(flist):
         titles, vformat_d = load_resaults(base_filepath, file)
+        print vformat_d
         plt = plot_resaults(titles, vformat_d, z)
         plot_l.append( plt )
     for plt in plot_l:

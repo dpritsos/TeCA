@@ -12,6 +12,7 @@ import sys
 sys.path.append('../../synergeticprocessing/src')
 import synergeticpool as sp_mod
 import multiprocessing
+#import xml.etree.ElementTree as bxml
 
 #Define a local Synergetic Pool with One process for each available CPU
 cpu_num = multiprocessing.cpu_count()
@@ -46,6 +47,19 @@ class VectGen(object):
         self.fredsb_clean = re.compile(r'^[^\w]+|[^\w%]+$', re.U) #front-end-symbol-cleaning => fredsb_clean
         ##Find proper number
         self.proper_num = re.compile(r'(^[0-9]+$)|(^[0-9]+[,][0-9]+$)|(^[0-9]+[.][0-9]+$)|(^[0-9]{1,3}(?:[.][0-9]{3})+[,][0-9]+$)|(^[0-9]{1,3}(?:[,][0-9]{3})+[.][0-9]+$)')
+        
+    def ngrams_vects_from_file(self, args):#file, genre, base_filepath, ng_size=3):
+        file, genre, base_filepath, ng_size = args
+        for base in base_filepath:
+            filepath = base + genre  
+            xhtmlfiles_l = [files for path, dirs, files in os.walk(filepath)]
+            if xhtmlfiles_l:
+                break
+        file_ng = ( (filepath + "/"  + file), ng_size )  
+        webpg, ngram_vect = self.gen_ngram_vect_re( file_ng )           
+        ### 
+        print' Returning ', genre, webpg
+        return (genre, webpg, ngram_vect)
         
     def ngrams_vects_from_path(self, genre, base_filepath, ng_size=3, multiproc=True):
         #spool = sp_mod.SynergeticPool( local_workers=cpu_num, syn_listener_port=51000 )
@@ -126,6 +140,63 @@ class VectGen(object):
         ### 
         return (genre, global_term_dict, webpg_l, webpg_vect_l)    
     
+    def gen_ngram_vect_re(self, args):
+        xhtml, ngram_size = args
+        print xhtml
+        ##Export Ngrams => 3Grams
+        reg_ng_size = r'.{' + str(ngram_size) + '}'
+        ngrams = re.compile( reg_ng_size )
+        html_tags = re.compile(r'<[^>]+>')
+        html_scripts = re.compile(r'<script[^>]*>[\S\s]*</script>')
+        proper_html = re.compile(r'<html[^>]*>[\S\s]+</html>')
+        try:
+            fcod = codecs.open(xhtml, 'r', 'utf8', 'ignore')
+        except Exception as e:
+            print("faild to load %s: %s", (xhtml, e))
+        else:
+            try:    
+                xhtml_text = fcod.read()
+            except Exception as e:
+                print("faild to read %s: %s", (xhtml, e))
+            finally:
+                fcod.close()
+        #Check if it is a proper (X)HTML file
+        properhtml = proper_html.findall( xhtml_text )
+        if not properhtml:
+            return [None, None]
+        else:
+            xhtml_text = properhtml[0]
+        #Clean-up Scripts
+        xhtml_text_l = html_scripts.split( xhtml_text )
+        xt = list()
+        for html_chk in xhtml_text_l:
+            xt.extend( html_tags.split(html_chk) )
+        xhtml_text_l = xt
+        #Normalise Unicode String for consistency in text attributes extraction among all corpus' web pages 
+        for i in range(len(xhtml_text_l)):
+            try:
+                xhtml_text_l[i] = unicodedata.normalize('NFKC', xhtml_text_l[i].decode())
+            except:
+                xhtml_text_l[i] = unicodedata.normalize('NFKC', xhtml_text_l[i])
+        #Create the Ngramms Frequency Vectors
+        xhtml_NgF = dict()
+        #Define the term list that will be used for putting the Terms before we start counting them
+        terms_l = list()
+        for text_line in xhtml_text_l:
+            #Initially split the text to terms separated by whitespaces [ \t\n\r\f\v] 
+            terms_l.append( text_line ) #self.white_spliter.split(text_line) )
+        #Find and Count NGrams
+        for term in terms_l:
+            for i in range(len(term)):
+                Ngrms_l = ngrams.findall(term[i:])
+                for tri_g in Ngrms_l:
+                    if tri_g in xhtml_NgF: #if the dictionary of terms has the 'terms' as a key 
+                        xhtml_NgF[tri_g] += 1
+                    elif tri_g: #None empty strings are accepted 
+                        xhtml_NgF[tri_g] = 1
+        print "returning ", xhtml 
+        return [ xhtml.split('/')[-1], xhtml_NgF ]
+    
     def gen_ngram_vect(self, args):
         xhtml, ngram_size = args
         ##Export Ngrams => 3Grams
@@ -169,6 +240,7 @@ class VectGen(object):
                     elif tri_g: #None empty strings are accepted 
                         xhtml_NgF[tri_g] = 1
         del xhtml_t ### I DONT THINK THAT THIS IS THE SOLUTION FOR PREVENTING MEMORY LEAKAGE
+        print "returning ", xhtml 
         return [ xhtml.split('/')[-1], xhtml_NgF ]
         
     def gen_term_vect(self, xhtml):
