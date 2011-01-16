@@ -7,93 +7,8 @@ import codecs
 import os
 #from scgenrelerner_svmbased import *
 
-class VHTools(object):
 
-    @staticmethod
-    def keep_most_terms(terms_d, terms_amout):
-        """ keep_most_terms(): is getting a dictionary of Terms-Frequencies and 
-            the amount of Terms to return as arguments. It is returning the number
-            of Terms equal to the argument 'terms_amount' with the Highest Frequency. """
-        terms_l = [(v, k) for (k, v) in terms_d.iteritems()]
-        terms_l.sort()
-        terms_l.reverse()
-        most_terms_l = terms_l[0: terms_amout]
-        terms_d = dict( [ (k, v) for (v, k) in most_terms_l ] )
-        return terms_d    
-        
-    @staticmethod
-    def merge_tf_dicts(*terms_d):
-        """ mege_dicts(): is getting a set of term-frequency dictionaries as list of
-            arguments and return a dictionary of common terms with their sum of frequencies
-            of occurred in all dictionaries containing these terms. """
-        tf_d = dict()
-        tf_l = list()
-        for tr_dict in terms_d:
-            tf_l.extend( tr_dict.items() )    
-        for i in range(len(tf_l)):
-            if tf_l[i][0] in tf_d: 
-                tf_d[ tf_l[i][0] ] += tf_l[i][1]
-            else:
-                tf_d[ tf_l[i][0] ] = tf_l[i][1]
-        return tf_d
-    
-    @staticmethod
-    def tf_dict_idxing(term_d):
-        """ tf_dict_idxing(): is getting a Term-Frequency dictionary and returns one
-            with terms-index number. The index number is just their position in the
-            descending order sorted list of dictionary keys. """
-        term_l = term_d.keys()
-        term_l.sort()
-        idx = range( len(term_l) + 1 )
-        term_idx_d = dict( zip( term_l , idx[1:] ) )
-        return term_idx_d
-    
-    @staticmethod
-    def gener_tf_d(webpg_vect_l):
-        """ gener_tf_d(): is getting a list of Term-Frequency Dictionaries and creates a 
-            TF Dictionary of all terms occurred in the list. """
-        return VHTools.merge_tf_dicts( *webpg_vect_l )
-    
-    @staticmethod
-    def load_dict(filepath, filename, force_lower_case=False):
-        try:
-            f = codecs.open( filepath + str(filename), 'r', 'utf-8', 'strict')
-        except IOError as e:
-            print("FILE %s ERROR: %s" % (filename,e))
-            return None
-        #The following for loop is an alternative approach to reading lines instead of using f.readline() or f.readlines()
-        vect_dict = dict()
-        try:
-            for fileline in f:
-                line = fileline.replace('\n', '')
-                line = line.split(" => ") #BE CAREFULL with SPACES
-                if force_lower_case: 
-                    vect_dict[ line[0].lower() ] = float( line[1] )
-                else:
-                    vect_dict[ line[0] ] = float( line[1] )
-        except:
-            f.close()
-            return None
-        f.close()
-        #Return the TF Vector    
-        return vect_dict  
-
-    @staticmethod
-    def merge_to_global_dict(filelist, filepath=None, force_lower_case=False):
-        if not isinstance(filelist, (list, tuple)) :
-            return False
-        gpool = eventlet.GreenPool(10)
-        filepaths= map( lambda x: filepath, range(len(filelist)) )
-        force_lower= map( lambda x: force_lower_case, range(len(filelist)) )
-        #Start Merging the Dictionaries - or Vector of Term Frequencies
-        global_vect = VHTools.load_dict(filepath, filelist[0], force_lower_case)
-        for vect_d in gpool.imap(VHTools.load_dict, filepaths, filelist[1:], force_lower):
-            for d_trm in vect_d:
-                if d_trm in global_vect: 
-                    global_vect[d_trm] += vect_d[d_trm] 
-                else:
-                    global_vect[d_trm] = vect_d[d_trm]
-        return global_vect
+class Depri(object):
     
     @staticmethod
     def load_dict_l_Depricated(filepath, filename, g_terms_d=None, force_lower_case=False, page_num=0):
@@ -145,10 +60,126 @@ class VHTools(object):
         #Return tuple of WebPages Vectors and     
         return (wps_l, vect_l)
 
+
+
+class VHTools(object):
+    
     @staticmethod
-    def load_dict_l(filepath, filename, force_lower_case=False): #, g_terms_d=None, force_lower_case=False, page_num=0):
+    def __exec_on_files_frmpaths(func, basepath, filepath_l, force_lower_case=False):
+        """ """
+        if isinstance(filepath_l, str):
+            flist = [ files_n_paths[2] for files_n_paths in os.walk(filepath_l) ]
+            flist = flist[0]
+            fname_lst = [ str(basepath) + filepath_l + fname for fname in flist ]
+        elif isinstance(filepath_l, list):
+            fname_lst = list()
+            for filepath in filepath_l:
+                flist = [ files_n_paths[2] for files_n_paths in os.walk(filepath) ]
+                flist = flist[0]
+                fname_lst.extend( [ str(basepath) + filepath + fname for fname in flist ] )
+        else:
+            raise Exception("A String or a list of Strings was Expected as input - Stings should be file-paths")
+        return func(fname_lst, force_lower_case)
+    
+    @staticmethod
+    def keep_most_terms(terms_d, terms_amout):
+        """ keep_most_terms(): is getting a dictionary of Terms-Frequencies and 
+            the amount of Terms to return as arguments. It is returning the number
+            of Terms equal to the argument 'terms_amount' with the Highest Frequency. """
+        terms_l = [(v, k) for (k, v) in terms_d.iteritems()]
+        terms_l.sort()
+        terms_l.reverse()
+        most_terms_l = terms_l[0: terms_amout]
+        terms_d = dict( [ (k, v) for (v, k) in most_terms_l ] )
+        return terms_d    
+        
+    @staticmethod
+    def merge_tf_dicts(*terms_d):
+        """ mege_dicts(): is getting a set of term-frequency dictionaries as list of
+            arguments and return a dictionary of common terms with their sum of frequencies
+            of occurred in all dictionaries containing these terms. """
+        tf_d = dict()
+        tf_l = list()
+        for tr_dict in terms_d:
+            tf_l.extend( tr_dict.items() )    
+        for i in range(len(tf_l)):
+            if tf_l[i][0] in tf_d: 
+                tf_d[ tf_l[i][0] ] += tf_l[i][1]
+            else:
+                tf_d[ tf_l[i][0] ] = tf_l[i][1]
+        return tf_d
+    
+    @staticmethod
+    def tf_dict_idxing(term_d):
+        """ tf_dict_idxing(): is getting a Term-Frequency dictionary and returns one
+            with terms-index number. The index number is just their position in the
+            descending order sorted list of dictionary keys. """
+        term_l = term_d.keys()
+        term_l.sort()
+        idx = range( len(term_l) + 1 )
+        term_idx_d = dict( zip( term_l , idx[1:] ) )
+        return term_idx_d
+    
+    @staticmethod
+    def gener_tf_d(tf_d_l):
+        """ gener_tf_d(): is getting a list of Term-Frequency Dictionaries and creates a 
+            TF Dictionary of all terms occurred in the list. """
+        return VHTools.merge_tf_dicts( *tf_d_l )
+    
+    @staticmethod
+    def __load_tf_dict(filename, force_lower_case=False):
+        """ __load_tf_dict(): do not use this function prefer the VHTools.load_tf_dict(). 
+            This function is getting a filename and a lower case force option and returns a 
+            Term-Frequency dictionary loaded from the file given as argument. """
         try:
-            f = codecs.open( filepath + str(filename), "r", "utf-8")
+            f = codecs.open( filename, 'r', 'utf-8', 'strict')
+        except IOError as e:
+            print("VHTools.load_dict() FILE %s ERROR: %s" % (filename,e))
+            return None
+        #The following for loop is an alternative approach to reading lines instead of using f.readline() or f.readlines()
+        tf_d = dict()
+        try:
+            for fileline in f:
+                line = fileline.replace('\n', '')
+                Term, Freq = tuple( line.split(" => ") ) #BE CAREFULL with SPACES
+                if force_lower_case: 
+                    tf_d[ Term.lower() ] = float( Freq )
+                else:
+                    tf_d[ Term ] = float( Freq )
+        except Exception as e:
+            print("VHTools.load_dict() Error: %s" % e)
+            return None
+        finally:
+            f.close()    
+        return tf_d  
+    
+    @staticmethod
+    def load_tf_dict(filename_l, force_lower_case=False):
+        """ """
+        if isinstance(filename_l, str):
+            return VHTools.__load_tf_dict(filename_l, force_lower_case)
+        elif isinstance(filename_l, list):
+            mrgd_tf_d = dict()
+            for filename in filename_l:
+                tf_d = VHTools.__load_tf_dict(filename, force_lower_case)
+                for Term, Freq in tf_d.items():
+                    if Term in mrgd_tf_d: 
+                        mrgd_tf_d[ Term ] += Freq 
+                    else:
+                        mrgd_tf_d[ Term ] = Freq
+            return mrgd_tf_d
+        else:
+            raise Exception("A String or a list of Strings was Expected as input")
+    
+    @staticmethod
+    def load_tfd_frmpaths(basepath, filepath_l, force_lower_case=False):
+        """ """
+        return VHTools.__exec_on_files_frmpaths( VHTools.load_tf_dict, basepath, filepath_l, force_lower_case=False )
+
+    @staticmethod
+    def __load_tf_dict_l(filename, force_lower_case=False): #, g_terms_d=None, force_lower_case=False, page_num=0):
+        try:
+            f = codecs.open( str(filename), "r", "utf-8")
         except IOError, e:
             print("VHTools.load_dict_l() FILE %s ERROR: %s" % (filename,e))
             return None
@@ -159,7 +190,7 @@ class VHTools(object):
             for fileline in f:
                 wp_name, wp_tf_d = tuple( fileline.split(" => ") ) #BE CAREFULL with SPACES
                 wps_l.append( wp_name )
-                composed_terms = wp_tf_d.split('\t\t')
+                composed_terms = wp_tf_d.split('\t')
                 composed_terms.replace('\n', '')
                 vect_dict = dict()  
                 for comp_term in composed_terms:
@@ -177,38 +208,61 @@ class VHTools(object):
             f.close()
         #Return tuple of WebPages Vectors and     
         return (wps_l, vect_l)
-
+    
     @staticmethod
-    def __tf2idxf(webpg_vect, tf_idx_d):
+    def load_tf_dict_l(filename_l, force_lower_case=False):
+        """ """
+        if isinstance(filename_l, str):
+            return VHTools.__load_dict_l(filename_l, force_lower_case)
+        elif isinstance(filename_l, list):
+            mrgd_wps_l = list()
+            mrgd_vect_l = list()
+            for filename in filename_l:
+                wps_l, vect_l = VHTools.__load_dict_l(filename, force_lower_case)
+                mrgd_wps_l.extend( wps_l )
+                mrgd_vect_l.extend( vect_l )
+            return (mrgd_wps_l, mrgd_vect_l)
+        else:
+            raise Exception("A String or a list of Strings was Expected as input")
+        
+    @staticmethod
+    def load_tfd_l_frmpaths(basepath, filepath_l, force_lower_case=False):
+        """ """
+        return VHTools.__exec_on_files_frmpaths( VHTools.load_tf_dict_l, basepath, filepath_l, force_lower_case=False )
+            
+    @staticmethod
+    def __tf2idxf(tf_d, tf_idx_d):
         """ __tf2idxf(): Don't use it directly, use tf2idxf instead.
             This function is getting a TF dictionary representing the TF Vector,
             and a TF-Index as defined in VHTools.tf_dict_idxing(). It returns
             a Index-Frequency dictionary where each term of the TF dictionary has been 
             replaced with the Index number of the TF-Index. """
-        idxed_webpg_vect = dict() 
-        for term, freq in webpg_vect.items():
-            idxed_webpg_vect[ tf_idx_d[term] ] = freq
-        return idxed_webpg_vect
+        idxed_d = dict() 
+        for term, freq in tf_d.items():
+            idxed_d[ tf_idx_d[term] ] = freq
+        return idxed_d
     
     @staticmethod
-    def tf2idxf(webpg_vect_l, tf_idx_d):
+    def tf2idxf(tf_d_l, tf_idx_d):
         """ tf2idxf(): is getting a TF-Dictionary or a list of TF-Dictionaries and TF-Index. It applys
             the VHTools.__tf2idxf() function to the dictionaries and returns a list or single TF-Dictioary
             depending on the input. """
-        if isinstance(webpg_vect_l, list):
-            idxed_webpg_vect = list()
-            for webpage in webpg_vect_l:
-                idxed_webpg_vect.append( VHTools.__tf2idxf(webpage, tf_idx_d) )
-            return idxed_webpg_vect
-        elif isinstance(webpg_vect_l, dict):
-            return VHTools.__tf2idxf(webpg_vect_l, tf_idx_d)
+        if isinstance(tf_d_l, list):
+            idxed_d = list()
+            for tf_d in tf_d_l:
+                idxed_d.append( VHTools.__tf2idxf(tf_d, tf_idx_d) )
+            return idxed_d
+        elif isinstance(tf_d_l, dict):
+            return VHTools.__tf2idxf(tf_d_l, tf_idx_d)
+        else:
+            raise Exception("Dictionary or a List of Dictionaries was expected as fist input argument")
 
     @staticmethod
-    def save_dct(filename, records, filepath=None):
+    def save_tf_dct(filename, records, filepath=None):
         """save_dct():"""
         try:
             #Codecs needed for saving string that are encoded in UTF8, but I do not need it because strings are already the Proper Encoding form
-            f = codecs.open( filepath + filename, "w", "utf-8") #change "utf-8" to xcharset
+            f = codecs.open( filename, "w", "utf-8") #change "utf-8" to xcharset
         except IOError:
             return None 
         try: 
@@ -221,7 +275,7 @@ class VHTools(object):
         return True           
 
     @staticmethod
-    def save_dct_lst(filename, records, index, filepath=None):
+    def save_tf_dct_lst(filename, records, index, filepath=None):
         try:
             #Codecs needed for saving string that are encoded in UTF8, but I do not need it because strings are already the Proper Encoding form
             print "SAVING, ", filepath + filename
@@ -269,8 +323,50 @@ class VHTools(object):
                 if len( wpsl_genre[ g ] ) > pg_num:
                     wpsl_genre[ g ] = wpsl_genre[ g ][0:pg_num]
                     vectl_genre[ g ] = vectl_genre[ g ][0:pg_num]
+ 
     
-
+    
+class GreenVHTools(VHTools):
+    """ GreenVHTools Class is a GreenLet/Eventlet version of VHTools Class.
+        Actually it just overrides the load_tf_dict() and load_tf_dict_l() with an Eventlet-Based
+        version of them """
+        
+    @staticmethod
+    def load_tf_dict(filename_l, force_lower_case=False):
+        """ """
+        if isinstance(filename_l, str):
+            return VHTools.__load_dict_l(filename_l, force_lower_case)
+        elif isinstance(filename_l, list):
+            mrgd_wps_l = list()
+            mrgd_vect_l = list()
+            gpool = eventlet.GreenPool(1000)
+            force_lower= map( lambda x: force_lower_case, range(len(filename_l)) )
+            for wps_l, vect_l in gpool.imap(GreenVHTools.__load_dict_l, filename_l, force_lower):
+                mrgd_wps_l.extend( wps_l )
+                mrgd_vect_l.extend( vect_l )
+            return (mrgd_wps_l, mrgd_vect_l)
+        else:
+            raise Exception("A String or a list of Strings was Expected as input")
+    
+    @staticmethod
+    def load_tf_dict_l(filename_l, force_lower_case=False):
+        if isinstance(filename_l, str):
+            return GreenVHTools.__load_tf_dict(filename_l, force_lower_case)
+        elif isinstance(filename_l, list):
+            gpool = eventlet.GreenPool(1000)
+            force_lower= map( lambda x: force_lower_case, range(len(filename_l)) )
+            mrgd_tf_d = GreenVHTools.__load_tf_dict(filename_l[0], force_lower)
+            for tf_d in gpool.imap(GreenVHTools.__load_tf_dict, filename_l[1:], force_lower):
+                for Term, Freq in tf_d.items():
+                    if Term in mrgd_tf_d: 
+                        mrgd_tf_d[ Term ] += Freq 
+                    else:
+                        mrgd_tf_d[ Term ] = Freq
+            return mrgd_tf_d
+        else:
+            raise Exception("A String or a list of Strings was Expected as input")
+    
+    
 #Unit Test
 if __name__ == "__main__":
     
