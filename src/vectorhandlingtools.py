@@ -8,7 +8,7 @@ import os
 #from scgenrelerner_svmbased import *
 
 
-class Depri(object):
+class Depricated_Functions(object):
     
     @staticmethod
     def load_dict_l_Depricated(filepath, filename, g_terms_d=None, force_lower_case=False, page_num=0):
@@ -60,13 +60,46 @@ class Depri(object):
         #Return tuple of WebPages Vectors and     
         return (wps_l, vect_l)
 
+    @staticmethod
+    def glob_vect_l(base_filepath, vectors_d, genres, gterm_index, pg_num=None, wpsl_genre={}, vectl_genre={}, lower_case=False):
+        if pg_num == None:
+            pg_num = 0
+        for g in genres:
+            filepath = base_filepath + g + vectors_d
+            vect_flist = [files for path, dirs, files in os.walk(filepath)]
+            vect_flist = vect_flist[0] 
+            global_wps_l = list()
+            global_vect_l = list()
+            for filename in vect_flist:
+                resault = VHTools.load_dict_l(filepath, filename, gterm_index, force_lower_case=lower_case, page_num=pg_num)
+                if resault:
+                    wps_l, vect_l = resault
+                    global_wps_l.extend( wps_l )
+                    global_vect_l.extend( vect_l )
+                    print("%s global_vect_l len: %s" % (g, len(global_vect_l)))
+            #CLEAN VECTOR LIST
+            for i, line in enumerate(global_vect_l):
+                if 500 and line > 1000:  ###############
+                    del global_vect_l[i]
+                    del global_wps_l[i]
+            wpsl_genre[ g ] = global_wps_l
+            vectl_genre[ g ] = global_vect_l
+            if pg_num:
+                if len( wpsl_genre[ g ] ) > pg_num:
+                    wpsl_genre[ g ] = wpsl_genre[ g ][0:pg_num]
+                    vectl_genre[ g ] = vectl_genre[ g ][0:pg_num]
+
 
 
 class VHTools(object):
     
     @staticmethod
     def __exec_on_files_frmpaths(func, basepath, filepath_l, force_lower_case=False):
-        """ """
+        """ __exec_on_files_frmpaths(): is executing a function given as the first argument to all the
+            files found in the file-paths list given third and second argument. Optionally a fore lower
+            case argument can be given. """
+        if basepath is None:
+            basepath = '' 
         if isinstance(filepath_l, str):
             flist = [ files_n_paths[2] for files_n_paths in os.walk(filepath_l) ]
             flist = flist[0]
@@ -95,7 +128,7 @@ class VHTools(object):
         
     @staticmethod
     def merge_tf_dicts(*terms_d):
-        """ mege_dicts(): is getting a set of term-frequency dictionaries as list of
+        """ mege_tf_dicts(): is getting a set of term-frequency dictionaries as list of
             arguments and return a dictionary of common terms with their sum of frequencies
             of occurred in all dictionaries containing these terms. """
         tf_d = dict()
@@ -110,8 +143,14 @@ class VHTools(object):
         return tf_d
     
     @staticmethod
-    def tf_dict_idxing(term_d):
-        """ tf_dict_idxing(): is getting a Term-Frequency dictionary and returns one
+    def gen_tfd_frmlist(tf_d_l):
+        """ gen_tfd_frmlist(): is getting a list of Term-Frequency Dictionaries and creates a 
+            TF Dictionary of all terms occurred in the list. """
+        return VHTools.merge_tf_dicts( *tf_d_l )
+    
+    @staticmethod
+    def tf2tidx(term_d):
+        """ tf2tidx(): is getting a Term-Frequency dictionary and returns one
             with terms-index number. The index number is just their position in the
             descending order sorted list of dictionary keys. """
         term_l = term_d.keys()
@@ -119,12 +158,6 @@ class VHTools(object):
         idx = range( len(term_l) + 1 )
         term_idx_d = dict( zip( term_l , idx[1:] ) )
         return term_idx_d
-    
-    @staticmethod
-    def gener_tf_d(tf_d_l):
-        """ gener_tf_d(): is getting a list of Term-Frequency Dictionaries and creates a 
-            TF Dictionary of all terms occurred in the list. """
-        return VHTools.merge_tf_dicts( *tf_d_l )
     
     @staticmethod
     def __load_tf_dict(filename, force_lower_case=False):
@@ -141,13 +174,13 @@ class VHTools(object):
         try:
             for fileline in f:
                 line = fileline.replace('\n', '')
-                Term, Freq = tuple( line.split(" => ") ) #BE CAREFULL with SPACES
+                Term, Freq = tuple( line.split(" => ") )
                 if force_lower_case: 
                     tf_d[ Term.lower() ] = float( Freq )
                 else:
                     tf_d[ Term ] = float( Freq )
         except Exception as e:
-            print("VHTools.load_dict() Error: %s" % e)
+            print("VHTools.__load_tf_dict() Error: %s" % e)
             return None
         finally:
             f.close()    
@@ -155,7 +188,9 @@ class VHTools(object):
     
     @staticmethod
     def load_tf_dict(filename_l, force_lower_case=False):
-        """ """
+        """ load_tf_dict(): is getting a filename or a (filename list) and lower case force option
+            as arguments. It returns a Term-Frequency Dictionary which is a merged dictionary of all
+            TF dictionaries given a argument """
         if isinstance(filename_l, str):
             return VHTools.__load_tf_dict(filename_l, force_lower_case)
         elif isinstance(filename_l, list):
@@ -173,11 +208,15 @@ class VHTools(object):
     
     @staticmethod
     def load_tfd_frmpaths(basepath, filepath_l, force_lower_case=False):
-        """ """
+        """ laod_tf_frmpaths: is getting a list of paths as argument and a base path as optional argument. 
+            Returns a merge of all Term-Frequency Dictionaries found in the file paths list. """
         return VHTools.__exec_on_files_frmpaths( VHTools.load_tf_dict, basepath, filepath_l, force_lower_case=False )
 
     @staticmethod
-    def __load_tf_dict_l(filename, force_lower_case=False): #, g_terms_d=None, force_lower_case=False, page_num=0):
+    def __load_tf_dict_l(filename, force_lower_case=False):
+        """ __load_tf_dict_l(): is getting a filename as argument and force lower_case as optional argument.
+            It returns an a list for TF dictionaries and a list of the web-pages where the TF Dictionaries are 
+            related to. """
         try:
             f = codecs.open( str(filename), "r", "utf-8")
         except IOError, e:
@@ -190,11 +229,11 @@ class VHTools(object):
             for fileline in f:
                 wp_name, wp_tf_d = tuple( fileline.split(" => ") ) #BE CAREFULL with SPACES
                 wps_l.append( wp_name )
+                wp_tf_d.replace('\n', '')
                 composed_terms = wp_tf_d.split('\t')
-                composed_terms.replace('\n', '')
                 vect_dict = dict()  
                 for comp_term in composed_terms:
-                    Term, Freq = tuple( comp_term.split(' : ') ) 
+                    Term, Freq = tuple( comp_term.split(' : ') )
                     if force_lower_case:
                         vect_dict[ Term.lower() ] = float( Freq )
                     else:    
@@ -202,23 +241,23 @@ class VHTools(object):
                 vect_l.append( vect_dict )
         except Exception as e:
             f.close()
-            print("VHTools.load_dict_l() Error: %s" % e)
+            print("VHTools.__load_tf_dict_l() Error: %s" % e)
             return None
         finally:
-            f.close()
-        #Return tuple of WebPages Vectors and     
+            f.close()     
         return (wps_l, vect_l)
     
     @staticmethod
     def load_tf_dict_l(filename_l, force_lower_case=False):
-        """ """
+        """ loadtf_dict_l(): is getting a filename or a filename list as first arguments and
+            a lower case force option. """
         if isinstance(filename_l, str):
-            return VHTools.__load_dict_l(filename_l, force_lower_case)
+            return VHTools.__load_tf_dict_l(filename_l, force_lower_case)
         elif isinstance(filename_l, list):
             mrgd_wps_l = list()
             mrgd_vect_l = list()
             for filename in filename_l:
-                wps_l, vect_l = VHTools.__load_dict_l(filename, force_lower_case)
+                wps_l, vect_l = VHTools.__load_tf_dict_l(filename, force_lower_case)
                 mrgd_wps_l.extend( wps_l )
                 mrgd_vect_l.extend( vect_l )
             return (mrgd_wps_l, mrgd_vect_l)
@@ -227,7 +266,9 @@ class VHTools(object):
         
     @staticmethod
     def load_tfd_l_frmpaths(basepath, filepath_l, force_lower_case=False):
-        """ """
+        """ load_tfd_l(): is getting a list of file-paths, a base-path, and a lower case force option
+            as arguments. It returns a list of TF-Dictionaries and a list of the Web-pages related to 
+            the TF-Dictionaries, of all the files found in the file-paths lists."""
         return VHTools.__exec_on_files_frmpaths( VHTools.load_tf_dict_l, basepath, filepath_l, force_lower_case=False )
             
     @staticmethod
@@ -258,11 +299,12 @@ class VHTools(object):
             raise Exception("Dictionary or a List of Dictionaries was expected as fist input argument")
 
     @staticmethod
-    def save_tf_dct(filename, records, filepath=None):
-        """save_dct():"""
+    def save_tf_dct(filename, records):
+        """ save_tf_dct(): is getting a filename string and a TF-Dictionary saves 
+            the dictionary to a file with utf-8 Encoding. """
         try:
-            #Codecs needed for saving string that are encoded in UTF8, but I do not need it because strings are already the Proper Encoding form
-            f = codecs.open( filename, "w", "utf-8") #change "utf-8" to xcharset
+            #Codecs module is needed to assure the proper saving of string in UTF-8 encoding. 
+            f = codecs.open( filename, "w", "utf-8") 
         except IOError:
             return None 
         try: 
@@ -275,11 +317,13 @@ class VHTools(object):
         return True           
 
     @staticmethod
-    def save_tf_dct_lst(filename, records, index, filepath=None):
+    def save_tf_dct_lst(filename, records, index):
+        """ save_tf_dct_lst(): is getting a filename string a list of TF-Dictionaries and a List of Web-Pages
+            related to the TF-Dictionaries and saves them to a file in the form <webpage-filename> => <TF-Dictionary> """
         try:
-            #Codecs needed for saving string that are encoded in UTF8, but I do not need it because strings are already the Proper Encoding form
-            print "SAVING, ", filepath + filename
-            f = codecs.open( filepath + filename, "w", "utf-8") #change "utf-8" to xcharset
+            #Codecs module is needed to assure the proper saving of string in UTF-8 encoding.
+            print "SAVING, ", filename
+            f = codecs.open( filename, "w", "utf-8") 
         except IOError as e:
             print "save_dct_lst Error: ", e
             return None 
@@ -295,36 +339,6 @@ class VHTools(object):
             f.close()
         return True       
 
-    @staticmethod
-    def glob_vect_l(base_filepath, vectors_d, genres, gterm_index, pg_num=None, wpsl_genre={}, vectl_genre={}, lower_case=False):
-        if pg_num == None:
-            pg_num = 0
-        for g in genres:
-            filepath = base_filepath + g + vectors_d
-            vect_flist = [files for path, dirs, files in os.walk(filepath)]
-            vect_flist = vect_flist[0] 
-            global_wps_l = list()
-            global_vect_l = list()
-            for filename in vect_flist:
-                resault = VHTools.load_dict_l(filepath, filename, gterm_index, force_lower_case=lower_case, page_num=pg_num)
-                if resault:
-                    wps_l, vect_l = resault
-                    global_wps_l.extend( wps_l )
-                    global_vect_l.extend( vect_l )
-                    print("%s global_vect_l len: %s" % (g, len(global_vect_l)))
-            #CLEAN VECTOR LIST
-            for i, line in enumerate(global_vect_l):
-                if 500 and line > 1000:  ###############
-                    del global_vect_l[i]
-                    del global_wps_l[i]
-            wpsl_genre[ g ] = global_wps_l
-            vectl_genre[ g ] = global_vect_l
-            if pg_num:
-                if len( wpsl_genre[ g ] ) > pg_num:
-                    wpsl_genre[ g ] = wpsl_genre[ g ][0:pg_num]
-                    vectl_genre[ g ] = vectl_genre[ g ][0:pg_num]
- 
-    
     
 class GreenVHTools(VHTools):
     """ GreenVHTools Class is a GreenLet/Eventlet version of VHTools Class.
@@ -377,29 +391,44 @@ if __name__ == "__main__":
     print d2, "\n"
     
     l = [d1, d2]
-    d_all =  VHTools.merge_dicts( *l )
-    l_all = VHTools.tf_d_gen( l )
+    d_all =  VHTools.merge_tf_dicts( *l )
+    l_all = VHTools.gen_tfd_frmlist( l )
     
     print "all ", d_all
     print "List of Dict res", l_all
     
-    print VHTools.term_dict_idxing( d_all )
+    print VHTools.tf2tidx( d_all )
     
     print VHTools.keep_most_terms( d_all, 3 )
     
-
+    filename = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/news/ngrams_corpus_dictionaries/news.ncorpd"
+    print "TF Dictionary Loaded: ", len( VHTools.load_tf_dict(filename , True) )
+    flist = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages/news/ngrams_corpus_dictionaries/news.ncorpd", 
+             "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/blogs/ngrams_corpus_dictionaries/blogs.ncorpd"]
+    print "List of TF Dictionary Loaded: ", len( VHTools.load_tf_dict(flist , True) )
+    fpath_list = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages/news/ngrams_corpus_dictionaries/", 
+                  "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/blogs/ngrams_corpus_dictionaries/"] 
+    print "Merged TF Dictionary from files of a path or path list", len( VHTools.load_tfd_frmpaths(None, fpath_list , True) )
+    tidx_d = VHTools.tf2tidx( VHTools.load_tfd_frmpaths(None, fpath_list , True) )
+    print "From Term-Frequency Dictionary to Term-Index Dictionary after Indexing Process: ", tidx_d
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    filename = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/news/ngrams_corpus_webpage_vectors/www.latimes.com.49.html.news.ncvect"
+    flist = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages/news/ngrams_corpus_webpage_vectors/www.latimes.com.49.html.news.ncvect",
+             "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/news/ngrams_corpus_webpage_vectors/www.latimes.com.50.html.news.ncvect"]
+    wpgs, tf_d = VHTools.load_tf_dict_l(filename , True)
+    print "TF Dictionary list Loaded: ", len( wpgs ), len( tf_d )
+    print "TF Dict of the last loading: ", tf_d
+    wpgs_l, tf_d_l = VHTools.load_tf_dict_l(flist, True)
+    print "Merged list of TF Dictionary lists Loaded: ", len( wpgs ), len( tf_d_l )
+    print "TF Dict of the last loading: ", tf_d_l
+    merged_tf_d = VHTools.gen_tfd_frmlist(tf_d_l)
+    termidx_d = VHTools.tf2tidx( merged_tf_d )
+    print "TF Dict to Term-Index Dict from TF-Dictionary List (length): ", len( termidx_d )
+    print "TF Dict List to  Index-Frequency Dict List: ", VHTools.tf2idxf(tf_d, termidx_d)
+    fpath_list = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages/news/ngrams_corpus_webpage_vectors/",
+                  "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/blogs/ngrams_corpus_webpage_vectors/"]
+    #wpgs, tf_d = VHTools.load_tfd_l_frmpaths(None, fpath_list, True)
+    #print "Merged list of TF Dictionary lists Loaded from a list of paths: ", len( wpgs ), len( tf_d )
     
     
     
