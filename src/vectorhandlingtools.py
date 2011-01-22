@@ -5,6 +5,7 @@
 import eventlet
 import codecs
 import os
+import sys
 #from scgenrelerner_svmbased import *
 
 
@@ -13,7 +14,7 @@ class Depricated_Functions(object):
     @staticmethod
     def load_dict_l_Depricated(filepath, filename, g_terms_d=None, force_lower_case=False, page_num=0):
         try:
-            f = codecs.open( filepath + str(filename), "r", "utf-8")
+            f = codecs.open( filepath + str(filename), "r", "utf8")
         except IOError, e:
             print("FILE %s ERROR: %s" % (filename,e))
             return None
@@ -165,7 +166,7 @@ class VHTools(object):
             This function is getting a filename and a lower case force option and returns a 
             Term-Frequency dictionary loaded from the file given as argument. """
         try:
-            f = codecs.open( filename, 'r', 'utf-8', 'strict')
+            f = codecs.open( filename, 'r', 'utf8', 'strict')
         except IOError as e:
             print("VHTools.load_dict() FILE %s ERROR: %s" % (filename,e))
             return None
@@ -218,7 +219,7 @@ class VHTools(object):
             It returns an a list for TF dictionaries and a list of the web-pages where the TF Dictionaries are 
             related to. """
         try:
-            f = codecs.open( str(filename), "r", "utf-8")
+            f = codecs.open( str(filename), "r", "utf8")
         except IOError, e:
             print("VHTools.load_dict_l() FILE %s ERROR: %s" % (filename,e))
             return None
@@ -304,14 +305,15 @@ class VHTools(object):
             the dictionary to a file with utf-8 Encoding. """
         try:
             #Codecs module is needed to assure the proper saving of string in UTF-8 encoding. 
-            f = codecs.open( filename, "w", "utf-8") 
+            f = codecs.open( filename, 'w') #, 'utf8', 'ignore') 
+            fenc = codecs.EncodedFile(f, sys.getdefaultencoding(), 'utf8', 'replace')
         except IOError:
             return None 
         try: 
             for rec in records:
-                f.write(rec + " => "  + str(records[rec]) + "\n") # Write a string to a file 
-        except:
-            print("ERROR WRITTING FILE: %s" % filename)
+                fenc.write( rec + " => "  + str(records[rec]) + "\n" ) # Write a string to a file 
+        except Exception as e:
+            print("ERROR WRITTING FILE: %s -- %s" % (filename, e))
         finally:
             f.close()
         return True           
@@ -323,18 +325,19 @@ class VHTools(object):
         try:
             #Codecs module is needed to assure the proper saving of string in UTF-8 encoding.
             print "SAVING, ", filename
-            f = codecs.open( filename, "w", "utf-8") 
+            f = codecs.open( filename, 'w') #, 'utf8', 'ignore') 
+            fenc = codecs.EncodedFile(f, sys.getdefaultencoding(), 'utf8', 'replace') 
         except IOError as e:
             print "save_dct_lst Error: ", e
             return None 
         try: 
             for i in range(len(index)):
-                f.write(index[i] + " => ")
+                fenc.write(index[i] + " => ")
                 for rec in records[i]:
-                    f.write( str(rec) + " : "  + str(records[i][rec]) + "\t") 
-                f.write("\n") 
+                    fenc.write( rec + " : "  + str(records[i][rec]) + "\t") 
+                fenc.write("\n") 
         except Exception as e:
-            print("ERROR WRITTING FILE: %s -- %s" % (filename, e))
+            print("ERROR WRITTING FILE: %s -- %s ---- %s" % (filename, e, rec))
         finally:
             f.close()
         return True       
