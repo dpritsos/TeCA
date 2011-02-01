@@ -10,13 +10,12 @@ import sys
 
 class BaseHTMLFileTools(object):
 
-    def __load_html_file(self, filename, encoding='utf8', error_handling='strict'):
+    def __load_html_file(self, filename, encoding='utf-8', error_handling='strict'):
         """ __load_tf_dict(): do not use this function prefer the VHTools.load_tf_dict(). 
             This function is getting a filename and a lower case force option and returns a 
             Term-Frequency dictionary loaded from the file given as argument. """
         try:
-            f = open( filename, 'r') #, encoding, error_handling)
-            fenc = codecs.EncodedFile(f, sys.getdefaultencoding(), encoding, error_handling)
+            fenc = codecs.open( filename, 'rb',  encoding, error_handling) 
         except Exception as e:
             print("BaseHTMLFileTools.load_dict() FILE %s ERROR: %s" % (filename, e))
             return None
@@ -26,10 +25,10 @@ class BaseHTMLFileTools(object):
             print("BaseHTMLFileTools.load_dict() FILE %s ERROR: %s" % (filename, e))
             return None
         finally:
-            f.close()    
+            fenc.close()    
         return xhtml_str  
     
-    def load_html_files(self, filename_l, encoding='utf8', error_handling='strict'):
+    def load_html_files(self, filename_l, encoding='utf-8', error_handling='strict'):
         """ load_tf_dict(): is getting a filename or a (filename list) and lower case force option
             as arguments. It returns a Term-Frequency Dictionary which is a merged dictionary of all
             TF dictionaries given a argument """
@@ -72,19 +71,19 @@ class BaseHTML2TFRegexTools:
     
     def __init__(self):    
         #Whitespace characters [<space>\t\n\r\f\v] matching, for splitting the raw text to terms
-        self.white_spliter = re.compile(r'\s+')
+        self.white_spliter = re.compile(r'[\s]+', re.UNICODE)
         #Find URL String. Probably anchor text
-        self.url_str = re.compile(r'(((ftp://|FTP://|http://|HTTP://|https://|HTTPS://)?(www|[^\s()<>.?]+))?([.]?[^\s()<>.?]+)+?(?=.org|.edu|.tv|.com|.gr|.gov|.uk)(.org|.edu|.tv|.com|.gr|.gov|.uk){1}([/]\S+)*[/]?)')
+        self.url_str = re.compile(r'(((ftp://|FTP://|http://|HTTP://|https://|HTTPS://)?(www|[^\s()<>.?]+))?([.]?[^\s()<>.?]+)+?(?=.org|.edu|.tv|.com|.gr|.gov|.uk)(.org|.edu|.tv|.com|.gr|.gov|.uk){1}([/]\S+)*[/]?)', re.UNICODE)
         #Comma decomposer
-        self.comma_decomp = re.compile(r'[^,]+|[,]+')
-        self.comma_str = re.compile(r'[,]+')
+        self.comma_decomp = re.compile(r'[^,]+|[,]+', re.UNICODE)
+        self.comma_str = re.compile(r'[,]+', re.UNICODE)
         #Find dot or sequence of dots
-        self.dot_str = re.compile(r'[.]+')
-        self.dot_decomp = re.compile(r'[^.]+|[.]+')
+        self.dot_str = re.compile(r'[.]+', re.UNICODE)
+        self.dot_decomp = re.compile(r'[^.]+|[.]+', re.UNICODE)
         #Symbol term decomposer 
-        self.fredsb_clean = re.compile(r'^[^\w]+|[^\w%]+$', re.U) #front-end-symbol-cleaning => fredsb_clean
+        self.fredsb_clean = re.compile(r'^[^\w]+|[^\w%]+$', re.UNICODE) #front-end-symbol-cleaning => fredsb_clean
         #Find proper number
-        self.proper_num = re.compile(r'(^[0-9]+$)|(^[0-9]+[,][0-9]+$)|(^[0-9]+[.][0-9]+$)|(^[0-9]{1,3}(?:[.][0-9]{3})+[,][0-9]+$)|(^[0-9]{1,3}(?:[,][0-9]{3})+[.][0-9]+$)')
+        self.proper_num = re.compile(r'(^[0-9]+$)|(^[0-9]+[,][0-9]+$)|(^[0-9]+[.][0-9]+$)|(^[0-9]{1,3}(?:[.][0-9]{3})+[,][0-9]+$)|(^[0-9]{1,3}(?:[,][0-9]{3})+[.][0-9]+$)', re.UNICODE)
         
     def get_proper_numbers(self, terms_l, xhtml_TF):
         num_free_tl = list()
@@ -188,26 +187,36 @@ class BaseHTML2TFRegexTools:
                 clean_term_tl.append(term)
         #use the comma_free terms list as the terms list to continue processing
         return clean_term_tl
+    
+    def term_len_limit(self, term_l, limit):
+        norm_term_l = list()
+        for term in term_l:
+            if len(term) <= limit:
+                norm_term_l.append(term)
+        return norm_term_l
+    
+    def keep_encoding(self, term_l, encoding='ascii'):
+        pass
    
      
 class BaseRegexTools(object):
     
     def __init__(self):
-        self.proper_html = re.compile(r'<html[^>]*>[\S\s]+</html>')
+        self.proper_html = re.compile(r'<html[^>]*>[\S\s]+</html>', re.UNICODE)
         self.html_tags = re.compile(r'<[^>]+>')
-        self.html_scripts = re.compile(r'<script[^>]*>[\S\s]*?</script>')
-        self.html_style = re.compile(r'<style[^>]*>[\S\s]*?</style>')
-        self.whitespace_chars = re.compile(r'\s{2,}')
+        self.html_scripts = re.compile(r'<script[^>]*>[\S\s]*?</script>', re.UNICODE)
+        self.html_style = re.compile(r'<style[^>]*>[\S\s]*?</style>', re.UNICODE)
+        self.whitespace_chars = re.compile(r'[\s]+', re.UNICODE)   # {2,}')
     
     def encoding_norm(self, str):
         """ NOT WORKING AS EXPECTED TO BE FIXED """
         #Normalise unicode text data (Refer to unicodedata module) 
         try:
-            print str
-            encod_str = unicodedata.normalize('NFC', str.decode('utf8') )
-        except Exception as e:
-            #print text, e   
             encod_str = unicodedata.normalize('NFKC', str)
+        except Exception as e:
+            print("WHILE UTF-8 NORMALIZATION" % e)  
+            encod_str = unicodedata.normalize('NFKC', str.decode('utf-8'))
+            print ("STRING ASSUMED TO BE ENCODED-UTF8-BYTE-STRING and DECODED TO PROPER UTF-8")
         return encod_str
         
     def extract_text(self, xhtml_str):
@@ -222,6 +231,8 @@ class BaseRegexTools(object):
             nonstyle_html_str = self.html_style.sub('', nonscript_html_str)
             #Clean-up HTML tags
             text = self.html_tags.sub(' ', nonstyle_html_str)
+            #Normalise Encoding
+            ###norm_text = self.encoding_norm(text)
             #Replace whitespace chars with single space
             text = self.whitespace_chars.sub(' ', text)   
         return text
@@ -242,7 +253,7 @@ class HTML2NgFTools(BaseHTMLFileTools):
     
     def __init__(self, n=3):
         reg_ng_size = r'.{' + str(n) + '}'
-        self.ngrams = re.compile( reg_ng_size )
+        self.ngrams = re.compile( reg_ng_size, re.UNICODE )
     
     def nf_dict(self, xhtml_str):
         text = self.extract_text(xhtml_str)
@@ -310,6 +321,8 @@ class HTML2TFTools(BaseHTML2TFRegexTools, BaseRegexTools, BaseHTMLFileTools):
             return None
         #Initially split the text to terms separated by white-spaces [ \t\n\r\f\v] 
         terms_l = self.white_spliter.split(text)
+        #Any term has more than 512 characters is rejected
+        terms_l = self.term_len_limit(terms_l, 512)
         #Create the Word Term Frequency Vectors (Dictionary) 
         tf_d = dict()
         #Count and remove the Numbers form the terms_l
@@ -322,6 +335,8 @@ class HTML2TFTools(BaseHTML2TFRegexTools, BaseRegexTools, BaseHTMLFileTools):
         ##except dot (.) and percentage % at the end for the term)
         terms_l = self.get_propr_trms_n_symbs(terms_l, tf_d) 
         for term in terms_l:            
+            if self.white_spliter.findall(term):
+                raise Exception("FUCK IT %s" % self.white_spliter.findall(term) )
             if term in tf_d: #if the dictionary of terms has the 'terms' as a key 
                 tf_d[term] += 1
             elif term:
@@ -347,7 +362,6 @@ class HTML2TFTools(BaseHTML2TFRegexTools, BaseRegexTools, BaseHTMLFileTools):
                 xhtml_src = self.load_html_files(filename, encoding, error_handling)
                 tf_d_list.append( self.tf_dict(xhtml_src) )
                 wbpg_l.append(filename)
-            print len(wbpg_l), len(tf_d_list)
             return wbpg_l, tf_d_list
         else:
             wbpg_l, html_str_l = self.load_html_frmpaths(basepath, filepath_l, encoding, error_handling)  

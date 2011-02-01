@@ -9,89 +9,6 @@ import sys
 #from scgenrelerner_svmbased import *
 
 
-class Depricated_Functions(object):
-    
-    @staticmethod
-    def load_dict_l_Depricated(filepath, filename, g_terms_d=None, force_lower_case=False, page_num=0):
-        try:
-            f = codecs.open( filepath + str(filename), "r", "utf8")
-        except IOError, e:
-            print("FILE %s ERROR: %s" % (filename,e))
-            return None
-        #The following for loop is an alternative approach to reading lines instead of using f.readline() or f.readlines()
-        wps_l = list()
-        vect_l = list()
-        try:
-            for fileline in f:
-                line = fileline.split(" => ") #BE CAREFULL with SPACES
-                wps_l.append( line[0] )
-                composed_terms = line[1].split('\t')
-                vect_dict = dict()  
-                for comp_term in composed_terms:
-                    if comp_term == '\n': # or comp_term == ' ':
-                        continue
-                    decomp_term = comp_term.split(' : ') 
-                    if len(decomp_term) == 2:
-                        if g_terms_d == None:
-                            if force_lower_case:
-                                vect_dict[ decomp_term[0].lower() ] = float( decomp_term[1] )
-                            else:    
-                                vect_dict[ decomp_term[0] ] = float( decomp_term[1] )
-                        elif isinstance(g_terms_d, dict):
-                            #if Globals Term list has been given then find the proper index value for creating the numerically tagged dictionary
-                            try:
-                                if force_lower_case:
-                                    vect_dict[ g_terms_d[ decomp_term[0].lower() ] ] = float( decomp_term[1] )
-                                else:
-                                    vect_dict[ g_terms_d[ decomp_term[0] ] ] = float( decomp_term[1] )
-                            except:
-                                #if you cannot find the term in the global dictionary just drop the term
-                                #print("Term \" %s \"not found in the Global Dictionary/Index - Dropped!" % decomp_term[0])
-                                pass
-                vect_l.append( vect_dict )
-                #If a limited number of HTML page vector is needed then stop loading when this number is reached 
-                if len(vect_l) == page_num:
-                    break
-        except Exception as e:
-            f.close()
-            print "vectorhandlingtools.load_dict_l() while reading: ", e
-            return None
-        finally:
-            f.close()
-        #Return tuple of WebPages Vectors and     
-        return (wps_l, vect_l)
-
-    @staticmethod
-    def glob_vect_l(base_filepath, vectors_d, genres, gterm_index, pg_num=None, wpsl_genre={}, vectl_genre={}, lower_case=False):
-        if pg_num == None:
-            pg_num = 0
-        for g in genres:
-            filepath = base_filepath + g + vectors_d
-            vect_flist = [files for path, dirs, files in os.walk(filepath)]
-            vect_flist = vect_flist[0] 
-            global_wps_l = list()
-            global_vect_l = list()
-            for filename in vect_flist:
-                resault = VHTools.load_dict_l(filepath, filename, gterm_index, force_lower_case=lower_case, page_num=pg_num)
-                if resault:
-                    wps_l, vect_l = resault
-                    global_wps_l.extend( wps_l )
-                    global_vect_l.extend( vect_l )
-                    print("%s global_vect_l len: %s" % (g, len(global_vect_l)))
-            #CLEAN VECTOR LIST
-            for i, line in enumerate(global_vect_l):
-                if 500 and line > 1000:  ###############
-                    del global_vect_l[i]
-                    del global_wps_l[i]
-            wpsl_genre[ g ] = global_wps_l
-            vectl_genre[ g ] = global_vect_l
-            if pg_num:
-                if len( wpsl_genre[ g ] ) > pg_num:
-                    wpsl_genre[ g ] = wpsl_genre[ g ][0:pg_num]
-                    vectl_genre[ g ] = vectl_genre[ g ][0:pg_num]
-
-
-
 class VHTools(object):
     
     @staticmethod
@@ -102,13 +19,13 @@ class VHTools(object):
         if basepath is None:
             basepath = '' 
         if isinstance(filepath_l, str):
-            flist = [ files_n_paths[2] for files_n_paths in os.walk(filepath_l) ]
+            flist = [ files_n_paths[2] for files_n_paths in os.walk( str(basepath) + filepath_l ) ]
             flist = flist[0]
             fname_lst = [ str(basepath) + filepath_l + fname for fname in flist ]
         elif isinstance(filepath_l, list):
             fname_lst = list()
             for filepath in filepath_l:
-                flist = [ files_n_paths[2] for files_n_paths in os.walk(filepath) ]
+                flist = [ files_n_paths[2] for files_n_paths in os.walk( str(basepath) + filepath ) ]
                 flist = flist[0]
                 fname_lst.extend( [ str(basepath) + filepath + fname for fname in flist ] )
         else:
@@ -166,15 +83,18 @@ class VHTools(object):
             This function is getting a filename and a lower case force option and returns a 
             Term-Frequency dictionary loaded from the file given as argument. """
         try:
-            f = codecs.open( filename, 'r', 'utf8', 'strict')
+            fenc = codecs.open( filename, 'rb', 'utf-8', 'strict')
         except IOError as e:
             print("VHTools.load_dict() FILE %s ERROR: %s" % (filename,e))
             return None
         #The following for loop is an alternative approach to reading lines instead of using f.readline() or f.readlines()
         tf_d = dict()
         try:
-            for fileline in f:
-                line = fileline.replace('\n', '')
+            for fileline in fenc:
+                line = fileline.rstrip()
+                line = fileline.rstrip()
+                if len(line.split(" => ")) != 2:
+                    print line
                 Term, Freq = tuple( line.split(" => ") )
                 if force_lower_case: 
                     tf_d[ Term.lower() ] = float( Freq )
@@ -184,7 +104,7 @@ class VHTools(object):
             print("VHTools.__load_tf_dict() Error: %s" % e)
             return None
         finally:
-            f.close()    
+            fenc.close()    
         return tf_d  
     
     @staticmethod
@@ -219,21 +139,30 @@ class VHTools(object):
             It returns an a list for TF dictionaries and a list of the web-pages where the TF Dictionaries are 
             related to. """
         try:
-            f = codecs.open( str(filename), "r", "utf8")
+            fenc = codecs.open( str(filename), 'rb', 'utf-8', 'strict')
         except IOError, e:
-            print("VHTools.load_dict_l() FILE %s ERROR: %s" % (filename,e))
+            print("VHTools.__load_dict_l() FILE %s ERROR: %s" % (filename,e))
             return None
         #The following for loop is an alternative approach to reading lines instead of using f.readline() or f.readlines()
         wps_l = list()
         vect_l = list()
         try:
-            for fileline in f:
-                wp_name, wp_tf_d = tuple( fileline.split(" => ") ) #BE CAREFULL with SPACES
+            count = 0
+            for fileline in fenc:
+                line = fileline.rstrip()
+                count += 1
+                if len(line.split(" => ")) !=2:
+                    print 'LINE', line
+                    print 'count', count
+                    continue
+                wp_name, wp_tf_d = tuple( line.split(" => ") ) #BE CAREFULL with SPACES
                 wps_l.append( wp_name )
-                wp_tf_d.replace('\n', '')
                 composed_terms = wp_tf_d.split('\t')
                 vect_dict = dict()  
-                for comp_term in composed_terms:
+                for comp_term in composed_terms:              
+                    #print "comp", len(comp_term.split(' : '))
+                    #print "compsplit", comp_term.encode('unicode-escape')
+                    #print 'tuple', tuple( comp_term.split(' : ') )          
                     Term, Freq = tuple( comp_term.split(' : ') )
                     if force_lower_case:
                         vect_dict[ Term.lower() ] = float( Freq )
@@ -241,11 +170,10 @@ class VHTools(object):
                         vect_dict[ Term ] = float( Freq )
                 vect_l.append( vect_dict )
         except Exception as e:
-            f.close()
             print("VHTools.__load_tf_dict_l() Error: %s" % e)
             return None
         finally:
-            f.close()     
+            fenc.close()     
         return (wps_l, vect_l)
     
     @staticmethod
@@ -305,17 +233,16 @@ class VHTools(object):
             the dictionary to a file with utf-8 Encoding. """
         try:
             #Codecs module is needed to assure the proper saving of string in UTF-8 encoding. 
-            f = codecs.open( filename, 'w') #, 'utf8', 'ignore') 
-            fenc = codecs.EncodedFile(f, sys.getdefaultencoding(), 'utf8', 'replace')
+            fenc = codecs.open( filename, 'wb', 'utf-8', 'strict')
         except IOError:
             return None 
         try: 
-            for rec in records:
+            for rec in records:  
                 fenc.write( rec + " => "  + str(records[rec]) + "\n" ) # Write a string to a file 
         except Exception as e:
             print("ERROR WRITTING FILE: %s -- %s" % (filename, e))
         finally:
-            f.close()
+            fenc.close()
         return True           
 
     @staticmethod
@@ -324,9 +251,7 @@ class VHTools(object):
             related to the TF-Dictionaries and saves them to a file in the form <webpage-filename> => <TF-Dictionary> """
         try:
             #Codecs module is needed to assure the proper saving of string in UTF-8 encoding.
-            print "SAVING, ", filename
-            f = codecs.open( filename, 'w') #, 'utf8', 'ignore') 
-            fenc = codecs.EncodedFile(f, sys.getdefaultencoding(), 'utf8', 'replace') 
+            fenc = codecs.open( filename, 'wb', 'utf-8', 'strict') 
         except IOError as e:
             print "save_dct_lst Error: ", e
             return None 
@@ -339,7 +264,7 @@ class VHTools(object):
         except Exception as e:
             print("ERROR WRITTING FILE: %s -- %s ---- %s" % (filename, e, rec))
         finally:
-            f.close()
+            fenc.close()
         return True       
 
     

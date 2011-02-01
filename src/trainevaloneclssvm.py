@@ -2,12 +2,10 @@
 
 """
 import os
-print 'OS IMPORTED'
 from svmutil import *
-print 'IMPORTED SVM UTIL'
 import decimal
 from vectorhandlingtools import *
-print 'IMPORTED VectorHANDLING'
+
 
 class SVMTE(object): 
     
@@ -23,7 +21,7 @@ class SVMTE(object):
         model_params = svm_parameter( params_s )
         svm_m = svm_train(prob, model_params)
         print("Done!")
-        return class_tags, svm_m
+        return svm_m
     
     @staticmethod
     def evaluate_svm(fobj, svm_m, vectl_genre, trained_genre, genres):
