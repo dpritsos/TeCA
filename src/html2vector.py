@@ -7,8 +7,9 @@ import codecs
 import xml.etree 
 import unicodedata
 import sys
+from basicfiletools import BaseFileTools
 
-class BaseHTMLFileTools(object):
+class BaseHTMLFileTools(BaseFileTools):
 
     def __load_html_file(self, filename, encoding='utf-8', error_handling='strict'):
         """ __load_tf_dict(): do not use this function prefer the VHTools.load_tf_dict(). 
@@ -42,28 +43,28 @@ class BaseHTMLFileTools(object):
         else:
             raise Exception("A String or a list of Strings was Expected as input")
         
-    def file_list_frmpaths(self, basepath, filepath_l):
-        if basepath is None:
-            basepath = '' 
-        if isinstance(filepath_l, str):
-            flist = [ files_n_paths[2] for files_n_paths in os.walk( basepath + filepath_l ) ]
-            flist = flist[0]
-            fname_lst = [ str(basepath) + filepath_l + fname for fname in flist ]
-        elif isinstance(filepath_l, list):
-            fname_lst = list()
-            for filepath in filepath_l:
-                flist = [ files_n_paths[2] for files_n_paths in os.walk( basepath + filepath ) ]
-                flist = flist[0]
-                fname_lst.extend( [ str(basepath) + filepath + fname for fname in flist ] )
-        else:
-            raise Exception("A String or a list of Strings was Expected as input - Stings should be file-paths")
-        return fname_lst
+    #def file_list_frmpaths(self, basepath, filepath_l):
+    #    if basepath is None:
+    #        basepath = '' 
+    #    if isinstance(filepath_l, str):
+    #        flist = [ files_n_paths[2] for files_n_paths in os.walk( basepath + filepath_l ) ]
+    #        flist = flist[0]
+    #        fname_lst = [ str(basepath) + filepath_l + fname for fname in flist ]
+    #    elif isinstance(filepath_l, list):
+    #        fname_lst = list()
+    #        for filepath in filepath_l:
+    #            flist = [ files_n_paths[2] for files_n_paths in os.walk( basepath + filepath ) ]
+    #            flist = flist[0]
+    #            fname_lst.extend( [ str(basepath) + filepath + fname for fname in flist ] )
+    #    else:
+    #        raise Exception("A String or a list of Strings was Expected as input - Stings should be file-paths")
+    #    return fname_lst
     
     def load_html_frmpaths(self, basepath, filepath_l, encoding='utf8', error_handling='strict'):
         """ __exec_on_files_frmpaths(): is executing a function given as the first argument to all the
             files found in the file-paths list given third and second argument. Optionally a fore lower
             case argument can be given. """
-        fname_lst = self.file_list_frmpaths(self, basepath, filepath_l)
+        fname_lst = BaseHTMLFileTools.file_list_frmpaths(basepath, filepath_l)
         return  fname_lst, self.load_html_files(fname_lst, encoding, error_handling)
 
 
@@ -281,7 +282,7 @@ class HTML2NgFTools(BaseHTMLFileTools):
         
     def nf_d_frmpaths(self, basepath, filepath_l, encoding='utf8', error_handling='strict', low_men=False):
         if low_men:
-            flist = self.file_list_frmpaths(basepath, filepath_l)
+            flist = BaseHTMLFileTools.file_list_frmpaths(basepath, filepath_l)
             nf_d_list = list()
             wbpg_l = list()
             for filename in flist:
@@ -355,7 +356,7 @@ class HTML2TFTools(BaseHTML2TFRegexTools, BaseRegexTools, BaseHTMLFileTools):
     
     def tf_d_frmpaths(self, basepath, filepath_l, encoding='utf8', error_handling='strict', low_men=False):
         if low_men:
-            flist = self.file_list_frmpaths(basepath, filepath_l)
+            flist = BaseHTMLFileTools.file_list_frmpaths(basepath, filepath_l)
             tf_d_list = list()
             wbpg_l = list()
             for filename in flist:

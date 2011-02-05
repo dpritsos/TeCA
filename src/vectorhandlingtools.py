@@ -6,31 +6,29 @@ import eventlet
 import codecs
 import os
 import sys
+from basicfiletools import BaseFileTools
 #from scgenrelerner_svmbased import *
 
 
-class VHTools(object):
+class VHTools(BaseFileTools):
     
-    @staticmethod
-    def __exec_on_files_frmpaths(func, basepath, filepath_l, force_lower_case=False):
-        """ __exec_on_files_frmpaths(): is executing a function given as the first argument to all the
-            files found in the file-paths list given third and second argument. Optionally a fore lower
-            case argument can be given. """
-        if basepath is None:
-            basepath = '' 
-        if isinstance(filepath_l, str):
-            flist = [ files_n_paths[2] for files_n_paths in os.walk( str(basepath) + filepath_l ) ]
-            flist = flist[0]
-            fname_lst = [ str(basepath) + filepath_l + fname for fname in flist ]
-        elif isinstance(filepath_l, list):
-            fname_lst = list()
-            for filepath in filepath_l:
-                flist = [ files_n_paths[2] for files_n_paths in os.walk( str(basepath) + filepath ) ]
-                flist = flist[0]
-                fname_lst.extend( [ str(basepath) + filepath + fname for fname in flist ] )
-        else:
-            raise Exception("A String or a list of Strings was Expected as input - Stings should be file-paths")
-        return func(fname_lst, force_lower_case)
+    #@staticmethod
+    #def file_list_frmpaths(basepath, filepath_l):
+    #    if basepath is None:
+    #        basepath = '' 
+    #    if isinstance(filepath_l, str):
+    #        flist = [ files_n_paths[2] for files_n_paths in os.walk( basepath + filepath_l ) ]
+    #        flist = flist[0]
+    #        fname_lst = [ str(basepath) + filepath_l + fname for fname in flist ]
+    #    elif isinstance(filepath_l, list):
+    #        fname_lst = list()
+    #        for filepath in filepath_l:
+    #            flist = [ files_n_paths[2] for files_n_paths in os.walk( basepath + filepath ) ]
+    #            flist = flist[0]
+    #            fname_lst.extend( [ str(basepath) + filepath + fname for fname in flist ] )
+    #   else:
+    #       raise Exception("A String or a list of Strings was Expected as input - Stings should be file-paths")
+    #    return fname_lst
     
     @staticmethod
     def keep_most_terms(terms_d, terms_amout):
@@ -131,13 +129,15 @@ class VHTools(object):
     def load_tfd_frmpaths(basepath, filepath_l, force_lower_case=False):
         """ laod_tf_frmpaths: is getting a list of paths as argument and a base path as optional argument. 
             Returns a merge of all Term-Frequency Dictionaries found in the file paths list. """
-        return VHTools.__exec_on_files_frmpaths( VHTools.load_tf_dict, basepath, filepath_l, force_lower_case=False )
+        fname_lst = VHTools.file_list_frmpaths(basepath, filepath_l)
+        return VHTools.load_tf_dict(fname_lst, force_lower_case=False )
 
     @staticmethod
-    def __load_tf_dict_l(filename, force_lower_case=False):
+    def __load_tf_dict_l(filename, line_lim=0 , force_lower_case=False):
         """ __load_tf_dict_l(): is getting a filename as argument and force lower_case as optional argument.
             It returns an a list for TF dictionaries and a list of the web-pages where the TF Dictionaries are 
-            related to. """
+            related to. If line_lim is set above 0 then If a file contains more than one line (i.e. web page vectors) keep 
+            only the amount of pages requested in this argument  """
         try:
             fenc = codecs.open( str(filename), 'rb', 'utf-8', 'strict')
         except IOError, e:
@@ -147,28 +147,25 @@ class VHTools(object):
         wps_l = list()
         vect_l = list()
         try:
-            count = 0
+            lines_cnt = 0
             for fileline in fenc:
                 line = fileline.rstrip()
-                count += 1
-                if len(line.split(" => ")) !=2:
-                    print 'LINE', line
-                    print 'count', count
-                    continue
                 wp_name, wp_tf_d = tuple( line.split(" => ") ) #BE CAREFULL with SPACES
                 wps_l.append( wp_name )
                 composed_terms = wp_tf_d.split('\t')
                 vect_dict = dict()  
-                for comp_term in composed_terms:              
-                    #print "comp", len(comp_term.split(' : '))
-                    #print "compsplit", comp_term.encode('unicode-escape')
-                    #print 'tuple', tuple( comp_term.split(' : ') )          
+                for comp_term in composed_terms:                      
                     Term, Freq = tuple( comp_term.split(' : ') )
                     if force_lower_case:
                         vect_dict[ Term.lower() ] = float( Freq )
                     else:    
                         vect_dict[ Term ] = float( Freq )
                 vect_l.append( vect_dict )
+                #If a file contains more than one line (i.e. web page vectors) keep 
+                #only the amount of pages requested in the line_lim argument
+                lines_cnt += 1
+                if lines_cnt == line_lim:
+                    break
         except Exception as e:
             print("VHTools.__load_tf_dict_l() Error: %s" % e)
             return None
@@ -177,28 +174,36 @@ class VHTools(object):
         return (wps_l, vect_l)
     
     @staticmethod
-    def load_tf_dict_l(filename_l, force_lower_case=False):
+    def load_tf_dict_l(filename_l, page_lim=0, force_lower_case=False):
         """ loadtf_dict_l(): is getting a filename or a filename list as first arguments and
-            a lower case force option. """
+            a lower case force option. If page_lim is set above 0 then If a file contains more than one line (i.e. web page vectors) 
+            or a folder contains more than one files then keeps only the amount of pages requested in this argument either
+            because the amount of lines in a file have reached the argument or because the amount of file have been loaded have. """
         if isinstance(filename_l, str):
-            return VHTools.__load_tf_dict_l(filename_l, force_lower_case)
+            return VHTools.__load_tf_dict_l(filename_l, page_lim, force_lower_case)
         elif isinstance(filename_l, list):
             mrgd_wps_l = list()
             mrgd_vect_l = list()
             for filename in filename_l:
-                wps_l, vect_l = VHTools.__load_tf_dict_l(filename, force_lower_case)
+                wps_l, vect_l = VHTools.__load_tf_dict_l(filename, page_lim, force_lower_case)
                 mrgd_wps_l.extend( wps_l )
                 mrgd_vect_l.extend( vect_l )
+                #If a the merged list of web pages reached the the amount of pages requested 
+                #in the page_lim argument the loop stops
+                if len(mrgd_wps_l) == page_lim:
+                    break
             return (mrgd_wps_l, mrgd_vect_l)
         else:
             raise Exception("A String or a list of Strings was Expected as input")
         
     @staticmethod
-    def load_tfd_l_frmpaths(basepath, filepath_l, force_lower_case=False):
+    def load_tfd_l_frmpaths(basepath, filepath_l, page_lim=0, force_lower_case=False):
         """ load_tfd_l(): is getting a list of file-paths, a base-path, and a lower case force option
-            as arguments. It returns a list of TF-Dictionaries and a list of the Web-pages related to 
+            as arguments. In addition it has the page_lim argument for constraining the amount of web page vectors to be
+            loaded if requested using this argument. It returns a list of TF-Dictionaries and a list of the Web-pages related to 
             the TF-Dictionaries, of all the files found in the file-paths lists."""
-        return VHTools.__exec_on_files_frmpaths( VHTools.load_tf_dict_l, basepath, filepath_l, force_lower_case=False )
+        fname_lst = VHTools.file_list_frmpaths(basepath, filepath_l)
+        return VHTools.load_tf_dict_l(fname_lst, page_lim, force_lower_case)
             
     @staticmethod
     def __tf2idxf(tf_d, tf_idx_d):
@@ -206,16 +211,20 @@ class VHTools(object):
             This function is getting a TF dictionary representing the TF Vector,
             and a TF-Index as defined in VHTools.tf_dict_idxing(). It returns
             a Index-Frequency dictionary where each term of the TF dictionary has been 
-            replaced with the Index number of the TF-Index. """
+            replaced with the Index number of the TF-Index. In case the term of the 
+            TF Dictionary is not in the TF-Index then the term is just Dropped. Therefore,
+            the Index-Frequency dictionary it will no more include the missing (from TF-Index) term. """
         idxed_d = dict() 
         for term, freq in tf_d.items():
-            idxed_d[ tf_idx_d[term] ] = freq
+            if term in tf_idx_d:
+                idxed_d[ tf_idx_d[term] ] = freq
+            #else: DROP THE TERM
         return idxed_d
     
     @staticmethod
     def tf2idxf(tf_d_l, tf_idx_d):
-        """ tf2idxf(): is getting a TF-Dictionary or a list of TF-Dictionaries and TF-Index. It applys
-            the VHTools.__tf2idxf() function to the dictionaries and returns a list or single TF-Dictioary
+        """ tf2idxf(): is getting a TF-Dictionary or a list of TF-Dictionaries and TF-Index. It applies
+            the VHTools.__tf2idxf() function to the dictionaries and returns a list or single TF-Dictionary
             depending on the input. """
         if isinstance(tf_d_l, list):
             idxed_d = list()

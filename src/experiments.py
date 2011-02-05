@@ -43,14 +43,14 @@ class SVMExperiments(object):
         for rst_g in genres:
             if rst_g != g:
                 print base + rst_g + vectors_path
-                wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ base + rst_g + vectors_path ], force_lower_case=lower_case)
-                test_wpg_l.extend( wpg[0:1000] ) 
-                test_idxf_d_l.extend( tfdl[0:1000] )
-                del wpg, tfdl
+                wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ base + rst_g + vectors_path ], page_lim=1000, force_lower_case=lower_case)
+                test_wpg_l.extend( wpg ) 
+                test_idxf_d_l.extend( tfdl )
+        del wpg, tfdl
         test_idxf_d_l = VHTools.tf2idxf(test_idxf_d_l, tf_idx_d)
         print len(test_wpg_l), len(test_idxf_d_l)
         #Start the experiments
-        fobj = open( base_filepath + g + "_vs_all.eval", "w" )
+        fobj = open( base + g + "_vs_all.eval", "w" )
         fobj.write("---- for Genre= " + g + " ----\n")
         for i in [1,2,3]:
             ######
@@ -84,7 +84,7 @@ class SVMExperiments(object):
                 print "Training"
                 #for size in range(1500,9000,500):
                 svm_m = SVMTE.train_svm(fobj, train_idxf_d_l[0:], nu )
-                SVMTE.evaluate_svm(fobj, svm_m, test_idxf_d_l, g, genres)
+                SVMTE.evaluate_svm(fobj, svm_m, test_idxf_d_l)
         fobj.close()
         return ('Experiments for %s Done' % g) 
     

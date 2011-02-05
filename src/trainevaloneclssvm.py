@@ -24,22 +24,18 @@ class SVMTE(object):
         return svm_m
     
     @staticmethod
-    def evaluate_svm(fobj, svm_m, vectl_genre, trained_genre, genres):
+    def evaluate_svm(fobj, svm_m, test_idxf_d_l):
         c1 = decimal.Decimal('0')
         c2 = decimal.Decimal('0')
         tp = decimal.Decimal('0') 
         tn = decimal.Decimal('0')
         fp = decimal.Decimal('0')
         fn = decimal.Decimal('0')
-        total_global_vect_l = vectl_genre[trained_genre][0:1000]
-        for g in genres:
-            if g != trained_genre:
-                total_global_vect_l.extend(vectl_genre[ g ][0:1000]) 
         #Prediction phase
         #print len(vectl_genre['news'][3000:4000]), len(vectl_genre['product_companies'][0:3000]), len(total_global_vect_l)
-        print len(total_global_vect_l)
+        print len(test_idxf_d_l)
         print "Predicting"  
-        p_labels, acc, val = svm_predict([0]*len(total_global_vect_l), total_global_vect_l, svm_m, '-b 0' )
+        p_labels, acc, val = svm_predict([0]*len(test_idxf_d_l), test_idxf_d_l, svm_m, '-b 0' )
         #print p_labels
         print "Evaluating"
         for i, d in enumerate(p_labels):
@@ -74,7 +70,9 @@ class SVMTE(object):
             s = "F1=%s\n\n" % f1
             fobj.write(s)
         except Exception as e:
-            fobj.write( str(e)+"\n" )
+            s = "F1=0.0\n\n" 
+            fobj.write(s)
+
 
 
 

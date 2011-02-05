@@ -8,6 +8,7 @@ sys.path.append('../../synergeticprocessing/src')
 from synergeticpool import *
 from experiments import *
 
+#pool = SynergeticPool( { '192.168.1.68':(40000,'123456') }, local_workers=1, syn_listener_port=41000 )
 #pool = SynergeticPool( { '192.168.1.68':(40000,'123456'), '192.168.1.65':(40000,'123456') }, local_workers=1, syn_listener_port=41000 ) 
 pool = SynergeticPool( local_workers=1, syn_listener_port=41000 )
 print "Registering"
