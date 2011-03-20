@@ -42,23 +42,6 @@ class BaseHTMLFileTools(BaseFileTools):
             return file_lst
         else:
             raise Exception("A String or a list of Strings was Expected as input")
-        
-    #def file_list_frmpaths(self, basepath, filepath_l):
-    #    if basepath is None:
-    #        basepath = '' 
-    #    if isinstance(filepath_l, str):
-    #        flist = [ files_n_paths[2] for files_n_paths in os.walk( basepath + filepath_l ) ]
-    #        flist = flist[0]
-    #        fname_lst = [ str(basepath) + filepath_l + fname for fname in flist ]
-    #    elif isinstance(filepath_l, list):
-    #        fname_lst = list()
-    #        for filepath in filepath_l:
-    #            flist = [ files_n_paths[2] for files_n_paths in os.walk( basepath + filepath ) ]
-    #            flist = flist[0]
-    #            fname_lst.extend( [ str(basepath) + filepath + fname for fname in flist ] )
-    #    else:
-    #        raise Exception("A String or a list of Strings was Expected as input - Stings should be file-paths")
-    #    return fname_lst
     
     def load_html_frmpaths(self, basepath, filepath_l, encoding='utf8', error_handling='strict'):
         """ __exec_on_files_frmpaths(): is executing a function given as the first argument to all the
@@ -74,10 +57,10 @@ class BaseHTML2TFRegexTools:
         #Whitespace characters [<space>\t\n\r\f\v] matching, for splitting the raw text to terms
         self.white_spliter = re.compile(r'[\s]+', re.UNICODE)
         #Find URL String. Probably anchor text
-        self.url_str = re.compile(r'(((ftp://|FTP://|http://|HTTP://|https://|HTTPS://)?(www|[^\s()<>.?]+))?([.]?[^\s()<>.?]+)+?(?=.org|.edu|.tv|.com|.gr|.gov|.uk)(.org|.edu|.tv|.com|.gr|.gov|.uk){1}([/]\S+)*[/]?)', re.UNICODE)
+        self.url_str = re.compile(r'(((ftp://|FTP://|http://|HTTP://|https://|HTTPS://)?(www|[^\s()<>.?]+))?([.]?[^\s()<>.?]+)+?(?=.org|.edu|.tv|.com|.gr|.gov|.uk)(.org|.edu|.tv|.com|.gr|.gov|.uk){1}([/]\S+)*[/]?)', re.UNICODE|re.IGNORECASE)
         #Comma decomposer
-        self.comma_decomp = re.compile(r'[^,]+|[,]+', re.UNICODE)
-        self.comma_str = re.compile(r'[,]+', re.UNICODE)
+        self.comma_decomp = re.compile(r'[^,]+|[,]+', re.UNICODE|re.IGNORECASE)
+        self.comma_str = re.compile(r'[,]+', re.UNICODE|re.IGNORECASE)
         #Find dot or sequence of dots
         self.dot_str = re.compile(r'[.]+', re.UNICODE)
         self.dot_decomp = re.compile(r'[^.]+|[.]+', re.UNICODE)
@@ -202,12 +185,15 @@ class BaseHTML2TFRegexTools:
      
 class BaseRegexTools(object):
     
+    count = 0
+    
     def __init__(self):
-        self.proper_html = re.compile(r'<html[^>]*>[\S\s]+</html>', re.UNICODE)
+        self.proper_html = re.compile(r'<html[^>]*>[\S\s]+</html>', re.UNICODE|re.IGNORECASE)
         self.html_tags = re.compile(r'<[^>]+>')
-        self.html_scripts = re.compile(r'<script[^>]*>[\S\s]*?</script>', re.UNICODE)
-        self.html_style = re.compile(r'<style[^>]*>[\S\s]*?</style>', re.UNICODE)
+        self.html_scripts = re.compile(r'<script[^>]*>[\S\s]*?</script>', re.UNICODE|re.IGNORECASE)
+        self.html_style = re.compile(r'<style[^>]*>[\S\s]*?</style>', re.UNICODE|re.IGNORECASE)
         self.whitespace_chars = re.compile(r'[\s]+', re.UNICODE)   # {2,}')
+        self.unknown_char_seq = re.compile(r'['+ unicodedata.lookup('REPLACEMENT CHARACTER') +']', re.UNICODE|re.IGNORECASE)   # {2,}')
     
     def encoding_norm(self, str):
         """ NOT WORKING AS EXPECTED TO BE FIXED """
@@ -235,7 +221,11 @@ class BaseRegexTools(object):
             #Normalise Encoding
             ###norm_text = self.encoding_norm(text)
             #Replace whitespace chars with single space
-            text = self.whitespace_chars.sub(' ', text)   
+            text = self.whitespace_chars.sub(' ', text)
+            
+            #Replace utf8 'REPLACEMENT CHARACTER' with empty string
+            text = self.unknown_char_seq.sub('', text)
+               
         return text
 
 
@@ -337,7 +327,7 @@ class HTML2TFTools(BaseHTML2TFRegexTools, BaseRegexTools, BaseHTMLFileTools):
         terms_l = self.get_propr_trms_n_symbs(terms_l, tf_d) 
         for term in terms_l:            
             if self.white_spliter.findall(term):
-                raise Exception("FUCK IT %s" % self.white_spliter.findall(term) )
+                raise Exception("ERROR %s" % self.white_spliter.findall(term) )
             if term in tf_d: #if the dictionary of terms has the 'terms' as a key 
                 tf_d[term] += 1
             elif term:

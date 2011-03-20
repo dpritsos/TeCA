@@ -107,23 +107,48 @@ class PathCleanUp(BaseFileTools):
                 else:
                     break
     
+    @staticmethod
+    def move_frmto(sourcepath, dest, famount, basepath=''):
+        fpath_lst = PathCleanUp.file_list_frmpaths(None, sourcepath)
+        if not os.path.isdir( os.path.join(basepath, dest) ):
+            os.mkdir( os.path.join(basepath, dest) )
+        fpath_lst.sort() #Maybe there is no need for this line of code
+        fappnd_cnt = 0
+        for fpath in fpath_lst:
+            fpath_spled = os.path.split( fpath )
+            fpath_spled = fpath_spled[1]
+            PathCleanUp.movefile( fpath, os.path.join(dest, fpath_spled) )
+            fappnd_cnt += 1
+            if fappnd_cnt >= famount:
+                break
+    
     
 #Unit Test    
 if __name__ == '__main__':
     
-    base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages"
-    genres = [ "blogs", "news" , "product_companies", "forum" ] #"wiki_pages",     
+    base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/KI-04"
+    #base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/Santini_corpus"
+    #base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages"
+    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ] 
+    #genres = [ "blogs", "news" , "product_companies", "forum" ] #"wiki_pages",
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]      
     
     #for g in genres:
-    #    flist_filepath = os.path.join(base_filepath, g, g + ".lst.err" )
+    #    flist_filepath = os.path.join(base_filepath, g, g + ".train.lst.err" )
     #    dest = os.path.join(base_filepath, g, "non_proper_html_pages")
     #    PathCleanUp.move_flst(flist_filepath, dest)
     
     
+    #for g in genres: 
+    #    sourcepath = os.path.join(base_filepath, g, "html_pages/" )
+    #    dest = os.path.join(base_filepath, g, "test_only_html_pages/" )
+    #    print dest
+    #    PathCleanUp.move_atleast(sourcepath, dest, 1000, basepath='')
+        
     for g in genres: 
         sourcepath = os.path.join(base_filepath, g, "html_pages/" )
         dest = os.path.join(base_filepath, g, "test_only_html_pages/" )
-        PathCleanUp.move_atleast(sourcepath, dest, 1000, basepath='')
+        PathCleanUp.move_frmto(sourcepath, dest, 50, basepath='')
         
     print("Thank you and Goodbye!!!")
                 

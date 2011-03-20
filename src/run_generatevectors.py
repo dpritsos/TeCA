@@ -2,7 +2,7 @@
 
 """
 import os
-from generatevectors import HTML2TF
+from generatevectors import HTML2TF, HTML2NF
 import sys
 sys.path.append('../../synergeticprocessing/src')
 from synergeticpool import SynergeticPool
@@ -13,33 +13,62 @@ print "Registering"
 #pool.register_mod( ['html2vector', 'vectorhandlingtools', 'generatevectors'] )  
 print "Regitered OK"
 
-genres = [ "wiki_pages" ] #"news", "product_companies", "forum", "blogs", "wiki_pages" ] #academic ,  
-#genres = [ "blogs" ] #academic "news"
-base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages", "../Documents/Synergy-Crawler/saved_pages"] 
+#genres = [ "blogs", "news", "wiki_pages", "product_companies", "forum" ] #academic ,  
+#genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
+genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop"] 
+#base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages", "../Documents/Synergy-Crawler/saved_pages"]
+#base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/Santini_corpus", "../Documents/Synergy-Crawler/Santini_corpus"]
+base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/KI-04", "../Documents/Synergy-Crawler/KI-04"]  
 
 html2tf = HTML2TF()
+html2nf = HTML2NF(n=3)
 
+#if filepath and not os.path.isdir((filepath + "corpus_dictionaries/")):
+#    os.mkdir((filepath + "corpus_dictionaries/"))
+          
 resaults = list()
 for g in genres:
-    filepath = str( "/" + g + "/html_pages/")
-    tfv_file = str( "/" + g + "/corpus_webpage_vectors/" + g + ".tfvl" )
-    tfd_file = str( "/" + g + "/corpus_dictionaries/" + g + ".tfd" )
-    err_file = str( "/" + g + "/" + g + ".lst.err")
-    #if filepath and not os.path.isdir((filepath + "corpus_dictionaries/")):
-    #    os.mkdir((filepath + "corpus_dictionaries/"))
-    #if filepath and not os.path.isdir((filepath + "corpus_webpage_vectors/")):
-    #    os.mkdir((filepath + "corpus_webpage_vectors/"))
-    #if filepath and not os.path.isdir((filepath + "ngrams_corpus_dictionaries/")):
-    #    os.mkdir((filepath + "ngrams_corpus_dictionaries/"))
-    #if filepath and not os.path.isdir((filepath + "ngrams_corpus_webpage_vectors/")):
-    #    os.mkdir((filepath + "ngrams_corpus_webpage_vectors/"))
-    #
+    #Training Vectors file paths
+    train_filepath = str( "/" + g + "/html_pages/")
+    train_tfv_file = str( "/" + g + "/train_tf_vectors/" + g + ".tfvl" )
+    train_tfd_file = str( "/" + g + "/train_tf_dictionaries/" + g + ".tfd" )
+    train_err_file = str( "/" + g + "/" + g + ".train.lst.err")
+    #Testing Vectors file paths
+    test_filepath = str( "/" + g + "/test_only_html_pages/")
+    test_tfv_file = str( "/" + g + "/test_tf_vectors/" + g + ".tfvl" )
+    test_tfd_file = str( "/" + g + "/test_tf_dictionaries/" + g + ".tfd" )
+    test_err_file = str( "/" + g + "/" + g + ".test.lst.err")
     resaults.append( pool.dispatch(\
-    html2tf.html2tfv_n_tfd, base_filepath, filepath, tfv_file, tfd_file, err_file, encoding='utf-8', error_handling='replace', low_mem='True' \
+    html2tf.html2tfv_n_tfd, base_filepath, train_filepath, train_tfv_file, train_tfd_file, train_err_file, load_encoding='ascii', save_encoding='utf-8', error_handling='replace', low_mem='True' \
+                     ) )
+    resaults.append( pool.dispatch(\
+    html2tf.html2tfv_n_tfd, base_filepath, test_filepath, test_tfv_file, test_tfd_file, test_err_file, load_encoding='ascii', save_encoding='utf-8', error_handling='replace', low_mem='True' \
+                     ) )
+    
+for res in resaults:
+    print res.value
+
+for g in genres:
+    #Training Vectors file paths
+    train_filepath = str( "/" + g + "/html_pages/")
+    train_tfv_file = str( "/" + g + "/train_nf_vectors/" + g + ".nfvl" )
+    train_tfd_file = str( "/" + g + "/train_nf_dictionaries/" + g + ".nfd" )
+    train_err_file = str( "/" + g + "/" + g + ".train.lst.err")
+    #Testing Vectors file paths
+    test_filepath = str( "/" + g + "/test_only_html_pages/")
+    test_tfv_file = str( "/" + g + "/test_nf_vectors/" + g + ".nfvl" )
+    test_tfd_file = str( "/" + g + "/test_nf_dictionaries/" + g + ".nfd" )
+    test_err_file = str( "/" + g + "/" + g + ".test.lst.err")
+    resaults.append( pool.dispatch(\
+    html2nf.html2nfv_n_nfd, base_filepath, train_filepath, train_tfv_file, train_tfd_file, train_err_file, load_encoding='ascii', save_encoding='utf-8', error_handling='replace', low_mem='True' \
+                     ) )
+    resaults.append( pool.dispatch(\
+    html2nf.html2nfv_n_nfd, base_filepath, test_filepath, test_tfv_file, test_tfd_file, test_err_file, load_encoding='ascii', save_encoding='utf-8', error_handling='replace', low_mem='True' \
                      ) )
        
 for res in resaults:
-    print res.value             
+    print res.value
+
 
 pool.join_all()
 
