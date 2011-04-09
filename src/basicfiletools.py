@@ -33,13 +33,10 @@ class BaseFileTools(object):
         """ copyfile(): Copy a file from source to dest path. """
         source_f = open(source, 'rb')
         dest_f = open(dest, 'wb')
-        dest_path = os.path.split(dest)
-        if not os.path.isdir(dest_path):
-            os.mkdir(dest_path)
         while True:
             copy_buffer = source_f.read(1024*1024)
             if copy_buffer:
-                dest_f.write(1024*1024)
+                dest_f.write(copy_buffer)
             else:
                 break
         source_f.close()
@@ -122,15 +119,54 @@ class PathCleanUp(BaseFileTools):
             if fappnd_cnt >= famount:
                 break
     
+    @staticmethod
+    def move_fromeach(sourcepath, dest, famount, basepath=''):
+        fpath_lst = PathCleanUp.file_list_frmpaths(None, sourcepath)
+        if not os.path.isdir( os.path.join(basepath, dest) ):
+            os.mkdir( os.path.join(basepath, dest) )
+        site_file_dict = dict()
+        for fpath in fpath_lst:
+            fpath_spled = os.path.split( fpath )
+            fpath_spled = fpath_spled[1]
+            fname_sld = fpath_spled.split('.')
+            fname = '.'.join(fname_sld[:-2])
+            if fname in site_file_dict:
+                site_file_dict[ fname ].append( (fpath, os.path.join(dest, fpath_spled)) )
+            else:
+                site_file_dict[ fname ] = [ (fpath, os.path.join(dest, fpath_spled)) ]
+        for sd_paths in site_file_dict.values():
+            if len(sd_paths) >= famount: 
+                for i in range(famount):
+                    PathCleanUp.movefile( sd_paths[i][0], sd_paths[i][1] )
+    
+    @staticmethod
+    def copy_fromeach(sourcepath, dest, famount, basepath=''):
+        fpath_lst = PathCleanUp.file_list_frmpaths(None, sourcepath)
+        if not os.path.isdir( os.path.join(basepath, dest) ):
+            os.mkdir( os.path.join(basepath, dest) )
+        site_file_dict = dict()
+        for fpath in fpath_lst:
+            fpath_spled = os.path.split( fpath )
+            fpath_spled = fpath_spled[1]
+            fname_sld = fpath_spled.split('.')
+            fname = '.'.join(fname_sld[:-2])
+            if fname in site_file_dict:
+                site_file_dict[ fname ].append( (fpath, os.path.join(dest, fpath_spled)) )
+            else:
+                site_file_dict[ fname ] = [ (fpath, os.path.join(dest, fpath_spled)) ]
+        for sd_paths in site_file_dict.values():
+            if len(sd_paths) >= famount: 
+                for i in range(famount):
+                    PathCleanUp.copyfile( sd_paths[i][0], sd_paths[i][1] )
     
 #Unit Test    
 if __name__ == '__main__':
     
-    base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/KI-04"
+    #base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/KI-04"
     #base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/Santini_corpus"
-    #base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages"
-    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ] 
-    #genres = [ "blogs", "news" , "product_companies", "forum" ] #"wiki_pages",
+    base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages"
+    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ] 
+    genres = [ "blogs"] #, "news" , "product_companies", "forum", "wiki_pages" ] #"wiki_pages",
     #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]      
     
     #for g in genres:
@@ -143,12 +179,18 @@ if __name__ == '__main__':
     #    sourcepath = os.path.join(base_filepath, g, "html_pages/" )
     #    dest = os.path.join(base_filepath, g, "test_only_html_pages/" )
     #    print dest
-    #    PathCleanUp.move_atleast(sourcepath, dest, 1000, basepath='')
-        
+    #   PathCleanUp.move_atleast(sourcepath, dest, 1000, basepath='')
+    
     for g in genres: 
-        sourcepath = os.path.join(base_filepath, g, "html_pages/" )
-        dest = os.path.join(base_filepath, g, "test_only_html_pages/" )
-        PathCleanUp.move_frmto(sourcepath, dest, 50, basepath='')
+        sourcepath = os.path.join(base_filepath, g, "test_only_html_pages/" )
+        dest = os.path.join(base_filepath, g, "test_only_html_2500_pages/" )
+        print dest
+        PathCleanUp.copy_fromeach(sourcepath, dest, 125, basepath='')
+        
+    #for g in genres: 
+    #    sourcepath = os.path.join(base_filepath, g, "html_pages/" )
+    #    dest = os.path.join(base_filepath, g, "test_only_html_pages/" )
+    #    PathCleanUp.move_frmto(sourcepath, dest, 50, basepath='')
         
     print("Thank you and Goodbye!!!")
                 

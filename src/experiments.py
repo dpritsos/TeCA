@@ -48,26 +48,27 @@ class SVMExperiments(object):
         #Load Test Vectors
         print("Load Test Vectors") 
         #test_wpg_l, test_tf_d_l = VHTools.load_tfd_l_frmpaths(None, [ base + g + test_path ], page_lim=test_pg_lim, force_lower_case=lower_case)
-        test_wpg_l, test_tf_d_l =  VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/blogs/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case) 
-        wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/news/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case)
-        test_wpg_l.extend( wpg ) 
-        test_tf_d_l.extend( tfdl )
-        wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/product_companies/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case)
-        test_wpg_l.extend( wpg ) 
-        test_tf_d_l.extend( tfdl )
-        wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/forum/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case)
-        test_wpg_l.extend( wpg ) 
-        test_tf_d_l.extend( tfdl )
-        wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/wiki_pages/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case)
-        test_wpg_l.extend( wpg ) 
-        test_tf_d_l.extend( tfdl )
-        del wpg, tfdl
-        #for rst_g in genres:
-        #    if rst_g != g:
-        #        wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ base + rst_g + test_path ], page_lim=test_pg_lim, force_lower_case=lower_case) #base + rst_g + test_path
-        #        test_wpg_l.extend( wpg ) 
-        #        test_tf_d_l.extend( tfdl )
+        test_wpg_l = list()
+        test_tf_d_l = list()
+        #test_wpg_l, test_tf_d_l =  VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/blogs/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case) 
+        #wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/news/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case)
+        #test_wpg_l.extend( wpg ) 
+        #test_tf_d_l.extend( tfdl )
+        #wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/product_companies/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case)
+        #test_wpg_l.extend( wpg ) 
+        #test_tf_d_l.extend( tfdl )
+        #wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/forum/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case)
+        #test_wpg_l.extend( wpg ) 
+        #test_tf_d_l.extend( tfdl )
+        #wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/wiki_pages/test_tf_vectors/" ], page_lim=test_pg_lim, force_lower_case=lower_case)
+        #test_wpg_l.extend( wpg ) 
+        #test_tf_d_l.extend( tfdl )
         #del wpg, tfdl
+        for rst_g in genres:
+            wpg, tfdl = VHTools.load_tfd_l_frmpaths(None, [ base + rst_g + test_path ], page_lim=test_pg_lim, force_lower_case=lower_case) #base + rst_g + test_path
+            test_wpg_l.extend( wpg ) 
+            test_tf_d_l.extend( tfdl )
+        del wpg, tfdl
         print('Test TF Vectors list size =  %s (%s)' % (len(test_wpg_l), len(test_tf_d_l)))
         #Converting Training TF Vectors to IdxF Vectors
         print("Converting Training TF Vectors to IdxF Vectors")
@@ -87,7 +88,7 @@ class SVMExperiments(object):
         #del tf_dict
         #del tidx_d
         #Start the experiments
-        for i in [1,2,3]:
+        for i in [2,3]:
             ######
             TFREQ = 1
             lower_case = True
@@ -119,7 +120,7 @@ class SVMExperiments(object):
                 print "Training"
                 #for size in range(1500,9000,500):
                 svm_m = SVMTE.train_oneclass_svm(fobj, train_idxf_d_l_frmd[0:], nu )
-                SVMTE.evaluate_oneclass_svm(fobj, svm_m, test_idxf_d_l_frmd, genre_no=5) #len(genres))
+                SVMTE.evaluate_oneclass_svm(fobj, svm_m, test_idxf_d_l_frmd, genre_no=5, g_seq_num=genres.index(g)) #len(genres))
         fobj.close()
         return ('Experiments for %s Done' % g) 
     
@@ -220,8 +221,8 @@ class SVMExperiments(object):
         return ('Experiments for %s Done' % g) 
      
     def tf_experiment_set3(self, keep_term_lims, base_filepath, training_path, train_pg_lim, test_path, test_pg_lim, g, genres, lower_case):
-        upper_lim, step = keep_term_lims
-        for trm_amount in range(10, upper_lim, step):  
+        start_val, upper_lim, step = keep_term_lims
+        for trm_amount in range(start_val, upper_lim, step):  
             self.tf_experiment_set1(base_filepath, training_path, train_pg_lim, test_path, test_pg_lim, g, genres, lower_case, fmethod='a', keep_terms=trm_amount)
             
     def tf_experiment_set4(self, base_filepath, training_path, train_pg_lim, test_path, test_pg_lim, g, genres, freq_init, freq_lim, freq_step, lower_case, fmethod="w", keep_terms=None):
@@ -305,7 +306,7 @@ class SVMExperiments(object):
                 #########Invert TF
                 #global_vect_l = inv_tf(global_vect_l) 
                 #########Normalised Frequency form
-                for nu in [0.2, 0.3, 0.5, 0.7, 0.8]:
+                for nu in [0.2, 0.5, 0.8]: #[0.2, 0.3, 0.5, 0.7, 0.8]:
                     ############################################## Train SVM ###############################################
                     fobj.write("++++ for nu= " + str(nu) + " ++++\n")
                     print "Training"

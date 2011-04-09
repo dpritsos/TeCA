@@ -16,7 +16,7 @@ print "Registering"
 print "Regitered OK"
 exp = SVMExperiments()
 
-genres = [ "wiki_pages", "news", "product_companies", "forum", "blogs"] #academic , "forum",   
+genres = [ "forum", "wiki_pages", "news", "product_companies", "blogs"] #academic , "forum",   
 #genres = [ "blog"] #, "eshop", "faq", "frontpage", "listing", "php", "spage"] 
 #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop"] 
 base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages/", "../Documents/Synergy-Crawler/saved_pages/"]
@@ -38,13 +38,14 @@ exps_report = list()
 #    exps_report.append( pool.dispatch(exp.tf_experiment_set1, base_filepath, train_tf_vectors, 140, test_tf_vectors, 49, g, genres, lower_case=True) )
 #    print("Experiment %s VS All: Dispatched" % g)
 
-#for g in genres:
-#    exps_report.append( pool.dispatch(exp.tf_experiment_set3, (7000, 100),base_filepath, train_tf_vectors, 140, test_tf_vectors, 1000, g, genres, lower_case=True) )
-#    print("Experiment %s VS All: Dispatched" % g)
-    
 for g in genres:
-    exps_report.append( pool.dispatch(exp.tf_experiment_set4, base_filepath, train_tf_vectors, 2500, test_tf_vectors, 800, g, genres, freq_init=5, freq_lim=200, freq_step=5,lower_case=True, keep_terms=None) )
+    exps_report.append( pool.dispatch(exp.tf_experiment_set3, (10, 110, 10),base_filepath, train_tf_vectors, 2500, test_tf_vectors, 500, g, genres, lower_case=True) )
     print("Experiment %s VS All: Dispatched" % g)
+    
+#for g in genres:
+#    exps_report.append( pool.dispatch(exp.tf_experiment_set4, base_filepath, train_tf_vectors, 2500, test_tf_vectors, 800, g, genres, freq_init=5, freq_lim=200, freq_step=10,lower_case=True, keep_terms=None) )
+#    print("Experiment %s VS All: Dispatched" % g)
+
 
 #exps_report.append( pool.dispatch(exp.tf_experiment_set2, base_filepath, train_tf_vectors, 1000, test_tf_vectors, 500, genres, lower_case=True) )
 #print("Experiment Multiclass SVM Dispatched")

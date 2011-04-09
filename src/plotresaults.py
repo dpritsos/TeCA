@@ -5,8 +5,6 @@ import codecs
 import re
 import os
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-
 
 def load_resaults(filepath, filename):
     try:
@@ -236,8 +234,8 @@ def plot_resaults(titles, vformat_d, figure_num):
             plt.subplot(3,3, plt_pos )
             plt.title( titles[0].replace('----', '') + vformat.replace('****', '') )
             #plt.xlabel( 'Vects Number for Trainning' )
-            #plt.xlabel( 'Number of Features kept' )
-            plt.xlabel( 'Frequency Threshold' )
+            plt.xlabel( 'Number of Features kept' )
+            #plt.xlabel( 'Frequency Threshold' )
             plt.ylabel( ylbl[k] )
             for i, nu in enumerate([0.2, 0.3, 0.5, 0.7, 0.8]):
                 plt.plot(tvect_d[ str( nu )  ], res_d[ str( nu )  ], color[i] + 'o', tvect_d[ str( nu )  ], res_d[ str( nu )  ], color[i] + '-')
@@ -245,13 +243,13 @@ def plot_resaults(titles, vformat_d, figure_num):
     return plt
 
 if __name__ == '__main__':
-    base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/TERMS/" #KI-04/" Santini_corpus/"
+    base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages/TEST/" #Santini_corpus/"
     flist = [files for path, dirs, files in os.walk(base_filepath)]
     flist = flist[0]
     plot_l = list()
     for z, file in enumerate(flist):
         print file
-        titles, vformat_d = load_resaults_3(base_filepath, file)
+        titles, vformat_d = load_resaults_2(base_filepath, file)
         #print vformat_d['**** Binary ****']
         plt = plot_resaults(titles, vformat_d, z)
         plot_l.append( plt )

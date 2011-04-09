@@ -13,12 +13,12 @@ print "Registering"
 #pool.register_mod( ['html2vector', 'vectorhandlingtools', 'generatevectors'] )  
 print "Regitered OK"
 
-#genres = [ "blogs", "news", "wiki_pages", "product_companies", "forum" ] #academic ,  
+genres = [ "news", "product_companies", "blogs", "forum"] #academic , "news", "wiki_pages", "product_companies", "blogs", "forum"  
 #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
-genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop"] 
-#base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages", "../Documents/Synergy-Crawler/saved_pages"]
+#genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop"] 
+base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages", "../Documents/Synergy-Crawler/saved_pages"]
 #base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/Santini_corpus", "../Documents/Synergy-Crawler/Santini_corpus"]
-base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/KI-04", "../Documents/Synergy-Crawler/KI-04"]  
+#base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/KI-04", "../Documents/Synergy-Crawler/KI-04"]  
 
 html2tf = HTML2TF()
 html2nf = HTML2NF(n=3)
@@ -29,12 +29,12 @@ html2nf = HTML2NF(n=3)
 resaults = list()
 for g in genres:
     #Training Vectors file paths
-    train_filepath = str( "/" + g + "/html_pages/")
+    train_filepath = str( "/" + g + "/html_2500_pages/")
     train_tfv_file = str( "/" + g + "/train_tf_vectors/" + g + ".tfvl" )
     train_tfd_file = str( "/" + g + "/train_tf_dictionaries/" + g + ".tfd" )
     train_err_file = str( "/" + g + "/" + g + ".train.lst.err")
     #Testing Vectors file paths
-    test_filepath = str( "/" + g + "/test_only_html_pages/")
+    test_filepath = str( "/" + g + "/test_only_html_2500_pages/")
     test_tfv_file = str( "/" + g + "/test_tf_vectors/" + g + ".tfvl" )
     test_tfd_file = str( "/" + g + "/test_tf_dictionaries/" + g + ".tfd" )
     test_err_file = str( "/" + g + "/" + g + ".test.lst.err")
@@ -50,12 +50,12 @@ for res in resaults:
 
 for g in genres:
     #Training Vectors file paths
-    train_filepath = str( "/" + g + "/html_pages/")
+    train_filepath = str( "/" + g + "/html_2500_pages/")
     train_tfv_file = str( "/" + g + "/train_nf_vectors/" + g + ".nfvl" )
     train_tfd_file = str( "/" + g + "/train_nf_dictionaries/" + g + ".nfd" )
     train_err_file = str( "/" + g + "/" + g + ".train.lst.err")
     #Testing Vectors file paths
-    test_filepath = str( "/" + g + "/test_only_html_pages/")
+    test_filepath = str( "/" + g + "/test_only_html_2500_pages/")
     test_tfv_file = str( "/" + g + "/test_nf_vectors/" + g + ".nfvl" )
     test_tfd_file = str( "/" + g + "/test_nf_dictionaries/" + g + ".nfd" )
     test_err_file = str( "/" + g + "/" + g + ".test.lst.err")

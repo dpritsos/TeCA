@@ -39,7 +39,7 @@ class SVMTE(object):
         return svm_m
     
     @staticmethod
-    def evaluate_oneclass_svm(fobj, svm_m, test_idxf_d_l, genre_no):
+    def DEPRICATED_evaluate_oneclass_svm(fobj, svm_m, test_idxf_d_l, genre_no):
         c1 = float(0)
         c2 = float(0)
         tp = float(0) 
@@ -55,13 +55,67 @@ class SVMTE(object):
         print "Evaluating"
         for i, d in enumerate(p_labels):
             if d > 0:
-                if i > tg_lim:
+                if i >= tg_lim:
                     fp += 1
                 else:
                     tp += 1   
                 c1 += 1
             else:
-                if i > tg_lim:
+                if i >= tg_lim:
+                    tn += 1
+                else:
+                    fn += 1
+                c2 += 1
+        ##
+        s = "+ %s, - %s\n" % (c1, c2)
+        fobj.write(s)
+        s = "tp=%s, tn=%s\nfp=%s, fn=%s\n" % (tp,tn,fp,fn)
+        fobj.write(s)
+        try:
+            ##
+            precision = tp/(tp+fp)
+            s = "Precision=%f\n" % precision 
+            fobj.write(s)
+            ##
+            recall = tp/(tp+fn)
+            s = "Recall=%f\n" % recall 
+            fobj.write(s)
+            ##
+            f1 = (2*precision*recall)/(precision+recall)
+            s = "F1=%s\n\n" % f1
+            fobj.write(s)
+        except Exception as e:
+            s = "Precision=0.0\nRecall=0.0\nF1=0.0\n\n" 
+            fobj.write(s)
+        #OPTIONAL FUNCTION CALL
+        SVMTE.evaluate_oneclass_svm_2(fobj, p_labels, genre_no)
+    
+    @staticmethod
+    def evaluate_oneclass_svm(fobj, svm_m, test_idxf_d_l, genre_no, g_seq_num):
+        c1 = float(0)
+        c2 = float(0)
+        tp = float(0) 
+        tn = float(0)
+        fp = float(0)
+        fn = float(0)
+        #Prediction phase
+        print len(test_idxf_d_l)
+        print "Predicting"  
+        p_labels, acc, val = svm_predict([0]*len(test_idxf_d_l), test_idxf_d_l, svm_m, '-b 0' )
+        #print p_labels
+        tg_num_per_g = len(p_labels)/genre_no
+        down_tg_lim = tg_num_per_g*g_seq_num
+        up_tg_lim = tg_num_per_g + down_tg_lim 
+        print "Evaluating"
+        for i, d in enumerate(p_labels):
+            if d > 0:
+                if i < up_tg_lim and i >= down_tg_lim:
+                    tp += 1
+                else:
+                    fp += 1   
+                c1 += 1
+            else:
+                if i >= up_tg_lim or i < down_tg_lim:
                     tn += 1
                 else:
                     fn += 1
@@ -93,17 +147,23 @@ class SVMTE(object):
     @staticmethod
     def evaluate_oneclass_svm_2(fobj, p_labels, genre_no):
         pg_per_g = len(p_labels)/genre_no
-        evl_matrix = list(range(genre_no)) 
+        evl_matrix_p = [0]*genre_no 
+        evl_matrix_n = [0]*genre_no
+        negative_idcs = list() 
         start = 0
         end = pg_per_g
         for i in range(genre_no):
-            for p_lbl in p_labels[start:end]:
-                if p_lbl == 1:
-                    evl_matrix[ i ] += 1
+            for n_idx, p_lbl in enumerate(p_labels[start:end]):
+                if p_lbl == 1.0:
+                    evl_matrix_p[ i ] += 1
+                elif p_lbl == -1.0:
+                    evl_matrix_n[ i ] += 1
+                    negative_idcs.append( start + n_idx )
             start = end
             end = end + pg_per_g
         for i in range(genre_no):
-            fobj.write( str( evl_matrix[ i ] ) + "\n" )
+            fobj.write( str( evl_matrix_p[ i ] ) +"\t"+ str( evl_matrix_n[ i ] )  +"\t"+ str( pg_per_g - evl_matrix_p[ i ] - evl_matrix_n[ i ] ) +"\n" )
+        fobj.write( "negative_indices->" + str(negative_idcs) + "\n\n")
         #fobj.write( str(p_labels) )
     
     @staticmethod
