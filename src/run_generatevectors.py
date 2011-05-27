@@ -13,12 +13,12 @@ print "Registering"
 #pool.register_mod( ['html2vector', 'vectorhandlingtools', 'generatevectors'] )  
 print "Regitered OK"
 
-genres = [ "news", "product_companies", "blogs", "forum"] #academic , "news", "wiki_pages", "product_companies", "blogs", "forum"  
+genres = [ "forum", "news", "product_companies", "blogs" ] #academic , "news", "wiki_pages", "product_companies", "blogs", "forum"  
 #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
 #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop"] 
-base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/saved_pages", "../Documents/Synergy-Crawler/saved_pages"]
-#base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/Santini_corpus", "../Documents/Synergy-Crawler/Santini_corpus"]
-#base_filepath = ["/home/dimitrios/Documents/Synergy-Crawler/KI-04", "../Documents/Synergy-Crawler/KI-04"]  
+base_filepath = ["/home/dimitrios/Synergy-Crawler/saved_pages", "../Synergy-Crawler/saved_pages"]
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus", "../Synergy-Crawler/Santini_corpus"]
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/KI-04", "../Synergy-Crawler/KI-04"]  
 
 html2tf = HTML2TF()
 html2nf = HTML2NF(n=3)
