@@ -271,7 +271,7 @@ def plot_resaults(titles, vformat_d, figure_num):
     return plt
 
 if __name__ == '__main__':
-    base_filepath = "/home/dimitrios/Synergy-Crawler/Santini_corpus/OC-SVM_terms/" #Experiment_th1_featrs10-100-step10_3grams_2500-500pgs_ascii_6-April-2011/z/" #cross-val_site-fold_terms/" #mutliclass_svm/" "
+    base_filepath = "/home/dimitrios/Synergy-Crawler/Santini_corpus/" #Experiment_th1_featrs10-100-step10_3grams_2500-500pgs_ascii_6-April-2011/z/" #cross-val_site-fold_terms/" #mutliclass_svm/" "
     flist = [files for path, dirs, files in os.walk(base_filepath)]
     flist = flist[0]
     plot_l = list()

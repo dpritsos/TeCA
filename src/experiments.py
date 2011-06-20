@@ -1,6 +1,7 @@
 """
 
 """
+import sys
 sys.path.append('../../synergeticprocessing/src')
 sys.path.append('../../html2vectors/src')
 import os
@@ -20,6 +21,7 @@ class SVMExperiments(object):
     def __init__(self):
         self.svm = SVMTE()
         self.porter = MyStemmer()
+        self.keep_atleast_history = 0
         
     def locate_base(self, base_filepath, training_path, g):
         #Load TF Dictionary
@@ -121,6 +123,10 @@ class SVMExperiments(object):
         #If there is a limit to the terms of the dictionary that has to be kept
         if keep_terms:
             tf_dict = VHTools.keep_atleast(tf_dict, keep_terms)
+            if self.keep_atleast_history == len(tf_dict):
+                self.keep_atleast_history = len(tf_dict)
+                return
+            self.keep_atleast_history = len(tf_dict)
             fobj.write("^^^^ Terms kept= " + str(len(tf_dict)) + " ^^^^\n")
             fobj.write("TF_dictionary= " + str(tf_dict) + "\n")
         print("TF Dictionary kept length: %s" % len(tf_dict))

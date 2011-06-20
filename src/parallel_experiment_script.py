@@ -2,6 +2,7 @@
 
 """
 import os
+import sys
 sys.path.append('../../synergeticprocessing/src')
 sys.path.append('../../html2vectors/src')
 from vectorhandlingtools import *
@@ -18,11 +19,11 @@ print "Regitered OK"
 exp = SVMExperiments()
 
 #genres = [  "wiki_pages", "product_companies", "forum", "blogs", "news" ] #academic , "forum",   
-#genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"] 
-genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop"] 
+genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"] 
+#genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop"] 
 #base_filepath = ["/home/dimitrios/Synergy-Crawler/saved_pages/", "../Synergy-Crawler/saved_pages/"]
-#base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus/", "../Synergy-Crawler/Santini_corpus/"]
-base_filepath = ["/home/dimitrios/Synergy-Crawler/KI-04/", "../Synergy-Crawler/KI-04/"] 
+base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus/", "../Synergy-Crawler/Santini_corpus/"]
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/KI-04/", "../Synergy-Crawler/KI-04/"] 
 train_tf_d = "/train_tf_dictionaries/"
 train_tf_vectors = "/train_tf_vectors/"
 test_tf_d = "/test_tf_dictionaries/"
@@ -47,10 +48,11 @@ exps_report = list()
 #    exps_report.append( pool.dispatch(exp.exprmt_ocsvm, nu, featrs, vect_format, base_filepath, train_nf_vectors, 2500, test_nf_vectors, 500, g, genres, lower_case=True) )
 #    print("Experiment %s VS All: Dispatched" % g)
 
-
-keep_term_lst = range(10, 720, 50)
+keep_term_lst =  [10, 20, 50, 80, 100, 150, 200, 250, 300, 400]#range(500, 63000, 1500)
+keep_term_lst.extend(range(500, 63000, 1500))
+#keep_term_lst = range(10, 720, 50)
 for g in genres:
-    exps_report.append( pool.dispatch(exp.exprmt_feature_len_variation, keep_term_lst, base_filepath, train_tf_vectors, 65, test_tf_vectors, 50, g, genres, lower_case=True) )
+    exps_report.append( pool.dispatch(exp.exprmt_feature_len_variation, keep_term_lst, base_filepath, train_nf_vectors, 140, test_nf_vectors, 49, g, genres, lower_case=True) )
     print("Experiment %s VS All: Dispatched" % g)
 
 #keep_term_lst = range(10, 670, 30)
@@ -65,8 +67,9 @@ for g in genres:
 #    exps_report.append( pool.dispatch(exp.tf_experiment_set4, base_filepath, train_tf_vectors, 2500, test_tf_vectors, 800, g, genres, freq_init=5, freq_lim=200, freq_step=10,lower_case=True, keep_terms=None) )
 #    print("Experiment %s VS All: Dispatched" % g)
 
-#keep_term_lst = range(500, 63000, 1500)
-#c_lst = [1, 2, 5, 10, 50]
+#keep_term_lst =  [10, 20, 50, 80, 100, 150, 200, 250, 300, 400]#range(500, 63000, 1500)
+#keep_term_lst.extend(range(500, 63000, 1500))
+#c_lst = [1] #[1, 2, 5, 10, 50]
 #kfolds = 10
 #exps_report.append( pool.dispatch(exp.kfold_corss_multiclass, kfolds, keep_term_lst, c_lst, base_filepath, train_nf_vectors, 0, test_nf_vectors, 0, genres, lower_case=True) )
 #print("Experiment k-fold Cross-Validation Multi-Class SVM Dispatched")
