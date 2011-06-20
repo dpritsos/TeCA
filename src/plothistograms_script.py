@@ -3,6 +3,8 @@
 import codecs
 import re
 import os
+sys.path.append('../../synergeticprocessing/src')
+sys.path.append('../../html2vectors/src')
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from vetorhandlingtools import VHTools

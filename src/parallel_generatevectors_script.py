@@ -2,9 +2,10 @@
 
 """
 import os
+sys.path.append('../../synergeticprocessing/src')
+sys.path.append('../../html2vectors/src')
 from generatevectors import HTML2TF, HTML2NF
 import sys
-sys.path.append('../../synergeticprocessing/src')
 from synergeticpool import SynergeticPool
 
 #pool = SynergeticPool( { '192.168.1.65':(40000,'123456'), '192.168.1.68':(40000,'123456') }, local_workers=1, syn_listener_port=41000 ) 

@@ -2,9 +2,10 @@
 
 """
 import os
+sys.path.append('../../synergeticprocessing/src')
+sys.path.append('../../html2vectors/src')
 from vectorhandlingtools import *
 import sys
-sys.path.append('../../synergeticprocessing/src')
 from synergeticpool import *
 from experiments import *
 

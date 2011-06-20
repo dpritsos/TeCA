@@ -51,7 +51,7 @@ class BaseHTMLFileTools(BaseFileTools):
         return  fname_lst, self.load_html_files(fname_lst, encoding, error_handling)
 
 
-class BaseHTML2TFRegexTools:
+class BaseHTML2TFRegexTools(object):
     
     def __init__(self):    
         #Whitespace characters [<space>\t\n\r\f\v] matching, for splitting the raw text to terms
@@ -183,7 +183,7 @@ class BaseHTML2TFRegexTools:
         pass
    
      
-class BaseRegexTools(object):
+class BaseRegexTextExtraction(object):
     
     count = 0
     
@@ -222,14 +222,13 @@ class BaseRegexTools(object):
             ###norm_text = self.encoding_norm(text)
             #Replace whitespace chars with single space
             text = self.whitespace_chars.sub(' ', text)
-            
             #Replace utf8 'REPLACEMENT CHARACTER' with empty string
             text = self.unknown_char_seq.sub('', text)
                
         return text
 
 
-class BaseXmlTools(object):
+class BaseXmlTextExtraction(object):
     
     def __init__(self):
         """ TO BE IMPLEMENTED """
@@ -285,26 +284,26 @@ class HTML2NgFTools(BaseHTMLFileTools):
             return wbpg_l, self.nf_dict_l(html_str_l)
 
 
-class RegexHTML2NgFTools(HTML2NgFTools, BaseRegexTools):
+class RegexHTML2NgFTools(HTML2NgFTools, BaseRegexTextExtraction):
     
     def __init__(self, n=3):
-        BaseRegexTools.__init__(self)
+        BaseRegexTextExtraction.__init__(self)
         HTML2NgFTools.__init__(self, n)
 
 
-class XmlHTML2NgFTools(HTML2NgFTools, BaseXmlTools):
+class XmlHTML2NgFTools(HTML2NgFTools, BaseXmlTextExtraction):
     
     def __init__(self, n=3):
-        BaseXmlTools.__init__(self)
+        BaseXmlTextExtraction.__init__(self)
         HTML2NgFTools.__init__(self, n)
 
 
  
-class HTML2TFTools(BaseHTML2TFRegexTools, BaseRegexTools, BaseHTMLFileTools):
+class HTML2TFTools(BaseHTML2TFRegexTools, BaseRegexTextExtraction, BaseHTMLFileTools):
     
     def __init__(self):
         BaseHTML2TFRegexTools.__init__(self)    
-        BaseRegexTools.__init__(self)
+        BaseRegexTextExtraction.__init__(self)
         
     def tf_dict(self, xhtml_str):
         text = self.extract_text(xhtml_str)
@@ -359,17 +358,17 @@ class HTML2TFTools(BaseHTML2TFRegexTools, BaseRegexTools, BaseHTMLFileTools):
             return wbpg_l, self.tf_dict_l(html_str_l)
 
 
-class RegexHTML2TFTools(HTML2TFTools, BaseRegexTools):
+class RegexHTML2TFTools(HTML2TFTools, BaseRegexTextExtraction):
     
     def __init__(self):
-        BaseRegexTools.__init__(self)
+        BaseRegexTextExtraction.__init__(self)
         HTML2TFTools.__init__(self)
 
 
-class XmlHTML2TFTools(HTML2TFTools, BaseXmlTools):
+class XmlHTML2TFTools(HTML2TFTools, BaseXmlTextExtraction):
     
     def __init__(self):
-        BaseXmlTools.__init__(self)
+        BaseXmlTextExtraction.__init__(self)
         HTML2TFTools.__init__(self)
 
 

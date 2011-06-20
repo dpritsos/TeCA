@@ -1,5 +1,7 @@
 
 import os
+sys.path.append('../../synergeticprocessing/src')
+sys.path.append('../../html2vectors/src')
 from vectorhandlingtools import VHTools 
 from html2vector import RegexHTML2NgFTools, RegexHTML2TFTools
 import codecs

@@ -1,6 +1,8 @@
 """
 
 """
+sys.path.append('../../synergeticprocessing/src')
+sys.path.append('../../html2vectors/src')
 import os
 print 'os imported'
 from vectorhandlingtools import VHTools

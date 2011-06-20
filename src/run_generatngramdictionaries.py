@@ -2,6 +2,8 @@
 
 """
 import os
+sys.path.append('../../synergeticprocessing/src')
+sys.path.append('../../html2vectors/src')
 from vectorhandlingtools import *
 import termvectorgenerator as tvg
 from trainevaloneclssvm import *

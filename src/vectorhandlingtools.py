@@ -238,7 +238,7 @@ class VHTools(BaseFileTools):
             raise Exception("Dictionary or a List of Dictionaries was expected as fist input argument")
 
     @staticmethod
-    def save_tf_dct(filename, record, sencoding='utf-8', error_handling='strict'):
+    def save_tf_dct(filename, records, encoding='utf-8', error_handling='strict'):
         """ save_tf_dct(): is getting a filename string and a TF-Dictionary saves 
             the dictionary to a file with utf-8 Encoding. """
         try:
@@ -246,7 +246,7 @@ class VHTools(BaseFileTools):
             fenc = codecs.open( filename, 'wb', encoding, error_handling)
         except IOError:
             return None 
-        try: 
+        try:
             for rec in records:  
                 fenc.write( rec + " ~~> "  + str(records[rec]) + "\n" ) # Write a string to a file 
         except Exception as e:

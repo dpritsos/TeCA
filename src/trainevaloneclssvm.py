@@ -4,6 +4,7 @@
 import os
 from svmutil import *
 import decimal
+sys.path.append('../../html2vectors/src')
 from vectorhandlingtools import *
 
 
