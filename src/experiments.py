@@ -206,6 +206,10 @@ class SVMExperiments(object):
         #If there is a limit to the terms of the dictionary that has to be kept
         if keep_terms:
             tf_dict = VHTools.keep_atleast(tf_dict, keep_terms)
+            if self.keep_atleast_history == len(tf_dict):
+                self.keep_atleast_history = len(tf_dict)
+                return
+            self.keep_atleast_history = len(tf_dict)
             fobj.write("^^^^ Terms kept= " + str(len(tf_dict)) + " ^^^^\n")
             fobj.write("TF_dictionary= " + str(tf_dict) + "\n")
         print("TF Dictionary kept length: %s" % len(tf_dict))
@@ -369,11 +373,11 @@ class SVMExperiments(object):
             print paths_d['filepath'] + training_path
             print paths_d['filepath'] + test_path
             train_d = self.load_tt_set(paths_d['filepath'], training_path, train_pg_lim, g, lower_case)
-            test_l = self.load_tt_set(paths_d['filepath'], test_path, test_pg_lim, g, lower_case)
-            genre_tt_tf_d_l = train_d['tt-set'][1] + test_l['tt-set'][1]
+            #test_l = self.load_tt_set(paths_d['filepath'], test_path, test_pg_lim, g, lower_case) ### TEMP CHANGE
+            genre_tt_tf_d_l = train_d['tt-set'][1] #+ test_l['tt-set'][1] ### TEMP CHANGE
             tt_tf_d_ll.append( genre_tt_tf_d_l  )
             tt_tf_d_l_tmp.extend( genre_tt_tf_d_l )
-            tt_wps_ll.append( train_d['tt-set'][0] + test_l['tt-set'][0] )
+            tt_wps_ll.append( train_d['tt-set'][0] ) #+ test_l['tt-set'][0] ) ### TEMP CHANGE
             class_tags_ll.append( [cls_no]*len(genre_tt_tf_d_l) )
             tags_per_cls.append( len(genre_tt_tf_d_l) )
         #Generate Corpus Dictionary
@@ -397,6 +401,9 @@ class SVMExperiments(object):
         #If there is a limit to the terms of the dictionary that has to be kept
         if keep_terms:
             tf_dict = VHTools.keep_atleast(tf_dict, keep_terms)
+            if self.keep_atleast_history == len(tf_dict):
+                self.keep_atleast_history = len(tf_dict)
+                return
             fobj.write("^^^^ Terms kept= " + str(len(tf_dict)) + " ^^^^\n")
             #fobj.write("TF_dictionary= " + str(tf_dict) + "\n")
         print("TF Dictionary kept length: %s" % len(tf_dict))

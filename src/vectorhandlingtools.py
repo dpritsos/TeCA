@@ -155,7 +155,7 @@ class VHTools(BaseFileTools):
                 wps_l.append( wp_name )
                 composed_terms = wp_tf_d.split('\t')
                 vect_dict = dict()  
-                for comp_term in composed_terms:                     
+                for comp_term in composed_terms:                
                     Term, Freq = tuple( comp_term.split(' ~:~ ') )
                     if force_lower_case:
                         vect_dict[ Term.lower() ] = float( Freq )

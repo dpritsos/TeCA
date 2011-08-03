@@ -164,16 +164,25 @@ if __name__ == '__main__':
     
     #base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/KI-04"
     #base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/Santini_corpus"
-    base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages"
+    #base_filepath = "/home/dimitrios/Documents/Synergy-Crawler/saved_pages"
     #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ] 
-    genres = [ "blogs"] #, "news" , "product_companies", "forum", "wiki_pages" ] #"wiki_pages",
-    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]      
+    #genres = [ "blogs"] #, "news" , "product_companies", "forum", "wiki_pages" ] #"wiki_pages",
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
+    #genres = [ "blog_pgs", "news_pgs", "product_pgs", "forum_pgs", "wiki_pgs" ] 
+    genres = [ "wiki_pgs"]
+    base_filepath = "/home/dimitrios/Synergy-Crawler/Crawled_corpus_3000/"
+          
     
     #for g in genres:
     #    flist_filepath = os.path.join(base_filepath, g, g + ".train.lst.err" )
     #    dest = os.path.join(base_filepath, g, "non_proper_html_pages")
     #    PathCleanUp.move_flst(flist_filepath, dest)
-    
+   
+    #bpfh = BasePathFileHandler()
+    #for i, filenm in enumerate(bpfh.file_list_frmpaths(None, ['/home/dimitrios/Synergy-Crawler/saved_pages/wiki_pages/html_pages/'])):
+    #    if i > 2500:
+    #        break
+    #    bpfh.copyfile( filenm, '/home/dimitrios/Synergy-Crawler/Crawled_corpus_3000/wiki_pgs/html/' + filenm.split('/')[-1])     
     
     #for g in genres: 
     #    sourcepath = os.path.join(base_filepath, g, "html_pages/" )
@@ -182,10 +191,10 @@ if __name__ == '__main__':
     #   PathCleanUp.move_atleast(sourcepath, dest, 1000, basepath='')
     
     for g in genres: 
-        sourcepath = os.path.join(base_filepath, g, "test_only_html_pages/" )
-        dest = os.path.join(base_filepath, g, "test_only_html_2500_pages/" )
+        sourcepath = os.path.join(base_filepath, g, "html/" )
+        dest = os.path.join(base_filepath, g, "html_500/" )
         print dest
-        PathCleanUp.copy_fromeach(sourcepath, dest, 125, basepath='')
+        PathCleanUp.copy_fromeach(sourcepath, dest, 250, basepath='')
         
     #for g in genres: 
     #    sourcepath = os.path.join(base_filepath, g, "html_pages/" )
