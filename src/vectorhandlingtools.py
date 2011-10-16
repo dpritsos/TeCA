@@ -24,7 +24,7 @@ class VHTools(BaseFileTools):
         terms_l.reverse()
         atlest_terms_l = terms_l[0:terms_amount]
         last_freq = atlest_terms_l[-1][0]
-        print last_freq
+        #print last_freq
         for freq, term in terms_l[terms_amount:]:
             if freq == last_freq:
                 atlest_terms_l.append( (freq, term) )
@@ -89,9 +89,9 @@ class VHTools(BaseFileTools):
         #The following for loop is an alternative approach to reading lines instead of using f.readline() or f.readlines()
         tf_d = dict()
         try:
-            for fileline in fenc:
-                line = fileline.rstrip()
-                line = fileline.rstrip()
+            wholefile = fenc.read()
+            for fileline in wholefile.split("\n~\n~\n")[:-1]:
+                line = fileline #.rstrip()
                 if len(line.split(" ~~> ")) != 2:
                     print line
                 Term, Freq = tuple( line.split(" ~~> ") )
@@ -119,12 +119,33 @@ class VHTools(BaseFileTools):
                 tf_d = VHTools.__load_tf_dict(filename, encoding, error_handling, force_lower_case)
                 for Term, Freq in tf_d.items():
                     if Term in mrgd_tf_d: 
-                        mrgd_tf_d[ Term ] += Freq 
+                        mrgd_tf_d[ Term ] += float(Freq) 
                     else:
-                        mrgd_tf_d[ Term ] = Freq
+                        mrgd_tf_d[ Term ] = float(Freq)
             return mrgd_tf_d
         else:
             raise Exception("A String or a list of Strings was Expected as input")
+    
+    @staticmethod
+    def load_tf_dict_NUM(filename_l, encoding='utf-8', error_handling='strict', force_lower_case=False):
+        """ load_tf_dict(): is getting a filename or a (filename list) and lower case force option
+            as arguments. It returns a Term-Frequency Dictionary which is a merged dictionary of all
+            TF dictionaries given a argument """
+        if isinstance(filename_l, str):
+            return VHTools.__load_tf_dict(filename_l, encoding, error_handling, force_lower_case)
+        elif isinstance(filename_l, list):
+            mrgd_tf_d = dict()
+            for filename in filename_l:
+                tf_d = VHTools.__load_tf_dict(filename, encoding, error_handling, force_lower_case)
+                for Term, Freq in tf_d.items():
+                    if Term in mrgd_tf_d: 
+                        mrgd_tf_d[ int(Term) ] += float(Freq) 
+                    else:
+                        mrgd_tf_d[ int(Term) ] = float(Freq)
+            return mrgd_tf_d
+        else:
+            raise Exception("A String or a list of Strings was Expected as input")
+    
     
     @staticmethod
     def load_tfd_frmpaths(basepath, filepath_l, encoding, error_handling, force_lower_case=False):
@@ -149,18 +170,19 @@ class VHTools(BaseFileTools):
         vect_l = list()
         try:
             lines_cnt = 0
-            for fileline in fenc:
-                line = fileline.rstrip()
+            wholetxt = fenc.read()
+            for fileline in wholetxt.split("\n~\n~\n")[:-1]:
+                line = fileline #.rstrip()
                 wp_name, wp_tf_d = tuple( line.split(" ~~> ") ) #BE CAREFULL with SPACES
                 wps_l.append( wp_name )
-                composed_terms = wp_tf_d.split('\t')
-                vect_dict = dict()  
-                for comp_term in composed_terms:                
+                composed_terms = wp_tf_d.split('\t~,~\t')
+                vect_dict = dict()   
+                for comp_term in composed_terms:        
                     Term, Freq = tuple( comp_term.split(' ~:~ ') )
                     if force_lower_case:
                         vect_dict[ Term.lower() ] = float( Freq )
                     else:    
-                        vect_dict[ Term ] = float( Freq )
+                        vect_dict[ float(Term) ] = float( Freq )
                 vect_l.append( vect_dict )
                 #If a file contains more than one line (i.e. web page vectors) keep 
                 #only the amount of pages requested in the line_lim argument
@@ -248,7 +270,7 @@ class VHTools(BaseFileTools):
             return None 
         try:
             for rec in records:  
-                fenc.write( rec + " ~~> "  + str(records[rec]) + "\n" ) # Write a string to a file 
+                fenc.write( str(rec) + " ~~> "  + str(records[rec]) + "\n~\n~\n" ) # Write a string to a file 
         except Exception as e:
             print("ERROR WRITTING FILE: %s -- %s" % (filename, e))
         finally:
@@ -266,17 +288,22 @@ class VHTools(BaseFileTools):
             print "save_dct_lst Error: ", e
             return None 
         try: 
-            for i in range(len(index)):
+            idx_len = len(index)
+            for i in range(idx_len):
                 fenc.write(index[i] + " ~~> ")
-                for rec in records[i]:
-                    fenc.write( rec + " ~:~ "  + str(records[i][rec]) + "\t") 
-                fenc.write("\n") 
+                rcds_len = len(records[i])
+                for rec_no, rec in enumerate(records[i]):
+                    fenc.write( str(rec) + " ~:~ "  + str(records[i][rec]))
+                    if rec_no != rcds_len - 1:
+                        fenc.write("\t~,~\t")
+                    else:
+                        print 'NO LAST DILIMETER' 
+                fenc.write("\n~\n~\n") 
         except Exception as e:
             print("ERROR WRITTING FILE: %s -- %s ---- %s" % (filename, e, rec))
         finally:
             fenc.close()
         return True       
-
     
 class GreenVHTools(VHTools):
     """ GreenVHTools Class is a GreenLet/Eventlet version of VHTools Class.

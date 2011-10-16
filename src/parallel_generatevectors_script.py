@@ -19,10 +19,13 @@ from generatevectors import Html2TF_Concurrent, Text2TF_Concurrent
 #base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus_html2txt"]
 #base_filepath = ["/home/dimitrios/Synergy-Crawler/KI-04", "../Synergy-Crawler/KI-04"]  
 
-#base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus_html2txt"]
-#genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
-genres = [ "blog_pgs", "news_pgs", "product_pgs", "forum_pgs", "wiki_pgs" ] 
-base_filepath = ["/home/dimitrios/Synergy-Crawler/Crawled_corpus_3000/"]
+base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus_html2txt/"]
+genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
+#genres = [ "blog_pgs", "news_pgs", "product_pgs", "forum_pgs", "wiki_pgs" ] 
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/Crawled_corpus_3000/"]
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/Manually_Selected_Crawled_corpus_75/"]
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/Crawled_corpus_500/"]
+
 
 html2tf = Html2TF_Concurrent( lowercase=True )
 html2nf = Html2TF_Concurrent(n=3, lowercase=True)
@@ -60,26 +63,28 @@ for res in resaults:
 for g in genres:
     #Vectors file paths
     #filepath = str( "/" + g + "/html2ascii_perl_text/")
-    #filepath = str( "/" + g + "/html2text_debian_text/")
+    filepath = str( "/" + g + "/html2text_debian_text/")
     #filepath = str( "/" + g + "/htmldetagger_console_ver_text/")
+    #filepath = str( "/" + g + "/htmldetagger_console_500_ver_text/")
     #filepath = str( "/" + g + "/txt_rapidminer_app/")
     #filepath = str( "/" + g + "/txt_Htmlremover_app/")
-    ##filepath = str( "/" + g + "/txt_html2vectors_mod/")
+    #filepath = str( "/" + g + "/txt_html2vectors_mod/")
     #filepath = str( "/" + g + "/txt_html2vectors_mod_500/")
     #filepath = str( "/" + g + "/nltk-clean_html_text/")
-    ##filepath = str( "/" + g + "/lxml_elementtree_text/")
-    filepath = str( "/" + g + "/lxml_elementtree_text_500/")
+    #filepath = str( "/" + g + "/lxml_elementtree_text/")
+    #filepath = str( "/" + g + "/lxml_elementtree_text_500/")
     #filepath = str( "/" + g + "/html/")
     #tfv_file = str( "/" + g + "/html2ascii_perl_ng-tfv/" + g + ".nfvl" )
-    #tfv_file = str( "/" + g + "/html2text_debian_ng-tfv/" + g + ".nfvl" )
+    tfv_file = str( "/" + g + "/html2text_debian_ng-tfv/" + g + ".nfvl" )
     #tfv_file = str( "/" + g + "/htmldetagger_console_ver_ng-tfv/" + g + ".nfvl" )
+    #tfv_file = str( "/" + g + "/htmldetagger_console_ver_500_ng-tfv/" + g + ".nfvl" )
     #tfv_file = str( "/" + g + "/txt_rapidminer_app_ng-tfv/" + g + ".nfvl" )
     #tfv_file = str( "/" + g + "/txt_Htmlremover_app_ng-tfv/" + g + ".nfvl" ) 
-    ##tfv_file = str( "/" + g + "/txt_html2vectors_mod_ng-tfv/" + g + ".nfvl" )
+    #tfv_file = str( "/" + g + "/txt_html2vectors_mod_ng-tfv/" + g + ".nfvl" )
     #tfv_file = str( "/" + g + "/txt_html2vectors_mod_500_ng-tfv/" + g + ".nfvl" )
     #tfv_file = str( "/" + g + "/nltk-clean_html_text_ng-tfv/" + g + ".nfvl" )
     #tfv_file = str( "/" + g + "/lxml_elementtree_text_ng-tfv/" + g + ".nfvl" )
-    tfv_file = str( "/" + g + "/lxml_elementtree_text_500_ng-tfv/" + g + ".nfvl" )
+    #tfv_file = str( "/" + g + "/lxml_elementtree_text_500_ng-tfv/" + g + ".nfvl" )
     #tfv_file = str( "/" + g + "/html_ng-tfv/" + g + ".nfvl" )
     tfd_file = str( "/" + g + "/nf_dictionaries/" + g + ".nfd" )
     err_file = str( "/" + g + "/" + g + ".train.lst.err")

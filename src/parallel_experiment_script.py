@@ -35,24 +35,31 @@ train_nf_vectors = "/train_nf_vectors/"
 test_nf_d = "/train_nf_dictionaries/"
 test_nf_vectors = "/test_nf_vectors/"
 
-#genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"] 
-#base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus_html2txt/", "../Synergy-Crawler/Santini_corpus_html2txt/"]
-genres = [ "blog_pgs", "news_pgs", "product_pgs", "forum_pgs", "wiki_pgs" ] 
-base_filepath = ["/home/dimitrios/Synergy-Crawler/Crawled_corpus_3000/"]
+genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"] 
+base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus_html2txt/"]
+#genres = [ "blog_pgs", "news_pgs", "product_pgs", "forum_pgs", "wiki_pgs" ] 
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/Crawled_corpus_3000/"]
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/Manually_Selected_Crawled_corpus_75/"]
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/Crawled_corpus_500/"]
+
+
 ## Paths of Vector Lists for Santini's Corpus Cleaned-up from HTML tags by 8 different tools 
-##train_nf_vectors = "/txt_html2vectors_mod_ng-tfv/"
+#train_nf_vectors = "/txt_html2vectors_mod_ng-tfv/"
 #train_nf_vectors = "/txt_html2vectors_mod_500_ng-tfv/"
 #train_nf_vectors = "/txt_Htmlremover_app_ng-tfv/"
-##train_nf_vectors = "/lxml_elementtree_text_ng-tfv/"
-train_nf_vectors = "/lxml_elementtree_text_500_ng-tfv/"
+#train_nf_vectors = "/lxml_elementtree_text_ng-tfv/"
+#train_nf_vectors = "/lxml_elementtree_text_500_ng-tfv/"
 #train_nf_vectors = "/nltk-clean_html_text_ng-tfv/"
 #train_nf_vectors = "/html2ascii_perl_ng-tfv/"
 #train_nf_vectors = "/htmldetagger_console_ver_ng-tfv/"
+#train_nf_vectors = "/htmldetagger_console_ver_500_ng-tfv/"
 #train_nf_vectors = "/txt_rapidminer_app_ng-tfv/"
-#train_nf_vectors = "/html2text_debian_ng-tfv/"
+train_nf_vectors = "/html2text_debian_ng-tfv/"
 #train_nf_vectors = "/html_ng-tfv/"
 
-test_nf_vectors = "/test/"
+#test_nf_vectors = "/lxml_elementtree_text_ng-tfv/" #For Now!
+#test_nf_vectors = "/test/"
+
 
 
 exps_report = list()
@@ -68,11 +75,12 @@ exps_report = list()
 #    exps_report.append( pool.dispatch(exp.exprmt_ocsvm, nu, featrs, vect_format, base_filepath, train_nf_vectors, 2500, test_nf_vectors, 500, g, genres, lower_case=True) )
 #    print("Experiment %s VS All: Dispatched" % g)
 
-#keep_term_lst =  [10, 20, 50, 80, 100, 150, 200, 250, 300, 400]#range(500, 63000, 1500)
+################################################
+#keep_term_lst =  [20, 50, 80, 100, 150, 200, 300]#range(500, 63000, 1500)
 #keep_term_lst.extend(range(500, 63000, 1500))
 #keep_term_lst = range(10, 720, 50)
 #for g in genres:
-#    exps_report.append( pool.dispatch(exp.exprmt_feature_len_variation, keep_term_lst, base_filepath, train_nf_vectors, 140, test_nf_vectors, 49, g, genres, lower_case=True) )
+#    exps_report.append( pool.dispatch(exp.exprmt_feature_len_variation, keep_term_lst, base_filepath, train_nf_vectors, 66, test_nf_vectors, 9, g, genres, lower_case=True) )
 #    print("Experiment %s VS All: Dispatched" % g)
 
 #keep_term_lst = range(10, 670, 30)
@@ -87,12 +95,20 @@ exps_report = list()
 #    exps_report.append( pool.dispatch(exp.tf_experiment_set4, base_filepath, train_tf_vectors, 2500, test_tf_vectors, 800, g, genres, freq_init=5, freq_lim=200, freq_step=10,lower_case=True, keep_terms=None) )
 #    print("Experiment %s VS All: Dispatched" % g)
 
+
+#########################3
 #keep_term_lst =  [10, 20, 50, 80, 100, 150, 200, 250, 300, 400]#range(500, 63000, 1500)
 #keep_term_lst.extend(range(500, 63000, 1500))
-keep_term_lst = range(1500, 47000, 3000)
-c_lst = [1] #[1, 2, 5, 10, 50]
-kfolds = 10
-exps_report.append( pool.dispatch(exp.kfold_corss_multiclass, kfolds, keep_term_lst, c_lst, base_filepath, train_nf_vectors, 500, test_nf_vectors, 0, genres, lower_case=True) )
+#keep_term_lst = [3500] #range(1500, 47000, 3000)
+#c_lst = [1] #[1, 2, 5, 10, 50]
+#kfolds = 10
+#exps_report.append( pool.dispatch(exp.kfold_corss_multiclass, kfolds, keep_term_lst, c_lst, base_filepath, train_nf_vectors, 0, test_nf_vectors, 0, genres, lower_case=True) )
+#exps_report.append( pool.dispatch(exp.Testing_mem_phase1, kfolds, keep_term_lst, c_lst, base_filepath, train_nf_vectors, 0, test_nf_vectors, 0, genres, lower_case=True) )
+#exps_report.append( pool.dispatch(exp.Testing_mem_phase2, kfolds, keep_term_lst, c_lst, base_filepath, train_nf_vectors, 0, test_nf_vectors, 0, genres, lower_case=True) )
+#exps_report.append( pool.dispatch(exp.Testing_mem_phase3, kfolds, keep_term_lst, c_lst, base_filepath, train_nf_vectors, 0, test_nf_vectors, 0, genres, lower_case=True) )
+##########################
+
+
 print("Experiment k-fold Cross-Validation Multi-Class SVM Dispatched")
 
 #keep_term_lst = [500, 2500, 5000, 60000] #range(500, 63000, 1500)
