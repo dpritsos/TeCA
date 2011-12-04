@@ -57,33 +57,25 @@ class SVMExperiments_with_tables(object):
             term_idx_d, idx_freq_d = self.tb_hdlr.TFtbls_Lst_2_TIdx_D(fileh, base_tbgroup + g, training_lst, data_type=tbtls.default_TF_3grams_dtype)
             #Create the Training-Set Array
             print "Preparing Training Set", g
-            training_arr = self.tb_hdlr.pagetf_array(fileh, base_tbgroup + g, training_lst, term_idx_d, data_type=np.float32)
-            #Save Training Data in CArray (HD5 PyTables file)
             filters = tb.Filters(complevel=5, complib='zlib')
-            training_CArr = h5f_tmp.createCArray(h5f_tmp.root, 'Training_'+str(k), tb.Float32Atom(), training_arr.shape, filters=filters)
-            training_CArr[:,:] = training_arr[:,:]
-            print training_CArr[0:1, 10:20]
-            print training_arr[0:1, 10:20]
-            h5f_tmp.flush()
-            print 'Flush'
-            del training_arr
-            print training_CArr[0:1, 10:20]
+            training_EArr = h5f_tmp.createEArray(h5f_tmp.root, 'Training_'+str(k), tb.Float32Atom(), (0,len(term_idx_d)), filters=filters)
+            training_EArr = self.tb_hdlr.pagetf_EArray(training_EArr, fileh, base_tbgroup + g, training_lst, term_idx_d, data_type=np.float32)
+            #training_arr = self.tb_hdlr.pagetf_array(fileh, base_tbgroup + g, training_lst, term_idx_d, data_type=np.float32
+            #Save Training Data in CArray (HD5 PyTables file)
+            print training_EArr[0:1, 10:2]
             print np.shape(training_CArr)
             #Create the Evaluaton-Set Array
-            eval_arr = self.tb_hdlr.pagetf_array(fileh, base_tbgroup + g, k_eval_set_lst, term_idx_d, data_type=np.float32)            
-            k_eval_EArr = h5f_tmp.createEArray(h5f_tmp.root, 'Eval_'+str(k), tb.Float32Atom(), (0, eval_arr.shape[1]), filters=filters)
-            k_eval_EArr.append(eval_arr)
-            h5f_tmp.flush()
+            k_eval_EArr = h5f_tmp.createEArray(h5f_tmp.root, 'Eval_'+str(k), tb.Float32Atom(), (0,len(term_idx_d)), filters=filters)
+            k_eval_EArr = self.tb_hdlr.pagetf_EArray(k_eval_EArr, fileh, base_tbgroup + g, k_eval_set_lst, term_idx_d, data_type=np.float32)            
             for gnr in genres:
                 if gnr != g:
                     print "Prepare Training Set", gnr
                     PgLstTbl = fileh.getNode( base_tbgroup + g, '/PageListTable' )
-                    PgLstArr = PgLstTbl.read() 
-                    eval_arr = self.tb_hdlr.pagetf_array(fileh, base_tbgroup + g, PgLstArr['table_name'], term_idx_d, data_type=np.float32)
-                    k_eval_EArr.append(eval_arr)
-                    h5f_tmp.flush()
-            #h5f_tmp.flush()
-            #del eval_arr
+                    PgLstArr = PgLstTbl.read()
+                    k_eval_EArr = self.tb_hdlr.pagetf_EArray(k_eval_EArr, fileh, base_tbgroup + g, PgLstArr['table_name'], term_idx_d, data_type=np.float32)
+            del PgLstArr       
+                
+            
             print training_CArr[0:1, 10:20], np.shape(training_CArr)
             print k_eval_EArr[0:1, 10:20], np.shape(k_eval_EArr)
             
