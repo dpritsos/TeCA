@@ -1,12 +1,17 @@
 
+
+
+""" REQURIES UPDATE TO BE CONFORMED WITH THE NEW UDATE html2Vectors LIBRARY """
+
+
 import os
 import sys
 sys.path.append('../../synergeticprocessing/src')
 sys.path.append('../../html2vectors/src')
 import filehandlers.tfdfileshandler
 import filehandlers.basefilehandlers 
-import html2tfd.words
-import html2tfd.charngrams
+import html2tf.dictionaries.words
+import html2tf.dictionaries.cngrams
 import htmlattrib.regex
 import re
  
@@ -20,9 +25,9 @@ class Html2TF_Concurrent(object):
             raise Exception("keyword parameter lowecase=True/False is mandatory")
         nsize = kwargs.pop('n', None)
         if nsize:
-            self.h2tf = html2tfd.charngrams.Html2TF( n=nsize, lowercase=case )
+            self.h2tf = html2tf.dictionaries.cngrams.Html2TF( n=nsize, lowercase=case )
         else:
-            self.h2tf = html2tfd.words.Html2TF( lowercase=case )
+            self.h2tf = html2tf.dictionaries.words.Html2TF( lowercase=case )
         self.tfdfh = filehandlers.tfdfileshandler.TFdictFilesHandler()
         self.bfh = filehandlers.basefilehandlers.BaseFileHandler()
     
