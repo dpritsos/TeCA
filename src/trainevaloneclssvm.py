@@ -29,10 +29,11 @@ class SVMTE(object):
         if class_tags == None:
             class_tags = [0]*len(training_vectors)
         print(len(class_tags))
-        fobj.write( "Amount of Vector for training= " + str(len(class_tags)) + "\n" ) 
+        fobj.write( "Amount of Vector for training= " + str(len(class_tags)) + "\n" )
+        print training_vectors 
         prob = svm_problem(class_tags, training_vectors)
-        params_s = '-h 0 -s 2 -t 0 -n ' + str(nu)
-        #params_s = '-s 2 -t 0 -n ' + str(nu)
+        #params_s = '-h 0 -s 2 -t 0 -n ' + str(nu)
+        params_s = '-s 2 -t 2 -n ' + str(nu)
         print params_s
         model_params = svm_parameter( params_s )
         svm_m = svm_train(prob, model_params)
