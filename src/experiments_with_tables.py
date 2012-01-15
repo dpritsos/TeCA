@@ -9,7 +9,7 @@ import tables as tb
 import html2tf.tables.cngrams as cng_tb
 import html2tf.tables.tbtools as tbtls
 from html2tf.dictionaries.tfdtools import TFdictHandler
-import scikits.learn.svm as svm 
+import sklearn.svm as svm 
 import scipy.sparse as sps
 from trainevaloneclssvm import SVMTE 
 
@@ -111,80 +111,39 @@ class SVMExperiments_with_tables(object):
                 for nu in nu_lst:
                     ocsvm = svm.OneClassSVM(kernel='rbf', nu=nu)
                     print "FIT model"
-                    #svm_m = SVMTE.train_oneclass_svm(None, list(training_EArr[:, 0:feat_len]), nu )
-                    
-                    #0/0
-                    
-                    #eval_res_d = SVMTE.evaluate_oneclass_svm(svm_m, test_idxf_d_l_frmd, folds=len(genres), fld_seq_num=genres.index(g)) #len(genres))
-                    #s = "+ %s, - %s\n" % (eval_res_d['c1'], eval_res_d['c2'])
-                    #s += "tp=%s, tn=%s\nfp=%s, fn=%s\n" % (eval_res_d['tp'],eval_res_d['tn'],eval_res_d['fp'],eval_res_d['fn'])
-                    #s += "Precision=%f\n" % eval_res_d['precision'] 
-                    #s += "Recall=%f\n" % eval_res_d['recall'] 
-                    #s += "F1=%s\n\n" % eval_res_d['f1']
-                    
-                    
-                    
                     feat_len =  len(training_EArr[1,:])
-                    #print feat_len
-                   
-                    print len(training_EArr[:, 0:feat_len])
-                    ###bin = np.zeros(np.shape(training_EArr))
-                    ###bin[ np.nonzero(training_EArr[:, 0:feat_len]) ] = 1.0
-                    ###############z[(np.array([1,2,3]),np.array([2,3,4]))] = 1#################
-                    ###ocsvm.fit( bin ) #training_EArr[:, 0:feat_len] ) #class_weight={}, sample_weight=None, **params)
-                    #print np.where( training_EArr[:, 0:feat_len] > 100, training_EArr[:, 0:feat_len], 0)
-                    arrr = np.where( training_EArr[:, 0:feat_len] > 2, training_EArr[:, 0:feat_len], 0)
+                    print len(k_eval_EArr[:, 0:feat_len])
+                    arrr = np.where( k_eval_EArr[:, 0:feat_len] > 2, k_eval_EArr[:, 0:feat_len], 0)
                     arrr[ np.nonzero(arrr) ] = 1 
                     print arrr 
                     ocsvm.fit( arrr ) #class_weight={}, sample_weight=None, **params)
-                    #training_EArr = training_EArr.read()
-                    #ocsvm.fit( sps.csr_matrix( (training_EArr[np.nonzero(training_EArr[:, 0:feat_len])], np.nonzero(training_EArr[:, 0:feat_len])) ) ) #class_weight={}, sample_weight=None, **params)
-                    #sps.csr_matrix( (training_EArr[0:2000, 0:10000].reshape(training_EArr[0:2000, 0:10000].shape[0]*training_EArr[0:2000, 0:10000].shape[0]), np.where( training_EArr[0:2000, 0:10000] > 0 ) ) ) 
                     print "Predict for kfold"
-                    ###bin = np.zeros(np.shape(k_eval_EArr))
-                    ###bin[ np.nonzero(k_eval_EArr[:, 0:feat_len]) ] = 1.0
-                    ###res = ocsvm.predict( bin ) #k_eval_EArr[:, 0:feat_len] )
-                    arrr = np.where( k_eval_EArr[:, 0:feat_len] > 2, k_eval_EArr[:, 0:feat_len], 0)
+                    arrr = np.where( training_EArr[:, 0:feat_len] > 2, training_EArr[:, 0:feat_len], 0)
                     arrr[ np.nonzero(arrr) ] =  1
                     res = ocsvm.predict( arrr )
-                    #res = ocsvm.predict( sps.csr_matrix( (k_eval_EArr[np.nonzero(k_eval_EArr[:, 0:feat_len])], np.nonzero(k_eval_EArr[:, 0:feat_len])) ) )
-                    #print np.where( res == -1 )
-                    #print np.where( res == 1 )
-                    ###print np.where( res == 1 )[0]
                     tp = len( np.where( res == 1 )[0] )
-                    ###print np.where( res == -1 )[0] 
                     fn = len( np.where( res == -1 )[0] )
-                    print res, tp, fn
-                    
+                    print res, tp, fn      
                     print "Predict for rest of genres"
-                    ###bin = np.zeros(np.shape(eval_EArr))
-                    ###bin[ np.nonzero(eval_EArr[:, 0:feat_len]) ] = 1.0
-                    ###res = ocsvm.predict( bin ) #eval_EArr[:, 0:feat_len] )
                     arrr = np.where( eval_EArr[:, 0:feat_len] > 2, eval_EArr[:, 0:feat_len], 0)
                     arrr[ np.nonzero(arrr) ] =  1
                     res = ocsvm.predict( arrr )
                     #res = ocsvm.predict( sps.csr_matrix( (eval_EArr[np.nonzero(eval_EArr[:, 0:feat_len])], np.nonzero(eval_EArr[:, 0:feat_len])) ) )
                     print "Evaluate"
-                    #print np.where( res == -1 )
-                    #print np.where( res == 1 )
-                    ###print np.where( res == -1 )[0]
                     tn = len( np.where( res == -1 )[0] )
                     ###print np.where( res == 1 )[0] 
                     fp = len( np.where( res == 1 )[0] )
-                    
                     print res, tn, fp
                     
-                    
-                    
-                    if (tp + fp) != 0:
+                    if (tp + fp) != 0.0:
                         P = np.float(tp) / np.float( tp + fp )
                     else:
                         P = 0.0
-                    if (tp + fn) !=0:
+                    if (tp + fn) != 0.0:
                         R = np.float(tp) / np.float( tp + fn )
                     else:
                         R = 0.0
-                    if (P + R) != 0:
+                    if (P + R) != 0.0:
                         F1 = np.float( 2 * P * R ) / np.float( P + R )
                     else:
                         F1 = 0.0
@@ -202,6 +161,93 @@ class SVMExperiments_with_tables(object):
                     res_table.row['Acc'] = Acc
                     res_table.row.append()
         res_table.flush()
+        
+        
+    def CSVM_kFold_Cross(self, kfolds, C, featr_size_lst, fileh, base_tbgroup, res_table, g, genres):
+        ##
+        for k in range(kfolds):
+            #Load the Training-set Dictionary - Sorted by frequency for THIS-FOLD
+            print "Get Dictionary - Sorted by Frequency for this fold"
+            DicFreq = fileh.getNode(fileh.root, '/DictFreq_'+str(k))
+            #Get Training-set for This-Fold
+            print "Get Training Data Array"
+            training_EArr = fileh.getNode(fileh.root, 'Training_'+str(k))
+            #Get the Evaluation-set for This-FOLD
+            print "Get Evaluation Data Array"
+            k_eval_EArr = fileh.getNode(fileh.root, 'Eval_0_'+str(k))
+            print "Get Evaluation Data Array"
+            eval_EArr = fileh.getNode(fileh.root, 'Eval_1_'+str(k))
+            for featrs_size in featr_size_lst: 
+                #Keep the amount of feature required - it will keep_at_least as many as
+                #the featrs_size keeping all the terms with same frequency the last term satisfies the featrs_size
+                feat_len = np.max(np.where( DicFreq == DicFreq[featrs_size] )[0])
+                print "Features Size:", feat_len
+                for nu in nu_lst:
+                    ocsvm = svm.SVC()
+                    print "FIT model"
+                    feat_len =  len(training_EArr[1,:])
+                    print len(k_eval_EArr[:, 0:feat_len])
+                    arrr = np.where( k_eval_EArr[:, 0:feat_len] > 2, k_eval_EArr[:, 0:feat_len], 0)
+                    arrr[ np.nonzero(arrr) ] = 1
+                    lbls = np.ones(len(arrr))
+                    
+                    arrr1 = np.where( eval_EArr[:500, 0:feat_len] > 2, eval_EArr[:500, 0:feat_len], 0)
+                    arrr1[ np.nonzero(arrr) ] =  1
+                    lbls1 = np.ones(len(arrr1))
+                    lbls1[np.where(lbls1 > 0)] = 2
+                     
+                    print np.shape(np.vstack((arrr, arrr1)))
+                    print np.shape(np.hstack((lbls, lbls1)))
+                    ocsvm.fit( np.vstack((arrr, arrr1)), np.hstack((lbls, lbls1)) ) #class_weight={}, sample_weight=None, **params)
+                    
+                    print "Predict for kfold"
+                    arrr = np.where( training_EArr[:, 0:feat_len] > 2, training_EArr[:, 0:feat_len], 0)
+                    arrr[ np.nonzero(arrr) ] =  1
+                    res = ocsvm.predict( arrr )
+                    tp = len( np.where( res == 1 )[0] )
+                    fn = len( np.where( res == 2 )[0] )
+                    print res, tp, fn      
+                    print "Predict for rest of genres"
+                    arrr = np.where( eval_EArr[500:, 0:feat_len] > 2, eval_EArr[500:, 0:feat_len], 0)
+                    arrr[ np.nonzero(arrr) ] =  1
+                    res = ocsvm.predict( arrr )
+                    
+                    print "Evaluate"
+                    tn = len( np.where( res == 2 )[0] )
+                    ###print np.where( res == 1 )[0] 
+                    fp = len( np.where( res == 1 )[0] )
+                    print res, tn, fp
+                    
+                    if (tp + fp) != 0.0:
+                        P = np.float(tp) / np.float( tp + fp )
+                    else:
+                        P = 0.0
+                    if (tp + fn) != 0.0:
+                        R = np.float(tp) / np.float( tp + fn )
+                    else:
+                        R = 0.0
+                    if (P + R) != 0.0:
+                        F1 = np.float( 2 * P * R ) / np.float( P + R )
+                    else:
+                        F1 = 0.0
+                    if (tp + tn + fp + fn) !=0:
+                        Acc = np.float(tp + tn) / np.float(tp + tn + fp + fn)
+                    else:
+                        Acc = 0.0
+                    print tn, fn, tn, fp, F1, P, R, Acc
+                    res_table.row['kfold'] = k
+                    res_table.row['nu'] = nu
+                    res_table.row['feat_num'] = feat_len
+                    res_table.row['F1'] = F1
+                    res_table.row['P'] = P
+                    res_table.row['R'] = R
+                    res_table.row['Acc'] = Acc
+                    res_table.row.append()
+        res_table.flush()
+        
+        
+        
+        
 """       
     def svm_evalon_tset(self, fobj, tf_dict, train_wpg_l, train_tf_d_l, test_wpg_l, test_tf_d_l, g, genres, format_l, nu_lst, freq_th=1, keep_terms=None):
         #If there is a limit to the terms of the dictionary that has to be kept
@@ -742,6 +788,7 @@ if __name__=='__main__':
         h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santini_corpus/10fold_Exp_Genre__'+g+'.h5', 'r')
         #h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/10fold_Exp_Genre__'+g+'.h5', 'r')
         res_table =  res_fileh.createTable('/', 'Res_'+g+'_vs_rest', ResaultsTable_desc)
+        #exp.CSVM_kFold_Cross(kfolds, 1, featr_size_lst, h5file, base_tbgroup, res_table, g, genres)
         exp.OCSVM_kFold_Cross(kfolds, nu_lst, featr_size_lst, h5file, base_tbgroup, res_table, g, genres)
         h5file.close()
     res_fileh.close()
