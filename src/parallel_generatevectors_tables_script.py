@@ -17,7 +17,7 @@ import html2tf.tables.tbtools as tbtls
 genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
 #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop"] 
 #base_filepath = ["/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus", "../Synergy-Crawler/Automated_Crawled_Corpus"]
-base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus", "../Synergy-Crawler/Santini_corpus"]
+base_filepath = ["/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre", "../Synergy-Crawler/Santinis_7-web_genre"]
 #base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus_html2txt"]
 #base_filepath = ["/home/dimitrios/Synergy-Crawler/KI-04", "../Synergy-Crawler/KI-04"]  
 
@@ -41,7 +41,7 @@ resaults = list()
 CorpusTable = tbtls.TFTablesHandler()   
 #CorpusTable.create(table_name="/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5",\
 #ttypes_structures_lst=["trigrams"], corpus_name="Automated_Crawled_Corpus", genres_lst=genres)
-CorpusTable.create(table_name="/home/dimitrios/Synergy-Crawler/Santini_corpus/Santini_corpus.h5",\
+CorpusTable.create(table_name="/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus.h5",\
                    ttypes_structures_lst=["trigrams"], corpus_name="Santini_corpus", genres_lst=genres)
 
 print CorpusTable.get()
@@ -59,7 +59,7 @@ for g in genres:
     #filepath = str( "/" + g + "/nltk-clean_html_text/")
     #filepath = str( "/" + g + "/lxml_elementtree_text/")
     #filepath = str( "/" + g + "/lxml_elementtree_text_500/")
-    filepath = str( "/" + g + "/html_pages/")
+    filepath = str( "/" + g + "/html/")
     #tfv_file = str( "/" + g + "/html2ascii_perl_ng-tfv/" + g + ".nfvl" )
 
     #resaults.append( pool.dispatch(\    
