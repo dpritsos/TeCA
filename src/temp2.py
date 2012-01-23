@@ -4,7 +4,8 @@ import numpy as np
 
 #[ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
 
-fh = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Results.h5', 'r')
+#fh = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Results.h5', 'r')
+fh = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results.h5', 'r')
 
 print fh
 #arr = fh.root.Res_eshop_vs_rest.where('nu < 0.8')

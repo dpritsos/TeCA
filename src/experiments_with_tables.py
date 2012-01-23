@@ -9,7 +9,8 @@ import tables as tb
 import html2tf.tables.cngrams as cng_tb
 import html2tf.tables.tbtools as tbtls
 from html2tf.dictionaries.tfdtools import TFDictHandler
-import sklearn.svm as svm 
+import sklearn.svm as svm
+import sklearn.linear_model as linear_model 
 import scipy.sparse as sps
 from trainevaloneclssvm import SVMTE 
 
@@ -167,14 +168,24 @@ class CSVM_CrossVal(tbtls.TFTablesHandler):
                 #the featrs_size keeping all the terms with same frequency the last term satisfies the featrs_size
                 print "Features Size:", feat_len      
                 for c in C_lst:
-                    csvm = svm.SVC(C=c, kernel='linear')
+                    #csvm = svm.SVC(C=c, kernel='linear')
+                    #csvm = svm.LinearSVC(C=c)
+                    csvm = linear_model.SGDClassifier(n_iter=40, n_jobs=1)
                     print "FIT model"
-                    #train_X = training_earr_X[:, 0:feat_len] 
-                    train_Y = training_earr_Y[:]
-                    train_X = np.where( training_earr_X[:, 0:feat_len] > 0, training_earr_X[:, 0:feat_len], 0)
+                    ##train_X = training_earr_X[:, 0:feat_len] 
+                    train_Y = training_earr_Y[::20]
+                    train_X = np.where( training_earr_X[::20, 0:feat_len] > 0, training_earr_X[::20, 0:feat_len], 0)
                     train_X[ np.nonzero(train_X) ] = 1
-                    print train_X  
-                    csvm.fit(train_X, train_Y) 
+                    #csvm.fit(train_X, train_Y)
+                    chnk = np.divide(len(train_X), 2)
+                    #train_X = np.where( training_earr_X[0:chnk, 0:feat_len] > 0, training_earr_X[0:chnk, 0:feat_len], 0)
+                    #train_X[ np.nonzero(train_X) ] = 1
+                    csvm.partial_fit(train_X[0:chnk], train_Y[0:chnk], classes=np.unique(train_Y) )
+                    for i in range(2):
+                        j = i+1
+                        t_train_X = train_X[(j*chnk):((j+1)*chnk), 0:feat_len]
+                        #print training_earr_Y[(i*chnk):((i+1)*chnk)]
+                        csvm.partial_fit(t_train_X, train_Y[(j*chnk):((j+1)*chnk)])
                     print "Predict for kfold:k",k
                     #crossval_X = crossval_earr_X[:, 0:feat_len] 
                     crossval_Y = crossval_earr_Y[:]
@@ -191,8 +202,8 @@ class CSVM_CrossVal(tbtls.TFTablesHandler):
             res_table.flush()
             
     def exec_test(self):
-        self.prepare_data(10, None)
-        #self.evaluate(10, [1], [30000])
+        #self.prepare_data(10, None)
+        self.evaluate(10, [1], [30000])
         
         
 
@@ -399,14 +410,13 @@ class OCSVM_CrossVal(tbtls.TFTablesHandler):
 
 if __name__=='__main__':
     
-    exp = SVMExperiments_with_tables()
     kfolds = 10
     nu_lst = [0.2, 0.8]
     featr_size_lst = [1000]
     #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus.h5', 'r')
     crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
     #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Data.h5', 'w')
-    crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data.h5', 'w')
+    crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data.h5', 'r')
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Results.h5', 'w')
     crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results.h5', 'w')
     #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
