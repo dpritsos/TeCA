@@ -10,6 +10,7 @@ import html2tf.tables.cngrams as cng_tb
 import html2tf.tables.tbtools as tbtls
 from html2tf.dictionaries.tfdtools import TFDictHandler
 import sklearn.svm as svm
+import sklearn.svm.sparse as sp_svm
 import sklearn.linear_model as linear_model 
 import scipy.sparse as sps
 from trainevaloneclssvm import SVMTE 
@@ -142,6 +143,11 @@ class CSVM_CrossVal(tbtls.TFTablesHandler):
         print "Create Results table for all this CrossValidation Multi-class SVM"
         self.h5f_res.createTable(self.h5f_res.root, "MultiClass_CrossVal",  MultiResultsTable_desc)
         
+        from sklearn.grid_search import GridSearchCV
+        from sklearn.linear_model import SGDClassifier
+        #from sklearn.datasets import fetch_20newsgroups_vectorized
+        #twenty = fetch_20newsgroups_vectorized()
+        
         for k in range(kfolds):
             #Get the Training-set Dictionary - Sorted by frequency for THIS-FOLD
             print "Get Dictionary - Sorted by Frequency for this kfold:", k
@@ -170,22 +176,33 @@ class CSVM_CrossVal(tbtls.TFTablesHandler):
                 for c in C_lst:
                     #csvm = svm.SVC(C=c, kernel='linear')
                     #csvm = svm.LinearSVC(C=c)
-                    csvm = linear_model.SGDClassifier(n_iter=40, n_jobs=1)
+                    csvm = sp_svm.LinearSVC(C=c)
+                    #csvm = linear_model.SGDClassifier(n_iter=50, alpha=1e-5, n_jobs=1)
                     print "FIT model"
                     ##train_X = training_earr_X[:, 0:feat_len] 
-                    train_Y = training_earr_Y[::20]
-                    train_X = np.where( training_earr_X[::20, 0:feat_len] > 0, training_earr_X[::20, 0:feat_len], 0)
-                    train_X[ np.nonzero(train_X) ] = 1
-                    #csvm.fit(train_X, train_Y)
-                    chnk = np.divide(len(train_X), 2)
-                    #train_X = np.where( training_earr_X[0:chnk, 0:feat_len] > 0, training_earr_X[0:chnk, 0:feat_len], 0)
+                    train_Y = training_earr_Y[:]
+                    ##train_X = np.where( training_earr_X[::20, 0:feat_len] > 0, training_earr_X[::20, 0:feat_len], 0)
                     #train_X[ np.nonzero(train_X) ] = 1
-                    csvm.partial_fit(train_X[0:chnk], train_Y[0:chnk], classes=np.unique(train_Y) )
-                    for i in range(2):
-                        j = i+1
-                        t_train_X = train_X[(j*chnk):((j+1)*chnk), 0:feat_len]
-                        #print training_earr_Y[(i*chnk):((i+1)*chnk)]
-                        csvm.partial_fit(t_train_X, train_Y[(j*chnk):((j+1)*chnk)])
+                    
+                    train_X = self.Arr2CsrMtrx( training_earr_X, len(training_earr_X), feat_len )
+                    
+                    print train_X
+                                                                        
+                    csvm.fit(train_X, train_Y)
+                    
+                    ########################
+                    #chnk = np.divide(len(training_earr_Y), 10)
+                    #for u in range(50):
+                    #    print "Train Circle:", u
+                    #    train_X = np.where( training_earr_X[0:chnk, 0:feat_len] > 0, training_earr_X[0:chnk, 0:feat_len], 0)
+                    #    train_X[ np.nonzero(train_X) ] = 1
+                    #    csvm.partial_fit(train_X[0:chnk], training_earr_Y[0:chnk], classes=np.unique(training_earr_Y) )
+                    #    for i in range(10):
+                    #        j = i+1
+                    #        train_X = np.where( training_earr_X[(j*chnk):((j+1)*chnk), 0:feat_len] > 0, training_earr_X[(j*chnk):((j+1)*chnk), 0:feat_len], 0)
+                    #        train_X[ np.nonzero(train_X) ] = 1
+                    #        csvm.partial_fit(train_X, training_earr_Y[(j*chnk):((j+1)*chnk)])
+                    ####################3
                     print "Predict for kfold:k",k
                     #crossval_X = crossval_earr_X[:, 0:feat_len] 
                     crossval_Y = crossval_earr_Y[:]
