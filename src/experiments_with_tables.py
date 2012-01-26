@@ -23,7 +23,6 @@ class ResultsTable_desc(tb.IsDescription):
     F1 = tb.Float32Col(pos=4)
     P = tb.Float32Col(pos=5)
     R = tb.Float32Col(pos=6)
-    Acc = tb.Float32Col(pos=7)
     
 class MultiResultsTable_desc(tb.IsDescription):
     kfold = tb.UInt32Col(pos=1)
@@ -269,7 +268,7 @@ class OCSVM_CrossVal(tbtls.TFTablesHandler):
             crossval_pg_lst = list()
             crossval_clss_tag_lst = list()
             
-            for g in self.gerens_lst:
+            for g in self.genres_lst:
                 page_lst_tb = self.page_lst_tb[g].read()
                 #Get the Training set for this Genre g
                 grn_trn_pg_lst = self.complementof_list( page_lst_tb['table_name'], start, end )
@@ -337,17 +336,21 @@ class OCSVM_CrossVal(tbtls.TFTablesHandler):
                 print crosval_earr_Y
                 
             
-    def evaluate(self, kfolds, nu_lst, featr_size_lst):
+    def evaluate(self, kfolds, nu_lst, featr_size_lst, end_dct):
+        print "fff"
+        self.genres_lst = end_dct
         
-        for g in self.gerens_lst:
+        self.ocsvm_gnr_end_bound_dct = end_dct
+        
+        for g in self.genres_lst:
             #Create Results table for all this CrossValidation Multi-class SVM
             print "Create Results table for all this CrossValidation Multi-class SVM for genre:", g
-            self.h5f_res.createTable(self.h5f_res.root, g+"_MultiClass_CrossVal",  MultiResultsTable_desc)
+            self.h5f_res.createTable(self.h5f_res.root, g+"_MultiClass_CrossVal",  ResultsTable_desc)
             
             for k in range(kfolds):
                 #Get the Training-set Dictionary - Sorted by frequency for THIS-FOLD
                 print "Get Dictionary - Sorted by Frequency for this kfold:", k
-                kfold_Dictionary_TF_arr = self.h5f_data.getNode(self.h5f_data.root, g+'+kfold_'+str(k)+'_Dictionary_TF_arr')
+                kfold_Dictionary_TF_arr = self.h5f_data.getNode(self.h5f_data.root, g+'_kfold_'+str(k)+'_Dictionary_TF_arr')
                 
                 #Get Training-set for kFold
                 print "Get Training Data Array for kfold & genre:", k, g
@@ -383,12 +386,12 @@ class OCSVM_CrossVal(tbtls.TFTablesHandler):
                         ## No Required for this implementation crossval_Y = crossval_earr_Y[:]
                         crossval_X = np.where( crossval_earr_X[:, 0:feat_len] > 0, crossval_earr_X[:, 0:feat_len], 0)
                         crossval_X[ np.nonzero(crossval_X) ] = 1
-                        self.ocsvm_gnr_end_bound_dct[g]
                         res = ocsvm.predict(crossval_X[0:self.ocsvm_gnr_end_bound_dct[g]])
                         tp = len( np.where( res == 1 )[0] )
                         fn = len( np.where( res == -1 )[0] )
                         
                         res = ocsvm.predict(crossval_X[self.ocsvm_gnr_end_bound_dct[g]::])
+                        print res
                         tn = len( np.where( res == -1 )[0] ) 
                         fp = len( np.where( res == 1 )[0] )
                                                 
@@ -408,21 +411,21 @@ class OCSVM_CrossVal(tbtls.TFTablesHandler):
                             Acc = np.float(tp + tn) / np.float(tp + tn + fp + fn)
                         else:
                             Acc = 0.0
-                        print tn, fn, tn, fp, F1, P, R, Acc
+                        print tn, fn, tp, fp,"|", P, R, F1  
                         res_table.row['kfold'] = k
-                        res_table.row['nu'] = nu
+                        res_table.row['nu'] = n
                         res_table.row['feat_num'] = feat_len
                         res_table.row['F1'] = F1
                         res_table.row['P'] = P
                         res_table.row['R'] = R
-                        res_table.row['Acc'] = Acc
                         res_table.row.append()  
                         
                 res_table.flush()
             
     def exec_test(self):
-        self.prepare_data(10, None)
-        #self.evaluate(10, [1], [30000])
+        #self.prepare_data(10, None)
+        end_dct = {"blog":20, "eshop":20, "faq":20, "frontpage":20, "listing":20, "php":20, "spage":20}
+        self.evaluate(10, [0.9], [3000], end_dct)
 
 
 if __name__=='__main__':
@@ -431,15 +434,23 @@ if __name__=='__main__':
     nu_lst = [0.2, 0.8]
     featr_size_lst = [1000]
     #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus.h5', 'r')
-    crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
+    #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
     #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Data.h5', 'w')
-    crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data.h5', 'r')
+    #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data.h5', 'r')
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Results.h5', 'w')
-    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results.h5', 'w')
+    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results.h5', 'w')
+    
+    crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus.h5', 'r')
+    #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
+    crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_CrossVal_Data.h5', 'r')
+    #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data.h5', 'r')
+    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_CrossVal_Results.h5', 'w')
+    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results.h5', 'w')
     #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
     
-    csvm_crossval = CSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Automated_Crawled_Corpus", "/trigrams/")
-    csvm_crossval.exec_test()
+    ocsvm_crossval = OCSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Santini_corpus", "/trigrams/")
+    #csvm_crossval = CSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Automated_Crawled_Corpus", "/trigrams/")
+    ocsvm_crossval.exec_test()
     
     crp_tftb_h5.close() 
     crp_crssvl_data.close()
