@@ -337,7 +337,7 @@ class OCSVM_CrossVal(tbtls.TFTablesHandler):
                 
             
     def evaluate(self, kfolds, nu_lst, featr_size_lst, end_dct):
-        print "fff"
+    
         self.genres_lst = end_dct
         
         self.ocsvm_gnr_end_bound_dct = end_dct
@@ -373,7 +373,7 @@ class OCSVM_CrossVal(tbtls.TFTablesHandler):
                     #the featrs_size keeping all the terms with same frequency the last term satisfies the featrs_size
                     print "Features Size:", feat_len      
                     for n in nu_lst:
-                        ocsvm = svm.OneClassSVM(nu=n, kernel='linear')
+                        ocsvm = svm.OneClassSVM(nu=n, kernel='rbf')
                         print "FIT model"
                         #train_X = training_earr_X[:, 0:feat_len] 
                         ## No Required for this implementation train_Y = training_earr_Y[:]
@@ -425,7 +425,7 @@ class OCSVM_CrossVal(tbtls.TFTablesHandler):
     def exec_test(self):
         #self.prepare_data(10, None)
         end_dct = {"blog":20, "eshop":20, "faq":20, "frontpage":20, "listing":20, "php":20, "spage":20}
-        self.evaluate(10, [0.9], [3000], end_dct)
+        self.evaluate(10, [0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.75, 0.80, 0.9, 0.95], [30, 300, 3000], end_dct)
 
 
 if __name__=='__main__':
