@@ -5,18 +5,18 @@ sys.path.append('../../html2vectors/src')
 
 import tables as tb
 import numpy as np
-from html2vect.tables import tbtools
+from html2vect.base.convert import tfttools as tbtools
 import html2vect.tables.cngrams as cngrams
 import html2vect.tables.words as words
 
 
 words.Html2TF(lowercase=False, valid_html=True, ndtype=np.dtype([('terms', 'S128'), ('freq', 'float32')]))
 
-#genres = [ "blogs", "forum", "news", "product_pages", "wiki_pages" ] #academic , "news", "wiki_pages", "product_companies", "blogs", "forum"  
-genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
+genres = [ "blogs", "forum", "news", "product_pages", "wiki_pages" ] #academic , "news", "wiki_pages", "product_companies", "blogs", "forum"  
+#genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
 #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop"] 
-#base_filepath = ["/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus", "../Synergy-Crawler/Automated_Crawled_Corpus"]
-base_filepath = ["/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre", "../Synergy-Crawler/Santinis_7-web_genre"]
+base_filepath = ["/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus", "../Synergy-Crawler/Automated_Crawled_Corpus"]
+#base_filepath = ["/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre", "../Synergy-Crawler/Santinis_7-web_genre"]
 #base_filepath = ["/home/dimitrios/Synergy-Crawler/Santini_corpus_html2txt"]
 #base_filepath = ["/home/dimitrios/Synergy-Crawler/KI-04", "../Synergy-Crawler/KI-04"]  
 
@@ -29,15 +29,15 @@ base_filepath = ["/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre", "../Syn
 
 
 html2tf_wrd = words.Html2TF(lowercase=True, valid_html=False, ndtype=np.dtype([('terms', 'S128'), ('freq', 'float32')]))
-html2nf_3n = cngrams.Html2TF(n=3, lowercase=True, valid_html=False, ndtype=np.dtype([('terms', 'S3'), ('freq', 'float32')]))
+html2tf_3n = cngrams.Html2TF(n=3, lowercase=True, valid_html=False, ndtype=np.dtype([('terms', 'S3'), ('freq', 'float32')]))
 
 #Creating the Default H5File tree structure to save the Corpus' TF and other Tables(pytables)
 #Create HD5 file in user defined path
-#h5file = tb.openFile("/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC_w.h5", mode="w")
-h5file = tb.openFile("/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus_w.h5", mode="w")
-CorpusTable = tbtools.TFTablesHandler(h5file)   
+h5file = tb.openFile("/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5", mode="w")
+#h5file = tb.openFile("/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus_w.h5", mode="w")
+CorpusTable = tbtools.TFTablesTools(h5file)   
 #CorpusTable.create(ttypes_structures_lst=["trigrams"], corpus_name="Automated_Crawled_Corpus", genres_lst=genres)
-CorpusTable.create(ttypes_structures_lst=["words"], corpus_name="Santini_corpus", genres_lst=genres)
+CorpusTable.create(ttypes_structures_lst=["trigrams"], corpus_name="Automated_Crawled_Corpus", genres_lst=genres)
 
 print CorpusTable.get()
 
@@ -58,7 +58,7 @@ for g in genres:
     #tfv_file = str( "/" + g + "/html2ascii_perl_ng-tfv/" + g + ".nfvl" )
     print base_filepath[0]+filepath
     #tablesGroup, GenrePageListTable = html2tf_wrd.from_paths() but I don't want what it returns right now 
-    print html2tf_wrd.from_paths(CorpusTable.get(), "/Santini_corpus/words/"+g, "PageListTable",\
+    print html2tf_3n.from_paths(CorpusTable.get(), "/Automated_Crawled_Corpus/trigrams/"+g, "PageListTable",\
                                  None, base_filepath[0]+filepath, encoding='utf-8', error_handling='replace')
     
     #print html2tf_3n(base_filepath, filepath, CorpusTable.get(), "/Automated_Crawled_Corpus/trigrams/"+g, "PageListTable", load_encoding='utf-8', error_handling='replace')

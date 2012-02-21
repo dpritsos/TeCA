@@ -7,17 +7,21 @@ sys.path.append('../../html2vectors/src')
 import numpy as np
 import tables as tb
 #import html2tf.tables.cngrams as cng_tb
-import html2vect.tables.tbtools as tbtls
-from html2vect.dict.tfdtools import TFDictHandler
+import html2vect.base.convert.tfttools as tbtls
+from html2vect.base.convert.tfdtools import TFDictTools
+from html2vect.base.convert.convert import TFVects2Matrix2D
 import sklearn.decomposition as decomp
 import sklearn.svm as svm
 import sklearn.svm.sparse as sp_svm
 import sklearn.linear_model as linear_model
 import sklearn.covariance as skcov
 from sklearn.metrics import precision_score, recall_score
-import scipy.sparse as sps
+import scipy.sparse as ssp
 from trainevaloneclssvm import SVMTE
 from sklearn.feature_extraction.text import TfidfTransformer
+
+from sklearn.grid_search import GridSearchCV
+
 
 
 class ResultsTable_desc(tb.IsDescription):
@@ -39,10 +43,10 @@ class MultiResultsTable_desc(tb.IsDescription):
     Acc = tb.Float32Col(pos=7)
    
 
-class CSVM_CrossVal(tbtls.TFTablesHandler):
+class CSVM_CrossVal(tbtls.TFTablesTools):
     
     def __init__(self, h5file, h5f_data, h5f_res, corpus_grp, trms_type_grp):
-        tbtls.TFTablesHandler.__init__(self, h5file)
+        tbtls.TFTablesTools.__init__(self, h5file)
         self.h5file = h5file
         self.h5f_data = h5f_data
         self.h5f_res = h5f_res
@@ -54,6 +58,8 @@ class CSVM_CrossVal(tbtls.TFTablesHandler):
         self.kfold_mod = dict()
         self.gnr2clss = dict()
         self.e_arr_filters = tb.Filters(complevel=5, complib='zlib')
+        
+        self.tfv2matrix2d = TFVects2Matrix2D()
     
     def complementof_list(self, lst, excld_dwn_lim, excld_up_lim):
         if excld_dwn_lim == 0:
@@ -93,7 +99,26 @@ class CSVM_CrossVal(tbtls.TFTablesHandler):
                 grn_trn_pg_lst = self.complementof_list( page_lst_tb['table_name'], start, end )
                 training_pg_lst.extend( grn_trn_pg_lst )
                 training_clss_tag_lst.extend( [self.gnr2clss[gnr]]*len(grn_trn_pg_lst) )
+          
+            #train_matrix = self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
             
+            #print train_matrix
+            
+            #cross_val_matrix =  self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)      
+                   
+            #csvm = svm.SVC(kernel='rbf', C=1)
+            
+            #csvm.fit(train_matrix.todense(), training_clss_tag_lst)
+            
+            #print csvm.score(cross_val_matrix.todense(), crossval_clss_tag_lst)
+            
+            #self.tfv2matrix2d.Dictionary = []
+            
+            train_matrix = self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
+            
+            0/0
+            
+                
             print len(crossval_pg_lst)
             print len(crossval_clss_tag_lst), crossval_clss_tag_lst 
             print len(training_pg_lst), 
@@ -101,16 +126,19 @@ class CSVM_CrossVal(tbtls.TFTablesHandler):
             
             #Create the Training-set Dictionary - Sorted by frequency
             print "Creating Dictionary - Sorted by Frequency" 
-            term_idx_d, kfold_Dictionary_TF_arr = self.TFTables2TFDict_n_TFArr(self.corpus_grp + self.trms_type_grp,\
-                                                                               training_pg_lst,\
-                                                                               data_type=tbtls.default_TF_3grams_dtype)
+            tf_d = self.tfv2matrix2d.merge_tfts2tfd(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
+            term_idx_d = self.tfv2matrix2d.tf2tidx(tf_d)
+            del tf_d
+            #term_idx_d, kfold_Dictionary_TF_arr = self.TFTables2TFDict_n_TFArr(self.corpus_grp + self.trms_type_grp,\
+            #                                                                   training_pg_lst,\
+            #                                                                   data_type=tbtls.default_TF_3grams_dtype)
             
             #print term_idx_d.items()[0:10]
             #print kfold_Dictionary_TF_arr[0:10] 
             
-            DicFreq = self.h5f_data.createTable(self.h5f_data.root, 'kfold_'+str(k)+'_Dictionary_TF_arr', kfold_Dictionary_TF_arr)
+            #DicFreq = self.h5f_data.createTable(self.h5f_data.root, 'kfold_'+str(k)+'_Dictionary_TF_arr', kfold_Dictionary_TF_arr)
             
-            print DicFreq[0:10]
+            #print DicFreq[0:10]
             
             ###############From this line and down need to be veryfied that the reasaults are corect!#############
             
@@ -142,6 +170,25 @@ class CSVM_CrossVal(tbtls.TFTablesHandler):
             print crossval_earr_X[0:5, 10:20]
             print np.shape(crossval_earr_X)
             print crosval_earr_Y
+            
+            train_matrix = self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
+            
+            cross_val_matrix =  self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, crossval_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
+            
+            
+            print ssp.csr_matrix(crossval_earr_X).todense() == cross_val_matrix.todense()
+            
+            print term_idx_d == self.tfv2matrix2d.Dictionary
+            
+            0/0
+            ccsvm = sp_svm.SVC(kernel='rbf', C=1)
+            csvm = sp_svm.SVC(kernel='rbf', C=1)
+            
+            ccsvm.fit(ssp.csr_matrix(training_earr_X), training_clss_tag_lst)
+            csvm.fit(train_matrix, training_clss_tag_lst)
+            
+            print ccsvm.score(ssp.csr_matrix(crossval_earr_X), crossval_clss_tag_lst)
+            print csvm.score(cross_val_matrix, crossval_clss_tag_lst)
             
             
     def evaluate(self, kfolds, C_lst, featr_size_lst):
@@ -224,14 +271,34 @@ class CSVM_CrossVal(tbtls.TFTablesHandler):
                     res_table.row['Acc'] = res_acc_score
                     res_table.row.append()
             res_table.flush()
-            
+         
+    
     def exec_test(self):
-        #self.prepare_data(10, None)
-        self.evaluate(10, [1], [30000])
+        self.prepare_data(10, None)
+        #self.evaluate(10, [1], [30000])
+        
+        
+        
+############################ TRASH CODE
+"""training_clss_tag_lst
+            training_clss_tag_lst
+           
+            csvm = svm.SVC()
+            parameters = {'kernel':('rbf',), 'C':[1,10]}
+            
+            clf = GridSearchCV(csvm, parameters, n_jobs=1)
+            clf.fit(train_matrix.todense(), training_clss_tag_lst)
+           
+            print clf.best_estimator_
+            print clf.best_score_ 
+            
+""" 
+###################
+        
         
         
 
-class OCSVM_CrossVal(tbtls.TFTablesHandler):
+class OCSVM_CrossVal(tbtls.TFTablesTools):
     
     def __init__(self, h5file, h5f_data, h5f_res, corpus_grp, trms_type_grp):
         tbtls.TFTablesHandler.__init__(self, h5file)
@@ -465,7 +532,7 @@ class OCSVM_CrossVal(tbtls.TFTablesHandler):
             
     def exec_test(self):
         #self.prepare_data(10, None)
-        end_dct = {"blog":20, "eshop":20, "faq":20, "frontpage":20, "listing":20, "php":20, "spage":20}
+        end_dct = { "eshop":20, "blog":20, "faq":20, "frontpage":20, "listing":20, "php":20, "spage":20}
         self.evaluate(10, [0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.75, 0.80, 0.9, 0.95], [30, 300, 3000], end_dct)
         #self.evaluate(10, [1], [30, 300, 3000], end_dct)
 
@@ -476,24 +543,26 @@ if __name__=='__main__':
     nu_lst = [0.2, 0.8]
     featr_size_lst = [1000]
     #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus.h5', 'r')
-    #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
-    #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Data.h5', 'w')
-    #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data.h5', 'r')
-    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Results.h5', 'w')
-    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results.h5', 'w')
+    crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
+    #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Data_TEST_SPARSE.h5', 'w')
+    crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data_TEST_SPARSE.h5', 'w')
+    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Results_TEST_SPASE.h5', 'w')
+    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results_TEST_SPARSE.h5', 'w')
     
-    crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus_w.h5', 'r')
+    #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus_w.h5', 'r')
     #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
-    crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_CrossVal_Data_w.h5', 'r')
+    #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_CrossVal_Data_w.h5', 'r')
     #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data.h5', 'r')
-    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_CrossVal_Results_w.h5', 'w')
+    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_CrossVal_Results_w.h5', 'w')
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results.h5', 'w')
     #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
     
-    ocsvm_crossval = OCSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Santini_corpus", "/words/")
+    #ocsvm_crossval = OCSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Santini_corpus", "/words/")
     #ocsvm_crossval = OCSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Santini_corpus", "/trigrams/")
-    #csvm_crossval = CSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Automated_Crawled_Corpus", "/trigrams/")
-    ocsvm_crossval.exec_test()
+    #csvm_crossval = CSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Santini_corpus", "/trigrams/")
+    csvm_crossval = CSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Automated_Crawled_Corpus", "/trigrams/")
+    csvm_crossval.exec_test()
+    #ocsvm_crossval.exec_test()
     
     crp_tftb_h5.close() 
     crp_crssvl_data.close()
