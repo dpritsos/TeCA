@@ -59,7 +59,7 @@ class CSVM_CrossVal(tbtls.TFTablesTools):
         self.gnr2clss = dict()
         self.e_arr_filters = tb.Filters(complevel=5, complib='zlib')
         
-        self.tfv2matrix2d = TFVects2Matrix2D()
+        self.tfv2matrix2d = TFVects2Matrix2D(DSize=3000)
     
     def complementof_list(self, lst, excld_dwn_lim, excld_up_lim):
         if excld_dwn_lim == 0:
