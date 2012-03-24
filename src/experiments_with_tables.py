@@ -99,25 +99,25 @@ class CSVM_CrossVal(tbtls.TFTablesTools):
                 grn_trn_pg_lst = self.complementof_list( page_lst_tb['table_name'], start, end )
                 training_pg_lst.extend( grn_trn_pg_lst )
                 training_clss_tag_lst.extend( [self.gnr2clss[gnr]]*len(grn_trn_pg_lst) )
-          
-            #train_matrix = self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
-            
-            #print train_matrix
-            
-            #cross_val_matrix =  self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)      
+                  
                    
-            #csvm = svm.SVC(kernel='rbf', C=1)
+            csvm = sp_svm.SVC(kernel='linear', C=1)
             
-            #csvm.fit(train_matrix.todense(), training_clss_tag_lst)
+            train = self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
             
-            #print csvm.score(cross_val_matrix.todense(), crossval_clss_tag_lst)
+            #
+            csvm.fit( np.divide(train, train),\
+                      training_clss_tag_lst)
             
-            #self.tfv2matrix2d.Dictionary = []
+            cross = self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, crossval_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
             
-            train_matrix = self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
+            #
+            print csvm.score( np.divide(cross, cross),\
+                             crossval_clss_tag_lst)
+            
+            self.tfv2matrix2d.Dictionary = None
             
             0/0
-            
                 
             print len(crossval_pg_lst)
             print len(crossval_clss_tag_lst), crossval_clss_tag_lst 
@@ -128,17 +128,20 @@ class CSVM_CrossVal(tbtls.TFTablesTools):
             print "Creating Dictionary - Sorted by Frequency" 
             tf_d = self.tfv2matrix2d.merge_tfts2tfd(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
             term_idx_d = self.tfv2matrix2d.tf2tidx(tf_d)
-            del tf_d
+            #del tf_d
             #term_idx_d, kfold_Dictionary_TF_arr = self.TFTables2TFDict_n_TFArr(self.corpus_grp + self.trms_type_grp,\
             #                                                                   training_pg_lst,\
             #                                                                   data_type=tbtls.default_TF_3grams_dtype)
             
             #print term_idx_d.items()[0:10]
             #print kfold_Dictionary_TF_arr[0:10] 
+            ##freqz = [frq for frq in tf_d.values()]
+            ##freqz.sort(reverse=True)
+            kfold_Dictionary_TF_arr = np.array(tf_d.items(), dtype=tbtls.default_TF_3grams_dtype)
+            ##print kfold_Dictionary_TF_arr 
+            DicFreq = self.h5f_data.createTable(self.h5f_data.root, 'kfold_'+str(k)+'_Dictionary_TF_arr', kfold_Dictionary_TF_arr)
             
-            #DicFreq = self.h5f_data.createTable(self.h5f_data.root, 'kfold_'+str(k)+'_Dictionary_TF_arr', kfold_Dictionary_TF_arr)
-            
-            #print DicFreq[0:10]
+            print DicFreq[0:10]
             
             ###############From this line and down need to be veryfied that the reasaults are corect!#############
             
@@ -171,36 +174,12 @@ class CSVM_CrossVal(tbtls.TFTablesTools):
             print np.shape(crossval_earr_X)
             print crosval_earr_Y
             
-            train_matrix = self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, training_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
-            
-            cross_val_matrix =  self.tfv2matrix2d.from_tables(self.h5file, self.corpus_grp, crossval_pg_lst, data_type=tbtls.default_TF_3grams_dtype)
-            
-            
-            print ssp.csr_matrix(crossval_earr_X).todense() == cross_val_matrix.todense()
-            
-            print term_idx_d == self.tfv2matrix2d.Dictionary
-            
-            0/0
-            ccsvm = sp_svm.SVC(kernel='rbf', C=1)
-            csvm = sp_svm.SVC(kernel='rbf', C=1)
-            
-            ccsvm.fit(ssp.csr_matrix(training_earr_X), training_clss_tag_lst)
-            csvm.fit(train_matrix, training_clss_tag_lst)
-            
-            print ccsvm.score(ssp.csr_matrix(crossval_earr_X), crossval_clss_tag_lst)
-            print csvm.score(cross_val_matrix, crossval_clss_tag_lst)
-            
             
     def evaluate(self, kfolds, C_lst, featr_size_lst):
         
         #Create Results table for all this CrossValidation Multi-class SVM
         print "Create Results table for all this CrossValidation Multi-class SVM"
         self.h5f_res.createTable(self.h5f_res.root, "MultiClass_CrossVal",  MultiResultsTable_desc)
-        
-        from sklearn.grid_search import GridSearchCV
-        from sklearn.linear_model import SGDClassifier
-        #from sklearn.datasets import fetch_20newsgroups_vectorized
-        #twenty = fetch_20newsgroups_vectorized()
         
         for k in range(kfolds):
             #Get the Training-set Dictionary - Sorted by frequency for THIS-FOLD
@@ -228,19 +207,19 @@ class CSVM_CrossVal(tbtls.TFTablesTools):
                 #the featrs_size keeping all the terms with same frequency the last term satisfies the featrs_size
                 print "Features Size:", feat_len      
                 for c in C_lst:
-                    #csvm = svm.SVC(C=c, kernel='linear')
+                    csvm = svm.SVC(C=c, kernel='linear')
                     #csvm = svm.LinearSVC(C=c)
-                    csvm = sp_svm.LinearSVC(C=c)
+                    #csvm = sp_svm.LinearSVC(C=c)
                     #csvm = linear_model.SGDClassifier(n_iter=50, alpha=1e-5, n_jobs=1)
                     print "FIT model"
                     ##train_X = training_earr_X[:, 0:feat_len] 
                     train_Y = training_earr_Y[:]
-                    ##train_X = np.where( training_earr_X[::20, 0:feat_len] > 0, training_earr_X[::20, 0:feat_len], 0)
-                    #train_X[ np.nonzero(train_X) ] = 1
+                    train_X = np.where( training_earr_X[::20, 0:feat_len] > 0, training_earr_X[::20, 0:feat_len], 0)
+                    train_X[ np.nonzero(train_X) ] = 1
                     
-                    train_X = self.Arr2CsrMtrx( training_earr_X, len(training_earr_X), feat_len )
+                    #train_X = self.Arr2CsrMtrx( training_earr_X, len(training_earr_X), feat_len )
                     
-                    print train_X
+                    #print train_X
                                                                         
                     csvm.fit(train_X, train_Y)
                     
@@ -275,7 +254,7 @@ class CSVM_CrossVal(tbtls.TFTablesTools):
     
     def exec_test(self):
         self.prepare_data(10, None)
-        #self.evaluate(10, [1], [30000])
+        self.evaluate(10, [1], [30000])
         
         
         
