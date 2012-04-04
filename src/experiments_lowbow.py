@@ -51,8 +51,8 @@ genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
 class CSVM_CrossVal(object):
     
     def __init__(self, h5f_res, corpus_path, genres):        
-        self.lowbow_N = Html2LBN(3, lowercase=True, valid_html=False , smoothing_kernel=stats.norm)
-        self.lowbow_W = Html2LBW(lowercase=True, valid_html=False , smoothing_kernel=stats.norm)
+        self.lowbow_N = Html2LBN(3, lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
+        self.lowbow_W = Html2LBW(lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
 
         self.h5f_res = h5f_res
         self.corpus_path = corpus_path
@@ -75,11 +75,29 @@ class CSVM_CrossVal(object):
         self.cls_gnr_tgs = list()
         for i in range(5):
             self.cls_gnr_tgs.extend( [i+1]*200 )
-     
-        self.corpus_mtrx = self.lowbow_W.from_files( xhtml_file_l[0:400],\
-                                                     [1, 2, 3, 8, 10], 0.2, tid_dictionary=None,\
+            
+        #Create Corpus Dictionary for the training Set 
+        train_set_files = xhtml_file_l[0:180] +\
+                          xhtml_file_l[200:380] +\
+                          xhtml_file_l[400:580] +\
+                          xhtml_file_l[600:780] +\
+                          xhtml_file_l[800:980]
+        tf_d = dict()
+        #Merge All Term-Frequency Dictionaries created by the Raw Texts                  
+        for html_str in self.lowbow_N.load_files(train_set_files, encoding='utf8', error_handling='replace'):
+            tf_d = self.lowbow_N.merge_tfds( tf_d, self.lowbow_N.tf_dict( self.lowbow_N._text( html_str ) ) )
+        
+        tf_d = self.lowbow_N.keep_atleast(tf_d, 15000)
+        print len(tf_d)
+        
+        #Create The Terms-Index Dictionary that is shorted by Frequency descending order
+        tid = self.lowbow_N.tf2tidx( tf_d )
+        
+        #Create LowBow Vectors Sparse Matrix
+        self.corpus_mtrx = self.lowbow_N.from_files( xhtml_file_l,\
+                                                     [0.1, 0.3, 0.5, 0.7, 0.9], 0.2, tid_dictionary=tid,\
                                                      encoding='utf8', error_handling='replace' )
-    
+
             
     def evaluate(self, kfolds, C_lst, featr_size_lst, tset_size):
         
@@ -90,22 +108,22 @@ class CSVM_CrossVal(object):
             #the featrs_size keeping all the terms with same frequency the last term satisfies the featrs_size
             #print "Features Size:", feat_len      
             for c in C_lst:
-                csvm = svm.SVC(C=c, kernel='linear')
+                csvm = sp_svm.SVC(C=c, kernel='linear')
                 #csvm = svm.LinearSVC(C=c)
                 #csvm = sp_svm.LinearSVC(C=c)
                 #csvm = linear_model.SGDClassifier(n_iter=50, alpha=1e-5, n_jobs=1)
                 print "FIT model"
                 ##train_X = training_earr_X[:, 0:feat_len] 
                 train_Y = self.cls_gnr_tgs[0:180] +\
-                          self.cls_gnr_tgs[200:380] #+\
-                          #self.cls_gnr_tgs[400:580] +\
-                          #self.cls_gnr_tgs[600:780] +\
-                          #self.cls_gnr_tgs[800:980]
-                train_X = ssp.vstack((self.corpus_mtrx[0][0:180,0:200],\
-                                      self.corpus_mtrx[0][200:380,0:200] ))#,\
-                           #           self.corpus_mtrx[0][400:580,0:200],\
-                           #           self.corpus_mtrx[0][600:780,0:200],\
-                           #           self.corpus_mtrx[0][800:980,0:200]))
+                          self.cls_gnr_tgs[200:380] +\
+                          self.cls_gnr_tgs[400:580] +\
+                          self.cls_gnr_tgs[600:780] +\
+                          self.cls_gnr_tgs[800:980]
+                train_X = ssp.vstack((self.corpus_mtrx[0][0:180,:],\
+                                      self.corpus_mtrx[0][200:380,:],\
+                                      self.corpus_mtrx[0][400:580,:],\
+                                      self.corpus_mtrx[0][600:780,:],\
+                                      self.corpus_mtrx[0][800:980,:]))
                 #np.where( training_earr_X[::20, 0:feat_len] > 0, training_earr_X[::20, 0:feat_len], 0)
                 #train_X[ np.nonzero(train_X) ] = 1
                 
@@ -116,26 +134,26 @@ class CSVM_CrossVal(object):
                 print ssp.isspmatrix_csr(train_X)
                 #print train_X
                 
-                csvm.fit( ssp.coo_matrix(train_X, shape=train_X.shape).todense(), train_Y)
+                csvm.fit( ssp.coo_matrix(train_X, shape=train_X.shape, dtype=np.float64), train_Y)
 
                 #print "Predict for kfold:k",k
                 #crossval_X = crossval_earr_X[:, 0:feat_len] 
                 for g in genres:
                     crossval_Y = self.cls_gnr_tgs[180:200] +\
-                                 self.cls_gnr_tgs[380:400] #+\
-                            #     self.cls_gnr_tgs[580:600] +\
-                            #     self.cls_gnr_tgs[780:800] +\
-                            #     self.cls_gnr_tgs[980:1000]
-                    crossval_X = ssp.vstack((self.corpus_mtrx[0][180:200,0:200],\
-                                             self.corpus_mtrx[0][380:400,0:200]))##,\
-                             #                self.corpus_mtrx[0][580:600,0:200],\
-                             #                self.corpus_mtrx[0][780:800,0:200],\
-                             #                self.corpus_mtrx[0][980:1000,0:200])) 
+                                 self.cls_gnr_tgs[380:400] +\
+                                 self.cls_gnr_tgs[580:600] +\
+                                 self.cls_gnr_tgs[780:800] +\
+                                 self.cls_gnr_tgs[980:1000]
+                    crossval_X = ssp.vstack((self.corpus_mtrx[0][180:200,:],\
+                                             self.corpus_mtrx[0][380:400,:],\
+                                             self.corpus_mtrx[0][580:600,:],\
+                                             self.corpus_mtrx[0][780:800,:],\
+                                             self.corpus_mtrx[0][980:1000,:])) 
                     
                 #np.where( crossval_earr_X[:, 0:feat_len] > 0, crossval_earr_X[:, 0:feat_len], 0)
                 #crossval_X[ np.nonzero(crossval_X) ] = 1  
             
-                res_acc_score = csvm.score( ssp.coo_matrix(crossval_X, shape=crossval_X.shape).todense(), crossval_Y)
+                res_acc_score = csvm.score( ssp.coo_matrix(crossval_X, shape=crossval_X.shape, dtype=np.float64), crossval_Y)
                 
                 print "Accuracy:", res_acc_score 
                 #res_table.row['kfold'] = k
