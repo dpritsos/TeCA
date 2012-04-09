@@ -23,6 +23,7 @@ import scipy.sparse as ssp
 from scipy import stats
 
 from html2vect.sparse.lowbow import Html2LBN, Html2LBW  
+import copy
 
 #from sklearn.feature_extraction.text import TfidfTransformer
 #from sklearn.grid_search import GridSearchCV
@@ -51,8 +52,8 @@ genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
 class CSVM_CrossVal(object):
     
     def __init__(self, h5f_res, corpus_path, genres):        
-        self.lowbow_N = Html2LBN(3, lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
-        self.lowbow_W = Html2LBW(lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
+        self.lowbow_N = Html2LBN(3, attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
+        self.lowbow_W = Html2LBW(lowercase=True, attrib='text', valid_html=False, smoothing_kernel=stats.norm)
 
         self.h5f_res = h5f_res
         self.corpus_path = corpus_path
@@ -66,14 +67,12 @@ class CSVM_CrossVal(object):
                     
     def prepare_data(self):
         
-        htmls_filepaths_l = list()
+        xhtml_file_l = list()
         for g in genres:
-            htmls_filepaths_l.append( str( g + "/html/" ) )
+            xhtml_file_l.extend( self.lowbow_W.file_list_frmpaths(self.corpus_path, [ str( g + "/html/" ) ] ) )
             
-        xhtml_file_l = self.lowbow_N.file_list_frmpaths(self.corpus_path, htmls_filepaths_l)
-        
         self.cls_gnr_tgs = list()
-        for i in range(5):
+        for i in range(len(genres)):
             self.cls_gnr_tgs.extend( [i+1]*200 )
             
         #Create Corpus Dictionary for the training Set 
@@ -81,20 +80,24 @@ class CSVM_CrossVal(object):
                           xhtml_file_l[200:380] +\
                           xhtml_file_l[400:580] +\
                           xhtml_file_l[600:780] +\
-                          xhtml_file_l[800:980]
+                          xhtml_file_l[800:980] +\
+                          xhtml_file_l[1000:1180] +\
+                          xhtml_file_l[1200:1380]
+                                    
         tf_d = dict()
         #Merge All Term-Frequency Dictionaries created by the Raw Texts                  
-        for html_str in self.lowbow_N.load_files(train_set_files, encoding='utf8', error_handling='replace'):
-            tf_d = self.lowbow_N.merge_tfds( tf_d, self.lowbow_N.tf_dict( self.lowbow_N._text( html_str ) ) )
+        for html_str in self.lowbow_W.load_files(train_set_files, encoding='utf8', error_handling='replace'):
+            tf_d = self.lowbow_W.merge_tfds( copy.deepcopy( tf_d ), self.lowbow_W.tf_dict( self.lowbow_W._attrib_( html_str ) ) ) #<------ FIX HERE
         
-        tf_d = self.lowbow_N.keep_atleast(tf_d, 15000)
+        tf_d = self.lowbow_W.keep_atleast(tf_d, 500) #<----
         print len(tf_d)
         
         #Create The Terms-Index Dictionary that is shorted by Frequency descending order
-        tid = self.lowbow_N.tf2tidx( tf_d )
+        tid = self.lowbow_W.tf2tidx( tf_d )
         
+        print tid.items()[0:50]
         #Create LowBow Vectors Sparse Matrix
-        self.corpus_mtrx = self.lowbow_N.from_files( xhtml_file_l,\
+        self.corpus_mtrx = self.lowbow_W.from_files( xhtml_file_l,\
                                                      [0.1, 0.3, 0.5, 0.7, 0.9], 0.2, tid_dictionary=tid,\
                                                      encoding='utf8', error_handling='replace' )
 
@@ -118,12 +121,16 @@ class CSVM_CrossVal(object):
                           self.cls_gnr_tgs[200:380] +\
                           self.cls_gnr_tgs[400:580] +\
                           self.cls_gnr_tgs[600:780] +\
-                          self.cls_gnr_tgs[800:980]
+                          self.cls_gnr_tgs[800:980] +\
+                          self.cls_gnr_tgs[1000:1180] +\
+                          self.cls_gnr_tgs[1200:1380]
                 train_X = ssp.vstack((self.corpus_mtrx[0][0:180,:],\
                                       self.corpus_mtrx[0][200:380,:],\
                                       self.corpus_mtrx[0][400:580,:],\
                                       self.corpus_mtrx[0][600:780,:],\
-                                      self.corpus_mtrx[0][800:980,:]))
+                                      self.corpus_mtrx[0][800:980,:],\
+                                      self.corpus_mtrx[0][1000:1180,:],\
+                                      self.corpus_mtrx[0][1200:1380,:]))
                 #np.where( training_earr_X[::20, 0:feat_len] > 0, training_earr_X[::20, 0:feat_len], 0)
                 #train_X[ np.nonzero(train_X) ] = 1
                 
@@ -143,12 +150,16 @@ class CSVM_CrossVal(object):
                                  self.cls_gnr_tgs[380:400] +\
                                  self.cls_gnr_tgs[580:600] +\
                                  self.cls_gnr_tgs[780:800] +\
-                                 self.cls_gnr_tgs[980:1000]
+                                 self.cls_gnr_tgs[980:1000] +\
+                                 self.cls_gnr_tgs[1180:1200] +\
+                                 self.cls_gnr_tgs[1380:1400]
                     crossval_X = ssp.vstack((self.corpus_mtrx[0][180:200,:],\
                                              self.corpus_mtrx[0][380:400,:],\
                                              self.corpus_mtrx[0][580:600,:],\
                                              self.corpus_mtrx[0][780:800,:],\
-                                             self.corpus_mtrx[0][980:1000,:])) 
+                                             self.corpus_mtrx[0][980:1000,:],\
+                                             self.corpus_mtrx[0][1180:1200,:],\
+                                             self.corpus_mtrx[0][1380:1400,:])) 
                     
                 #np.where( crossval_earr_X[:, 0:feat_len] > 0, crossval_earr_X[:, 0:feat_len], 0)
                 #crossval_X[ np.nonzero(crossval_X) ] = 1  
