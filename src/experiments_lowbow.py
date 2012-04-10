@@ -76,22 +76,23 @@ class CSVM_CrossVal(object):
             self.cls_gnr_tgs.extend( [i+1]*200 )
             
         #Create Corpus Dictionary for the training Set 
-        train_set_files = xhtml_file_l[0:180] +\
+        train_set_files = xhtml_file_l[0:500] 
+        """xhtml_file_l[0:180] +\
                           xhtml_file_l[200:380] +\
                           xhtml_file_l[400:580] +\
                           xhtml_file_l[600:780] +\
                           xhtml_file_l[800:980] +\
                           xhtml_file_l[1000:1180] +\
-                          xhtml_file_l[1200:1380]
+                          xhtml_file_l[1200:1380]"""
                                     
-        tf_d = dict()
+        tf_d = dict() 
         #Merge All Term-Frequency Dictionaries created by the Raw Texts                  
         for html_str in self.lowbow_W.load_files(train_set_files, encoding='utf8', error_handling='replace'):
-            tf_d = self.lowbow_W.merge_tfds( copy.deepcopy( tf_d ), self.lowbow_W.tf_dict( self.lowbow_W._attrib_( html_str ) ) ) #<------ FIX HERE
-        
-        tf_d = self.lowbow_W.keep_atleast(tf_d, 500) #<----
+            tf_d = self.lowbow_W.merge_tfds(tf_d, self.lowbow_W.tf_dict( html_str ))
+            
+        tf_d = self.lowbow_W.keep_atleast(tf_d, 500) #<---
         print len(tf_d)
-        
+        print tf_d.items()[0:50]
         #Create The Terms-Index Dictionary that is shorted by Frequency descending order
         tid = self.lowbow_W.tf2tidx( tf_d )
         
