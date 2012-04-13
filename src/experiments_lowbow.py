@@ -53,7 +53,7 @@ class CSVM_CrossVal(object):
     
     def __init__(self, h5f_res, corpus_path, genres):        
         self.lowbow_N = Html2LBN(3, attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
-        self.lowbow_W = Html2LBW(lowercase=True, attrib='text', valid_html=False, smoothing_kernel=stats.norm)
+        self.lowbow_W = Html2LBW(attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
 
         self.h5f_res = h5f_res
         self.corpus_path = corpus_path
@@ -76,21 +76,20 @@ class CSVM_CrossVal(object):
             self.cls_gnr_tgs.extend( [i+1]*200 )
             
         #Create Corpus Dictionary for the training Set 
-        train_set_files = xhtml_file_l[0:500] 
-        """xhtml_file_l[0:180] +\
+        train_set_files = xhtml_file_l[0:180] +\
                           xhtml_file_l[200:380] +\
                           xhtml_file_l[400:580] +\
                           xhtml_file_l[600:780] +\
                           xhtml_file_l[800:980] +\
                           xhtml_file_l[1000:1180] +\
-                          xhtml_file_l[1200:1380]"""
+                          xhtml_file_l[1200:1380]
                                     
         tf_d = dict() 
         #Merge All Term-Frequency Dictionaries created by the Raw Texts                  
         for html_str in self.lowbow_W.load_files(train_set_files, encoding='utf8', error_handling='replace'):
-            tf_d = self.lowbow_W.merge_tfds(tf_d, self.lowbow_W.tf_dict( html_str ))
+            tf_d = self.lowbow_W.merge_tfds(tf_d, self.lowbow_W.tf_dict( self.lowbow_W._attrib_(html_str) ) )
             
-        tf_d = self.lowbow_W.keep_atleast(tf_d, 500) #<---
+        #tf_d = self.lowbow_W.keep_atleast(tf_d, 500) #<---
         print len(tf_d)
         print tf_d.items()[0:50]
         #Create The Terms-Index Dictionary that is shorted by Frequency descending order
@@ -146,22 +145,21 @@ class CSVM_CrossVal(object):
 
                 #print "Predict for kfold:k",k
                 #crossval_X = crossval_earr_X[:, 0:feat_len] 
-                for g in genres:
-                    crossval_Y = self.cls_gnr_tgs[180:200] +\
-                                 self.cls_gnr_tgs[380:400] +\
-                                 self.cls_gnr_tgs[580:600] +\
-                                 self.cls_gnr_tgs[780:800] +\
-                                 self.cls_gnr_tgs[980:1000] +\
-                                 self.cls_gnr_tgs[1180:1200] +\
-                                 self.cls_gnr_tgs[1380:1400]
-                    crossval_X = ssp.vstack((self.corpus_mtrx[0][180:200,:],\
-                                             self.corpus_mtrx[0][380:400,:],\
-                                             self.corpus_mtrx[0][580:600,:],\
-                                             self.corpus_mtrx[0][780:800,:],\
-                                             self.corpus_mtrx[0][980:1000,:],\
-                                             self.corpus_mtrx[0][1180:1200,:],\
-                                             self.corpus_mtrx[0][1380:1400,:])) 
-                    
+                crossval_Y = self.cls_gnr_tgs[180:200] +\
+                             self.cls_gnr_tgs[380:400] +\
+                             self.cls_gnr_tgs[580:600] +\
+                             self.cls_gnr_tgs[780:800] +\
+                             self.cls_gnr_tgs[980:1000] +\
+                             self.cls_gnr_tgs[1180:1200] +\
+                             self.cls_gnr_tgs[1380:1400]
+                crossval_X = ssp.vstack((self.corpus_mtrx[0][180:200,:],\
+                                         self.corpus_mtrx[0][380:400,:],\
+                                         self.corpus_mtrx[0][580:600,:],\
+                                         self.corpus_mtrx[0][780:800,:],\
+                                         self.corpus_mtrx[0][980:1000,:],\
+                                         self.corpus_mtrx[0][1180:1200,:],\
+                                         self.corpus_mtrx[0][1380:1400,:])) 
+                
                 #np.where( crossval_earr_X[:, 0:feat_len] > 0, crossval_earr_X[:, 0:feat_len], 0)
                 #crossval_X[ np.nonzero(crossval_X) ] = 1  
             
