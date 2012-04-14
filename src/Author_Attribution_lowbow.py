@@ -23,7 +23,7 @@ import scipy.sparse as ssp
 from scipy import stats
 
 from html2vect.sparse.lowbow import Html2LBN, Html2LBW  
-import copy
+
 
 #from sklearn.feature_extraction.text import TfidfTransformer
 #from sklearn.grid_search import GridSearchCV
@@ -83,7 +83,7 @@ class CSVM_CrossVal(object):
         for html_str in self.lowbow_W.load_files(train_file_l, encoding='utf8', error_handling='replace'):
             tf_d = self.lowbow_W.merge_tfds(tf_d, self.lowbow_W.tf_dict(  self.lowbow_W._attrib_(html_str) ) )
             
-        tf_d = self.lowbow_W.keep_atleast(tf_d, 10000) #<---
+        #tf_d = self.lowbow_W.keep_atleast(tf_d, 15000) #<---
         print len(tf_d)
         print tf_d.items()[0:50]
         #Create The Terms-Index Dictionary that is shorted by Frequency descending order
@@ -92,7 +92,7 @@ class CSVM_CrossVal(object):
         
         #Create LowBow Vectors Sparse Matrix - For Training Set
         self.train_corpus_mtrx = self.lowbow_W.from_files( train_file_l,\
-                                                     [0.1, 0.3, 0.5, 0.7, 0.9], 0.6, tid_dictionary=tid,\
+                                                     [0.1, 0.3, 0.5, 0.7, 0.9], 0.2, tid_dictionary=tid,\
                                                      encoding='utf8', error_handling='replace' )
         
         test_file_l = list()
@@ -104,7 +104,7 @@ class CSVM_CrossVal(object):
             
         #Create LowBow Vectors Sparse Matrix - For Training Set
         self.test_corpus_mtrx = self.lowbow_W.from_files( test_file_l,\
-                                                     [0.1, 0.3, 0.5, 0.7, 0.9], 0.6, tid_dictionary=tid,\
+                                                     [0.1, 0.3, 0.5, 0.7, 0.9], 0.2, tid_dictionary=tid,\
                                                      encoding='utf8', error_handling='replace' )
 
             

@@ -89,7 +89,7 @@ class CSVM_CrossVal(object):
         for html_str in self.lowbow_W.load_files(train_set_files, encoding='utf8', error_handling='replace'):
             tf_d = self.lowbow_W.merge_tfds(tf_d, self.lowbow_W.tf_dict( self.lowbow_W._attrib_(html_str) ) )
             
-        #tf_d = self.lowbow_W.keep_atleast(tf_d, 500) #<---
+        tf_d = self.lowbow_W.keep_atleast(tf_d, 200) #<---
         print len(tf_d)
         print tf_d.items()[0:50]
         #Create The Terms-Index Dictionary that is shorted by Frequency descending order
