@@ -117,7 +117,7 @@ class CSVM_CrossVal(object):
             #the featrs_size keeping all the terms with same frequency the last term satisfies the featrs_size
             #print "Features Size:", feat_len      
             for c in C_lst:
-                csvm = sp_svm.SVC(C=c, kernel='linear')
+                csvm = sp_svm.SVC(C=c, kernel='linear', scale_C=False)
                 #csvm = svm.LinearSVC(C=c)
                 #csvm = sp_svm.LinearSVC(C=c)
                 #csvm = linear_model.SGDClassifier(n_iter=50, alpha=1e-5, n_jobs=1)

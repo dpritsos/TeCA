@@ -280,7 +280,7 @@ class CSVM_CrossVal(tbtls.TFTablesTools):
 class OCSVM_CrossVal(tbtls.TFTablesTools):
     
     def __init__(self, h5file, h5f_data, h5f_res, corpus_grp, trms_type_grp):
-        tbtls.TFTablesHandler.__init__(self, h5file)
+        tbtls.TFTablesTools.__init__(self, h5file)
         self.h5file = h5file
         self.h5f_data = h5f_data
         self.h5f_res = h5f_res
@@ -510,7 +510,7 @@ class OCSVM_CrossVal(tbtls.TFTablesTools):
                 res_table.flush()
             
     def exec_test(self):
-        #self.prepare_data(10, None)
+        self.prepare_data(10, None)
         end_dct = { "eshop":20, "blog":20, "faq":20, "frontpage":20, "listing":20, "php":20, "spage":20}
         self.evaluate(10, [0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.6, 0.75, 0.80, 0.9, 0.95], [30, 300, 3000], end_dct)
         #self.evaluate(10, [1], [30, 300, 3000], end_dct)
@@ -521,12 +521,12 @@ if __name__=='__main__':
     kfolds = 10
     nu_lst = [0.2, 0.8]
     featr_size_lst = [1000]
-    #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus.h5', 'r')
-    crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
-    #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Data_TEST_SPARSE.h5', 'w')
-    crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data_TEST_SPARSE.h5', 'w')
-    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Results_TEST_SPASE.h5', 'w')
-    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results_TEST_SPARSE.h5', 'w')
+    crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus.h5', 'r')
+    #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
+    crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Data_TEST_SPARSE.h5', 'w')
+    #crp_crssvl_data = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Data_TEST_SPARSE.h5', 'w')
+    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_CrossVal_Results_TEST_SPASE.h5', 'w')
+    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/CSVM_CrossVal_Results_TEST_SPARSE.h5', 'w')
     
     #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Santini_corpus_w.h5', 'r')
     #crp_tftb_h5 = tb.openFile('/home/dimitrios/Synergy-Crawler/Automated_Crawled_Corpus/ACC.h5', 'r')
@@ -537,11 +537,11 @@ if __name__=='__main__':
     #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage"]
     
     #ocsvm_crossval = OCSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Santini_corpus", "/words/")
-    #ocsvm_crossval = OCSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Santini_corpus", "/trigrams/")
+    ocsvm_crossval = OCSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Santini_corpus", "/trigrams/")
     #csvm_crossval = CSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Santini_corpus", "/trigrams/")
-    csvm_crossval = CSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Automated_Crawled_Corpus", "/trigrams/")
-    csvm_crossval.exec_test()
-    #ocsvm_crossval.exec_test()
+    #csvm_crossval = CSVM_CrossVal(crp_tftb_h5, crp_crssvl_data, crp_crssvl_res, "/Automated_Crawled_Corpus", "/trigrams/")
+    #csvm_crossval.exec_test()
+    ocsvm_crossval.exec_test()
     
     crp_tftb_h5.close() 
     crp_crssvl_data.close()
