@@ -78,13 +78,6 @@ class CSVM_CrossVal(object):
             
         #Create Corpus Dictionary for the training Set
         train_set_files = xhtml_file_l[0:18] 
-        """train_set_files = xhtml_file_l[0:180] +\
-                          xhtml_file_l[200:380] +\
-                          xhtml_file_l[400:580] +\
-                          xhtml_file_l[600:780] +\
-                          xhtml_file_l[800:980] +\
-                          xhtml_file_l[1000:1180] +\
-                          xhtml_file_l[1200:1380]"""
                                     
         tf_d = dict() 
         #Merge All Term-Frequency Dictionaries created by the Raw Texts                  
