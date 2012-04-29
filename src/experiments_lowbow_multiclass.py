@@ -91,11 +91,11 @@ class CSVM_CrossVal(object):
         for html_str in self.lowbow_N4SG.load_files(train_set_files, encoding='utf8', error_handling='replace'):
             tf_d = self.lowbow_N4SG.merge_tfds(tf_d, self.lowbow_N4SG.tf_dict( self.lowbow_N4SG._attrib_(html_str) ) )
             
-        tf_d = self.lowbow_N4SG.keep_atleast(tf_d, 3000) #<---
+        tf_d = self.lowbow_N4SG.keep_atleast(tf_d, 20000) #<---
         print len(tf_d)
         print tf_d.items()[0:50]
         #Create The Terms-Index Dictionary that is shorted by Frequency descending order
-        tid = self.lowbow_N4SG.tf2tidx( tf_d )
+        tid = self.lowbow_N.tf2tidx( tf_d )
         
         print tid.items()[0:50]
         #Create LowBow Vectors Sparse Matrix
