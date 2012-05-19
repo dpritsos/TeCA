@@ -44,10 +44,15 @@ class ResultsTable_desc(tb.IsDescription):
     
 class MultiResultsTable_desc(tb.IsDescription):
     kfold = tb.UInt32Col(pos=1)
-    C = tb.Float32Col(pos=2)
-    feat_num = tb.UInt32Col(pos=3)
-    Acc = tb.Float32Col(pos=7)
-
+    Acc = tb.Float32Col(pos=2)
+    feat_num_rq = tb.UInt32Col(pos=3)
+    feat_num_rt = tb.UInt32Col(pos=4)
+    Centroids_num = tb.UInt32Col(pos=5)
+    Centroids = tb.Float32Col(shape=(1,10), pos=6)
+    Sigma = tb.Float32Col(pos=7)
+    Predicted_Y = tb.Float32Col(shape=(1,5000),pos=8)
+    Expected_Y = tb.Float32Col(shape=(1,5000),pos=9)
+    SVM_C = tb.Float32Col(pos=10)
 
 
 class CSVM_CrossVal_Lowbow(object):
@@ -117,9 +122,7 @@ class CSVM_CrossVal_Lowbow(object):
                             
                             print "FIT MODEL"
                             #FIT MODEL
-                            print trn_idxs
-                            train_Y = cls_gnr_tgs[ trn_idxs ]
-                            print train_Y 
+                            train_Y = cls_gnr_tgs[ trn_idxs ] 
                             mtrx = corpus_mtrx[0]
                             train_X = mtrx[trn_idxs,:]   
                             #Some checks    
@@ -130,26 +133,38 @@ class CSVM_CrossVal_Lowbow(object):
                             
                             print "EVALUATE"
                             #EVALUATE
-                            print crv_idxs
                             crossval_Y = cls_gnr_tgs[ crv_idxs ]
-                            print crossval_Y
                             mtrx = corpus_mtrx[0]
                             crossval_X = mtrx[crv_idxs,:]
                              
                             #ssp.csr_matrix(crossval_X, shape=crossval_X.shape, dtype=np.float64)
                             res_acc_score = csvm.score( ssp.csr_matrix(crossval_X.todense(), shape=crossval_X.shape), crossval_Y) #<----- WATCH THIS
                             
-                            print "Accuracy:", res_acc_score, " for:", k, c, len(resized_tf_d), centroids_l, Sigma 
+                            Predicted_Y = csvm.predict( ssp.csr_matrix(crossval_X.todense(), shape=crossval_X.shape) )
+                            
+                            print "Accuracy:", res_acc_score, " for:", k, c, len(resized_tf_d), centroids_l, Sigma, Predicted_Y 
                             
                             print "SAVE RESAULTS"
                              
                             self.res_table.row['kfold'] = k
-                            self.res_table.row['C'] = c
-                            self.res_table.row['feat_num'] = len(resized_tf_d)
                             self.res_table.row['Acc'] = res_acc_score
+                            self.res_table.row['feat_num_rq'] = featrs_size
+                            self.res_table.row['feat_num_rt'] = len(resized_tf_d)
+                            self.res_table.row['Centroids_num'] = len(centroids_l)
+                            z = np.zeros((1,10))
+                            z[0,np.arange(len(centroids_l))] = np.array(centroids_l)
+                            self.res_table.row['Centroids'] = z
+                            self.res_table.row['Sigma'] = Sigma
+                            z = np.zeros((1,5000))
+                            z[0,np.arange(len(Predicted_Y))] = Predicted_Y
+                            self.res_table.row['Predicted_Y'] = z
+                            z = np.zeros((1,5000))
+                            z[0,np.arange(len(crossval_Y))] = np.array(crossval_Y)
+                            self.res_table.row['Expected_Y'] = z
+                            self.res_table.row['SVM_C'] = c
                             self.res_table.row.append()
                             self.res_table.flush()
-                 
+
                  
 
 if __name__=='__main__':
@@ -159,21 +174,28 @@ if __name__=='__main__':
     lowbow_N4L2 = Html2LBN_L1_BW(3, attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
     lowbow_W = Html2LBW(attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
     
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
-    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_LOWBOW_RES.h5', 'w')
-    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/CSVM_LOWBOW_RES.h5', 'w')
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_RES_LowBow_Words_FAST.h5', 'w')
+    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/CSVM_LOWBOW_RES.h5', 'w')
     
     csvm_crossval_lowbow = CSVM_CrossVal_Lowbow(lowbow_W ,crp_crssvl_res, corpus_filepath, genres)
     
     kfolds = 10
     C_lst = [1]
-    featr_size_lst = [15000]
+    featr_size_lst = [100,300,500,700,1000,5000,10000,15000,20000,30000] #[100,200,300,400,500,600,700,800,900,1000,5000,10000,15000,20000,25000,30000] 
     Kernel = 'linear'
-    Centroids_ll = [[0.2, 0.5, 0.8]] 
-    Sigma_l = [0.2, 0.5, 0.7]
+    Centroids_ll = [ 
+                     #[0.5],\
+                     #[0.2, 0.3],\
+                     [0.2, 0.5, 0.8],\
+                     #[0.2, 0.4, 0.6, 0.8],\
+                     [0.1, 0.3, 0.5, 0.7, 0.9],\
+                     #[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+                   ] 
+    Sigma_l = [0.2] #[0.1, 0.2, 0.5, 0.7, 0.9]
             
     xhtml_file_l, cls_gnr_tgs = csvm_crossval_lowbow.corpus_files_and_tags()
     
