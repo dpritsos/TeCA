@@ -10,6 +10,7 @@ import tables as tb
 #import html2tf.tables.cngrams as cng_tb
 
 import scipy.sparse as ssp
+import scipy.spatial.distance as spd
 from sklearn.metrics import precision_score, recall_score, f1_score, roc_curve
 from sklearn import cross_validation
 
@@ -120,7 +121,7 @@ class CrossVal_Koppels_method(object):
         return predicted_Y, predicted_scores, max_sim_scores_per_iter, predicted_classes_per_iter      
         
     
-    def evaluate(self, xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst, sigma_threshold, similarity_func, norm_func):
+    def evaluate(self, xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst, sigma_threshold, similarity_func, sim_min_val, norm_func):
         
         #Convert lists to Arrays
         xhtml_file_l = np.array( xhtml_file_l )
@@ -182,7 +183,7 @@ class CrossVal_Koppels_method(object):
                         predicted_classes_per_iter = self.predict(gnr_classes,\
                                                                   crossval_X, crossval_Y,\
                                                                   tid, featrs_size,\
-                                                                  similarity_func, -1.0,\
+                                                                  similarity_func, sim_min_val,\
                                                                   iters, sigma_threshold) 
                         
                         
@@ -216,7 +217,8 @@ class CrossVal_Koppels_method(object):
                         
                         #Maybe Later
                         #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
-                                            
+                        
+                        print self.h5_res.createArray(iters_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
                         print self.h5_res.createArray(iters_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
                         print self.h5_res.createArray(iters_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
                         print self.h5_res.createArray(iters_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
@@ -236,29 +238,30 @@ def cosine_similarity(vector, centroid):
 
 if __name__ == '__main__':
     
-    sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
-    sparse_CNG = h2v_cng.Html2TF(4, attrib='text', lowercase=True, valid_html=False)
-    
     corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
     #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
     genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_Inter-100_FeatSize-Variable_SigmaThreshol-None.h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'w')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
     iter_l = [100]
     featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
     sigma_threshold = 0.8
+    N_Gram_size = 4
     
-    crossV_Koppels = CrossVal_Koppels_method(sparse_W, CrossVal_Kopples_method_res, corpus_filepath, genres)
+    #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
+    sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
+    
+    crossV_Koppels = CrossVal_Koppels_method(sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath, genres)
     
     xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
     
     crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
-                                     sigma_threshold, similarity_func=cosine_similarity, norm_func=None)
+                                     sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=None)
     
     CrossVal_Kopples_method_res.close()
 
