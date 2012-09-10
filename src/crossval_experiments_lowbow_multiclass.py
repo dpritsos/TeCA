@@ -58,7 +58,7 @@ class MultiResultsTable_desc(tb.IsDescription):
 class CSVM_CrossVal_Lowbow(object):
     
     def __init__(self, lowbow_type, h5f_res, corpus_path, genres):        
-        self.lowbow = Html2LBW(attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm) #lowbow_type 
+        self.lowbow = lowbow_type 
         self.corpus_path = corpus_path
         self.genres_lst = genres
         self.res_table = h5f_res.createTable(h5f_res.root, "multiclass_cross_validation",  MultiResultsTable_desc)
@@ -99,7 +99,7 @@ class CSVM_CrossVal_Lowbow(object):
             #SELECT FEATURE SIZE 
             for featrs_size in featr_size_lst:
                 resized_tf_d = self.lowbow.keep_atleast(tf_d, featrs_size) #<---
-                #print len(resized_tf_d)
+                print len(resized_tf_d)
                 print resized_tf_d.items()[0:50]
             
                 #Create The Terms-Index Dictionary that is shorted by Frequency descending order
@@ -165,32 +165,71 @@ class CSVM_CrossVal_Lowbow(object):
                             self.res_table.row.append()
                             self.res_table.flush()
 
+def binary(segments2matrix, trm_l_len):
+    
+    threshold=0.0
+    
+    #Sum up and return the sparse matrix for this string/text
+    segments2matrix_sum = segments2matrix.sum(0)
+        
+    #Get Normalised Sum of Sums
+    segments2matrix_sum_sums = segments2matrix_sum / np.max(segments2matrix_sum)    
+    #Be Careful after the above division the Sparse Matrix is transformed to Matrix (non-sparse)
+    
+    #print "Normalising"
+    #print segments2matrix_sum_sums
+
+    #segments2matrix_sum_sums[ np.where( segments2matrix_sum_sums >= threshold) ] = 1.0
+    segments2matrix_sum_sums[ np.where( segments2matrix_sum_sums == threshold) ] = 1/np.log(trm_l_len)    
+    
+    #print segments2matrix_sum_sums
+    
+    return ssp.csr_matrix( segments2matrix_sum_sums, shape=segments2matrix_sum_sums.shape, dtype=np.float32)
+
+
+def deriv(segments2matrix, trm_l_len):
+    
+    #Sum up and return the sparse matrix for this string/text
+    matrix_sum = segments2matrix.sum(0)
+    
+    deriv0 = matrix_sum[0, 1::] - matrix_sum[0, 0:-1] 
+    
+    #deriv1 = deriv0 - np.min(deriv0) 
+        
+    #Get Normalised Sum of Sums
+    deriv = deriv0 / np.max(deriv0)    
+    #Be Careful after the above division the Sparse Matrix is transformed to Matrix (non-sparse)
+    
+            
+    #print segments2matrix_sum_sums
+    return ssp.csr_matrix( deriv, shape=deriv.shape, dtype=np.float32)
                  
 
 if __name__=='__main__':
-    
-    lowbow_N = Html2LBN(3, attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
-    lowbow_N4SG = Html2LBN4SEG(3, attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
-    lowbow_N4L2 = Html2LBN_L1_BW(3, attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
-    lowbow_W = Html2LBW(attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm)
+        
+    lowbow_N = Html2LBN(4, attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm, norm_func=None)
+    lowbow_N4SG = Html2LBN4SEG(3, attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm, norm_func=None)
+    lowbow_N4L2 = Html2LBN_L1_BW(3, attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm, norm_func=None)
+    lowbow_W = Html2LBW(attrib='text', lowercase=True, valid_html=False, smoothing_kernel=stats.norm, norm_func=deriv) #binary
     
     corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
     #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
     genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
-    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_RES_LowBow_Words_FAST.h5', 'w')
-    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/CSVM_LOWBOW_RES.h5', 'w')
+    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_RES_LowBow&Derivative_Ngrams_FAST.h5', 'w')
+    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/CSVM_RES_LowBow_Ngrams_FAST.h5', 'w')
     
-    csvm_crossval_lowbow = CSVM_CrossVal_Lowbow(lowbow_W ,crp_crssvl_res, corpus_filepath, genres)
+    csvm_crossval_lowbow = CSVM_CrossVal_Lowbow(lowbow_N ,crp_crssvl_res, corpus_filepath, genres)
     
     kfolds = 10
     C_lst = [1]
-    featr_size_lst = [100,300,500,700,1000,5000,10000,15000,20000,30000] #[100,200,300,400,500,600,700,800,900,1000,5000,10000,15000,20000,25000,30000] 
-    Kernel = 'linear'
+    featr_size_lst = [1000,3000,5000,10000,15000,20000,30000] #[100,300,500,700,1000,3000] #[100,200,300,400,500,600,700,800,900,1000,5000,10000,15000,20000,25000,30000] 
+    #Kernel = 'rbf' #<----------------------SOS 
+    Kernel = 'linear' #<----------------------SOS
     Centroids_ll = [ 
                      #[0.5],\
                      #[0.2, 0.3],\
-                     [0.2, 0.5, 0.8],\
+                     #[0.2, 0.5, 0.8],\
                      #[0.2, 0.4, 0.6, 0.8],\
                      [0.1, 0.3, 0.5, 0.7, 0.9],\
                      #[0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]

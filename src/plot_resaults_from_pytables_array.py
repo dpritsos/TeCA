@@ -28,7 +28,7 @@ def plot_data(res_tb, sv_tb,  featr_size_lst, centroids_ll, sigma_l):
     ylbl = ['F1', 'Prec', 'Recall', "Accuracy"]
     plt.figure( 1 )
     plt_pos = 0 
-    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modelling: LowBow" )
+    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modelling: Derivative(>0)" )
     
     
     for centroids_l in centroids_ll[:]: 
@@ -39,11 +39,11 @@ def plot_data(res_tb, sv_tb,  featr_size_lst, centroids_ll, sigma_l):
             #centrd[0,np.arange(len(centroids_l))] = np.array(centroids_l)
             #print res_tb.read()
             for sigma in sigma_l:
-                print '(feat_num_rq == ' +str(featr_size)+ 'L) & (Centroids_num == ' +str(centrds_num)+ 'L) & (Sigma >= ' +str(np.float32(sigma))+ ' )'
+                #print '(feat_num_rq == ' +str(featr_size)+ 'L) & (Centroids_num == ' +str(centrds_num)+ 'L) & (Sigma >= ' +str(np.float32(sigma))+ ' )'
                 kfolds_acc = [ row['Acc'] for row in\
-                    res_tb.where('(feat_num_rq == ' +str(featr_size)+ 'L) & (Centroids_num == ' +str(centrds_num)+ 'L) & (Sigma >= ' +str(np.float32(sigma))+ ' )')]
+                    res_tb.where('(feat_num_rq == ' +str(featr_size)+')')] #'+ 'L) & (Centroids_num == ' +str(centrds_num)+ 'L) & (Sigma >= ' +str(np.float32(sigma))+ ' )')]
                 kfolds_feat_num = [ row['feat_num_rt'] for row in\
-                    res_tb.where('(feat_num_rq == ' +str(featr_size)+ 'L) & (Centroids_num == ' +str(centrds_num)+ 'L) & (Sigma >= ' +str(np.float32(sigma))+ ' )')] 
+                    res_tb.where('(feat_num_rq == ' +str(featr_size)+')')] #+ 'L) & (Centroids_num == ' +str(centrds_num)+ 'L) & (Sigma >= ' +str(np.float32(sigma))+ ' )')] 
                 kfolds_acc = np.array(kfolds_acc)
                 kfolds_feat_num = np.array(kfolds_feat_num)
                 #print kfolds_res
@@ -53,9 +53,9 @@ def plot_data(res_tb, sv_tb,  featr_size_lst, centroids_ll, sigma_l):
         tplt_ar = np.array(tplt_l)
         plt.xlabel( 'Number of Features' )
         plt.ylabel( 'Accuracy' )
-        plt.plot(tplt_ar[:,1], tplt_ar[:,0], color[centrds_num] + symbol[centrds_num] + line_type[centrds_num],\
-                 label=str(centrds_num)+' centroids - sigma='+str(sigma)) #, tvect_d[ nu ], res_d[ nu ], color[i] + line_type[i], label=nu)
-        plt.legend(loc=4 )
+        plt.plot(tplt_ar[:,1], tplt_ar[:,0], color[centrds_num] + symbol[centrds_num] + line_type[centrds_num])#,\
+                 #label=str(centrds_num)+' centroids - sigma='+str(sigma)) #, tvect_d[ nu ], res_d[ nu ], color[i] + line_type[i], label=nu)
+        #plt.legend(loc=4 )
         plt.grid(True)
     plt.Figure()
     plt.show()
@@ -91,7 +91,7 @@ def plot_resaults(titles, vformat_d, figure_num):
 
 if __name__ == '__main__':
     
-    featr_size_lst = [100,300,500,700,1000,5000,10000,15000,20000,30000]
+    featr_size_lst = [100,300,500,700,1000,3000,5000,10000,15000,20000,30000]
     Centroids_ll = [ 
                      #[0.5],\
                      #[0.2, 0.3],\
@@ -102,7 +102,9 @@ if __name__ == '__main__':
                    ] 
     Sigma_l = [0.2]
     
-    h5f = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_RES_LowBow_Words_FAST.h5', 'r')
+    h5f = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words_TM-Derivative(>0).h5', 'r')
+    #h5f = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'r')
+    
     #h5f = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/CSVM_RES_LowBow_Words_FAST.h5', 'r')
     
     #sv_h5f = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_RES_Words_FAST_merged10folds.h5', 'r')
