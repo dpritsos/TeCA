@@ -72,7 +72,7 @@ class CrossVal_OCSVM(object):
         return (gnr_classes, inds_per_gnr)   
     
     
-    def predict(self, gnr_classes, crossval_X, crossval_Y):
+    def predict(self, gnr_classes, crossval_X):
             
         #Initialise Predicted-Classes-Arrays List 
         predicted_Y_per_gnr = list()
@@ -91,7 +91,7 @@ class CrossVal_OCSVM(object):
         return predicted_Y_per_gnr.traspose() #columns assigned to genres      
         
     
-    def evaluate(self, xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst, sigma_threshold, similarity_func, sim_min_val, norm_func):
+    def evaluate(self, xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, nu_l, featr_size_lst, norm_func):
         
         #Convert lists to Arrays
         xhtml_file_l = np.array( xhtml_file_l )
@@ -148,7 +148,7 @@ class CrossVal_OCSVM(object):
                         #Creating a Group for this number of iterations in h5 file under this features number under this k-fold
                         nu_group = self.h5_res.createGroup(feat_num_group, 'Nu'+str(nu), "OC-SVM's Nu parameter group of Results Arrays for this K-fold" )
                        
-                        predicted_Y = self.predict(gnr_classes, crossval_X, crossval_Y, tid) 
+                        predicted_Y_per_gnr = self.predict(gnr_classes, crossval_X) 
                         
                         print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
                         print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
