@@ -74,52 +74,21 @@ class CrossVal_OCSVM(object):
     
     def predict(self, gnr_classes, crossval_X, crossval_Y):
             
+        #Initialise Predicted-Classes-Arrays List 
+        predicted_Y_per_gnr = list()
         
-                    
-        #Measure similarity for iters iterations i.e. for iters different feature subspaces Randomly selected 
-        for I in range(iters):
+        for g in self.genres_lst:
             
-            #Randomly select some of the available features
-            suffled_vocabilary_idxs = np.random.permutation( np.array(vocab_index_dct.values()) ) 
-            features_subspace = suffled_vocabilary_idxs[0:featrs_size]
+            #Get the predictions for each Vector for this genre
+            predicted_Y = gnr_classes[ g ].predict( crossval_X ) #For an one-class model, +1 or -1 is returned.
             
-            #Initialised Predicted Classes and Maximum Similarity Scores Array for this i iteration 
-            predicted_classes = np.zeros( crossval_X.shape[0] )
-            max_sim_scores = np.zeros( crossval_X.shape[0] )
+            #Keep the prediction per genre 
+            predicted_Y_per_gnr.apped( predicted_Y ) 
             
-            #Measure similarity for each Cross-Validation-Set vector to each available Genre Class(i.e. Class-Vector). For This feature_subspace
-            for i_vect, vect in enumerate(crossval_X[:, features_subspace]):
+        #Convert it to Array before returning
+        predicted_Y_per_gnr = np.vstack( predicted_Y_per_gnr )
     
-                #NOTE: max_sim is initialised for cosine-similarity which ranges from -1 to 1, with 1 indicates maximum similarity
-                #However, it can be any value given by sim_min_value argument  
-                max_sim = sim_min_value
-                for cls_tag, g in enumerate(self.genres_lst):
-                    
-                    #Measure Similarity
-                    sim_score = similarity_func(vect, gnr_classes[ g ][:, features_subspace])
-                    
-                    
-                    predicted_classes[i_vect] = cls_tag + 1 #plus 1 is the real class tag 0 means uncategorised
-                    max_sim_scores[i_vect] = sim_score
-                    max_sim = sim_score
-        
-            #Store Predicted Classes and Scores for this i iteration
-            max_sim_scores_per_iter[I,:] = max_sim_scores[:]
-            predicted_classes_per_iter[I,:] = predicted_classes[:]
-                                              
-        predicted_Y = np.zeros((crossval_Y.shape[0]), dtype=np.float)
-        predicted_scores = np.zeros((crossval_Y.shape[0]), dtype=np.float)
-        
-        for i_prd_cls, prd_cls in enumerate(predicted_classes_per_iter.transpose()):
-            genres_occs = np.histogram( prd_cls.astype(np.int), bins=np.arange(self.gnrs_num+2))[0] #One Bin per Genre plus one i.e the first to be always zero
-            #print genres_occs
-            genres_probs = genres_occs.astype(np.float) / np.float(iters)
-            #print genres_probs
-            #if np.max(genres_probs) >= sigma_threshold:
-            predicted_Y[i_prd_cls] = np.argmax( genres_probs )
-            predicted_scores[i_prd_cls] = np.max( genres_probs ) 
-        
-        return predicted_Y, predicted_scores, max_sim_scores_per_iter, predicted_classes_per_iter      
+        return predicted_Y_per_gnr.traspose() #columns assigned to genres      
         
     
     def evaluate(self, xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst, sigma_threshold, similarity_func, sim_min_val, norm_func):
