@@ -181,22 +181,13 @@ class CrossVal_OCSVM(object):
                         #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
                         
                         print self.h5_res.createArray(iters_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
-                        print self.h5_res.createArray(iters_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
-                        print self.h5_res.createArray(iters_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
-                        print self.h5_res.createArray(iters_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
-                        print self.h5_res.createArray(iters_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, "Max Similarity Score per Document per Iteration (CrossValidation Set)")[:]                        
+                        print self.h5_res.createArray(iters_group, 'predicted_Y_per_gnr', predicted_Y_per_gnr, "Predicted Y OC-SVM results per Document per nu (CrossValidation Set)")[:]                        
                         print self.h5_res.createArray(iters_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
                         print self.h5_res.createArray(iters_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
                         print self.h5_res.createArray(iters_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
                         print                
                                         
-               
-
-def cosine_similarity(vector, centroid):
- 
-    return vector * np.transpose(centroid) / ( np.linalg.norm(vector.todense()) * np.linalg.norm(centroid) )
-
-
+                                        
 
 if __name__ == '__main__':
     
@@ -212,7 +203,6 @@ if __name__ == '__main__':
     vocabilary_size = [100000] #[1000,3000,10000,100000]
     iter_l = [100]
     featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
-    sigma_threshold = 0.8
     N_Gram_size = 4
     
     #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
