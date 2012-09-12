@@ -143,7 +143,6 @@ class CrossVal_OCSVM(object):
                         mtrx = corpus_mtrx[0]
                         crossval_X = mtrx[crv_idxs, 0:featrs_size] 
                                 
-                        
                         print "EVALUATE"
                         #Creating a Group for this number of iterations in h5 file under this features number under this k-fold
                         nu_group = self.h5_res.createGroup(feat_num_group, 'Nu'+str(nu), "OC-SVM's Nu parameter group of Results Arrays for this K-fold" )
@@ -151,10 +150,10 @@ class CrossVal_OCSVM(object):
                         predicted_Y_per_gnr = self.predict(gnr_classes, crossval_X) 
                         
                         print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
-                        print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
+                        
                         
                         cv_tg_idxs = np.array( np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
-                        tp_n_fp = np.array( np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
+                        
                         
                         P_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
                         R_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
@@ -164,27 +163,36 @@ class CrossVal_OCSVM(object):
                         for gnr_cnt in range(len(self.genres_lst)):
                             start = end
                             end = end + cv_tg_idxs[gnr_cnt+1]
-                            counts_per_grn_cv = np.histogram( predicted_Y[start:end], bins=np.arange(self.gnrs_num+2) )[0]
-                            #print counts_per_grn_cv
-                            #print tp_n_fp[gnr_cnt+1]
-                            P = counts_per_grn_cv.astype(np.float) / tp_n_fp[gnr_cnt+1]
-                            P_per_gnr[gnr_cnt+1] = P[gnr_cnt+1]
-                            R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]
-                            R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  
-                            F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
                             
-                        P_per_gnr[0] = precision_score(crossval_Y, predicted_Y)   
-                        R_per_gnr[0] = recall_score(crossval_Y, predicted_Y) 
-                        F1_per_gnr[0] = f1_score(crossval_Y, predicted_Y)  
+                            #Counts per Genre (True Positive)
+                            tp_cnts_per_grn = np.sum( np.where( predicted_Y_per_gnr[gnr_cnt, start:end] > 0, 1, 0) ).astype(np.float)
+                            #Count True Positive and False Positive per Genre
+                            tp_n_fp = np.sum( np.where( predicted_Y_per_gnr[gnr_cnt, :] > 0, 1, 0) ).astype(np.float) 
+                            #Count True Positive and False Negative Per Genre
+                            #Acctualy this is equal to the number of samles is keept in the CrossValidation set per Genre
+                            #i.e. cv_tg_idxs
+                        
+                            #Calculate Precision
+                            P_per_gnr[gnr_cnt+1] = tp_cnts_per_gnr / tp_n_fp
+                            #Calculate Recall
+                            R_per_gnr[gnr_cnt+1] = tp_cnts_per_gnr / cv_tg_idxs[gnr_cnt+1] 
+                            #Calculate F1 score 
+                            F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
+                        
+                        #Zero Position cannot be used for OC-SVM as in Koppel's method because the later returns a unique class for each\
+                        #page while OC-SVM can return more than one 
+                        P_per_gnr[0] = 0  #precision_score(crossval_Y, predicted_Y)   
+                        R_per_gnr[0] = 0 #recall_score(crossval_Y, predicted_Y) 
+                        F1_per_gnr[0] = 0 #f1_score(crossval_Y, predicted_Y)  
                         
                         #Maybe Later
                         #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
                         
                         print self.h5_res.createArray(iters_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
                         print self.h5_res.createArray(iters_group, 'predicted_Y_per_gnr', predicted_Y_per_gnr, "Predicted Y OC-SVM results per Document per nu (CrossValidation Set)")[:]                        
-                        print self.h5_res.createArray(iters_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
-                        print self.h5_res.createArray(iters_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
-                        print self.h5_res.createArray(iters_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
+                        print self.h5_res.createArray(iters_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0] == 0)")[:]
+                        print self.h5_res.createArray(iters_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0] == 0)")[:]
+                        print self.h5_res.createArray(iters_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0] == 0)")[:]
                         print                
                                         
                                         
@@ -196,23 +204,22 @@ if __name__ == '__main__':
     genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'w')
+    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10.h5', 'w')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
-    iter_l = [100]
+    nu_l = [0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
     featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
     N_Gram_size = 4
     
     #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
     sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
-    crossV_Koppels = CrossVal_Koppels_method(sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath, genres)
+    crossV_OCSVM = CrossVal_OCSVM_method(sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath, genres)
     
-    xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
+    xhtml_file_l, cls_gnr_tgs = crossV_OCSVM.corpus_files_and_tags()
     
-    crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
-                                     sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=None)
+    crossV_OCSVM.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, nu_l, featr_size_lst, norm_func=None)
     
-    CrossVal_Kopples_method_res.close()
+    CrossVal_OCSVM_res.close()
