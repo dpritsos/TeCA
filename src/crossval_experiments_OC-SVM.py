@@ -67,7 +67,7 @@ class CrossVal_OCSVM(object):
             
             ocsvm = svm.OneClassSVM(kernel='linear', nu=nu, shrinking=True, cache_size=200, verbose=False)
             
-            gnr_classes[g] = ocsvm.fit( corpus_mtrx[inds_per_gnr[g], :] ) 
+            gnr_classes[g] = ocsvm.fit( corpus_mtrx[inds_per_gnr[g], :].todense() ) 
         
         return (gnr_classes, inds_per_gnr)   
     
@@ -87,8 +87,11 @@ class CrossVal_OCSVM(object):
             
         #Convert it to Array before returning
         predicted_Y_per_gnr = np.vstack( predicted_Y_per_gnr )
+        
+        print "Predicted_Y_per_gnr"
+        print predicted_Y_per_gnr
     
-        return predicted_Y_per_gnr.traspose() #columns assigned to genres      
+        return predicted_Y_per_gnr      
         
     
     def evaluate(self, xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, nu_l, featr_size_lst, norm_func):
@@ -174,10 +177,13 @@ class CrossVal_OCSVM(object):
                         
                             #Calculate Precision
                             P_per_gnr[gnr_cnt+1] = tp_cnts_per_gnr / tp_n_fp
+                            print "P", P_per_gnr
                             #Calculate Recall
-                            R_per_gnr[gnr_cnt+1] = tp_cnts_per_gnr / cv_tg_idxs[gnr_cnt+1] 
+                            R_per_gnr[gnr_cnt+1] = tp_cnts_per_gnr / cv_tg_idxs[gnr_cnt+1]
+                            print "R", R_per_gnr
                             #Calculate F1 score 
-                            F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
+                            F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1])
+                            print "F1", F_per_gnr 
                         
                         #Zero Position cannot be used for OC-SVM as in Koppel's method because the later returns a unique class for each\
                         #page while OC-SVM can return more than one 
@@ -216,7 +222,7 @@ if __name__ == '__main__':
     #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
     sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
-    crossV_OCSVM = CrossVal_OCSVM_method(sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath, genres)
+    crossV_OCSVM = CrossVal_OCSVM(sparse_CNG, CrossVal_OCSVM_res, corpus_filepath, genres)
     
     xhtml_file_l, cls_gnr_tgs = crossV_OCSVM.corpus_files_and_tags()
     
