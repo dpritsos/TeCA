@@ -63,10 +63,11 @@ class CrossVal_OCSVM(object):
     
         gnr_classes = dict()
         for g in self.genres_lst:
-            #Create the OC-SVM Model
             
+            #Create the OC-SVM Model for this genre
             ocsvm = svm.OneClassSVM(kernel='linear', nu=nu, shrinking=True, cache_size=200, verbose=False)
             
+            #Fit OC-SVM Model to Data of this genre
             gnr_classes[g] = ocsvm.fit( corpus_mtrx[inds_per_gnr[g], :].todense() ) 
         
         return (gnr_classes, inds_per_gnr)   
