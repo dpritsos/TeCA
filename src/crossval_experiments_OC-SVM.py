@@ -209,10 +209,10 @@ if __name__ == '__main__':
     
     corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
     #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    genres = [ "frontpage", "blog", "eshop", "faq",     "listing", "php", "spage" ]
+    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TESTONLY.h5', 'w')
+    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10.h5', 'w')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
     
     kfolds = 10
@@ -221,10 +221,10 @@ if __name__ == '__main__':
     featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
     N_Gram_size = 4
     
-    #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
-    sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
+    sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
+    #sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
-    crossV_OCSVM = CrossVal_OCSVM(sparse_CNG, CrossVal_OCSVM_res, corpus_filepath, genres)
+    crossV_OCSVM = CrossVal_OCSVM(sparse_W, CrossVal_OCSVM_res, corpus_filepath, genres)
     
     xhtml_file_l, cls_gnr_tgs = crossV_OCSVM.corpus_files_and_tags()
     
