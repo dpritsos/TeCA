@@ -24,9 +24,9 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
         
         for k in range(kfolds):
             
-            kfold_F1.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu0.2', name='F1_per_gnr' ) )
-            kfold_P.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu0.2', name='P_per_gnr' ) )
-            kfold_R.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu0.2', name='R_per_gnr' ) )
+            kfold_F1.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu0.7', name='F1_per_gnr' ) )
+            kfold_P.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu0.7', name='P_per_gnr' ) )
+            kfold_R.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu0.7', name='R_per_gnr' ) )
         
         F1_per_feat_size.append( np.mean(np.vstack(kfold_F1), axis=0) )
         P_per_feat_size.append( np.mean(np.vstack(kfold_P), axis=0) )
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     gnr_num = 7
     nu_l = [0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
         
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10.h5', 'r')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-BIN.h5', 'r')
     
     plot_data(CrossVal_Kopples_method_res, kfolds, featr_size_lst, genres)
     

@@ -84,19 +84,26 @@ class CrossVal_Koppels_method(object):
             
             #Measure similarity for each Cross-Validation-Set vector to each available Genre Class(i.e. Class-Vector). For This feature_subspace
             for i_vect, vect in enumerate(crossval_X[:, features_subspace]):
-    
-                #NOTE: max_sim is initialised for cosine-similarity which ranges from -1 to 1, with 1 indicates maximum similarity
-                #However, it can be any value given by sim_min_value argument  
+                
+                #Convert TF vectors to Binary 
+                vect_bin = np.where(vect[:, :].toarray() > 0, 1, 0) #NOTE: with np.where Always use A[:] > x instead of A > x in case of Sparse Matrices
+                #print vect.shape
+                
                 max_sim = sim_min_value
                 for cls_tag, g in enumerate(self.genres_lst):
                     
+                    #Convert TF vectors to Binary
+                    gnr_cls_bin = np.where(gnr_classes[ g ][:, features_subspace] > 0, 1, 0)
+                    #print gnr_cls_bin.shape
+                    
                     #Measure Similarity
-                    sim_score = similarity_func(vect, gnr_classes[ g ][:, features_subspace])
+                    sim_score = similarity_func(vect_bin, gnr_cls_bin)
                     
                     #Just for debugging for 
-                    if sim_score > 1.0:
-                        print "FUCK"
+                    if sim_score < 0.0:
+                        print "ERROR: Similarity score unexpected value ", sim_score
                     
+                    #Assign the class tag this vector is most similar and keep the respective similarity score
                     if sim_score > max_sim:
                         predicted_classes[i_vect] = cls_tag + 1 #plus 1 is the real class tag 0 means uncategorised
                         max_sim_scores[i_vect] = sim_score
@@ -236,6 +243,12 @@ def cosine_similarity(vector, centroid):
 
 
 
+def hamming_similarity(vector, centroid):
+ 
+    return 1.0 - spd.dice(centroid, vector)
+
+
+
 if __name__ == '__main__':
     
     corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
@@ -243,7 +256,7 @@ if __name__ == '__main__':
     genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_Hamming.h5', 'w')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
     
     kfolds = 10
@@ -260,8 +273,12 @@ if __name__ == '__main__':
     
     xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
     
+    #Cosine Similarity
+    #crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
+    #                                 sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=None)
+    #Hamming Similarity
     crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
-                                     sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=None)
+                                     sigma_threshold, similarity_func=hamming_similarity, sim_min_val=0.0, norm_func=None)
     
     CrossVal_Kopples_method_res.close()
 
