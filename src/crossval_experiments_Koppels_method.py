@@ -100,8 +100,8 @@ class CrossVal_Koppels_method(object):
                     sim_score = similarity_func(vect_bin, gnr_cls_bin)
                     
                     #Just for debugging for 
-                    if sim_score < 0.0:
-                        print "ERROR: Similarity score unexpected value ", sim_score
+                    #if sim_score < 0.0:
+                    #    print "ERROR: Similarity score unexpected value ", sim_score
                     
                     #Assign the class tag this vector is most similar and keep the respective similarity score
                     if sim_score > max_sim:
@@ -261,8 +261,12 @@ def correlation_similarity(vector, centroid):
     s00 = np.dot(vector_, centroid_)
     s01 = np.dot(vector_, centroid)
     s10 = np.dot(vector,centroid_)
-
-    return (s11*s00 - s01*s10) / np.sqrt((s10+s11)*(s01+s00)*(s11+s01)*(s00+s10))
+    
+    denom = np.sqrt((s10+s11)*(s01+s00)*(s11+s01)*(s00+s10))
+    if denom == 0.0:
+        denom = 1.0
+        
+    return (s11*s00 - s01*s10) / denom
     
     
 
@@ -273,7 +277,7 @@ if __name__ == '__main__':
     genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_Hamming.h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Hamming.h5', 'w')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
     
     kfolds = 10
@@ -283,10 +287,10 @@ if __name__ == '__main__':
     sigma_threshold = 0.8
     N_Gram_size = 4
     
-    #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
-    sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
+    sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
+    #sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
-    crossV_Koppels = CrossVal_Koppels_method(sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath, genres)
+    crossV_Koppels = CrossVal_Koppels_method(sparse_W, CrossVal_Kopples_method_res, corpus_filepath, genres)
     
     xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
     
