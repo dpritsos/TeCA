@@ -245,7 +245,7 @@ def cosine_similarity(vector, centroid):
 
 def hamming_similarity(vector, centroid):
  
-    return 1.0 - spd.dice(centroid, vector)
+    return 1.0 - spd.jaccard(centroid, vector)
 
 
 

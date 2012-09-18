@@ -68,8 +68,11 @@ class CrossVal_OCSVM(object):
             gnr_classes[g] = svm.OneClassSVM(kernel='linear', nu=nu, shrinking=True, cache_size=200, verbose=False)
             print "Fit Model for ", g
             print "Corpus_Mtrx", corpus_mtrx[inds_per_gnr[g], :].shape
+            #Convert TF vectors to Binary 
+            crp_arr_bin = np.where(corpus_mtrx[inds_per_gnr[g], :].toarray() > 0, 1, 0)
+            
             #Fit OC-SVM Model to Data of this genre
-            gnr_classes[g].fit( corpus_mtrx[inds_per_gnr[g], :].toarray() )
+            gnr_classes[g].fit( crp_arr_bin) #corpus_mtrx[inds_per_gnr[g], :].toarray() )
         
         return (gnr_classes, inds_per_gnr)   
     
@@ -81,8 +84,11 @@ class CrossVal_OCSVM(object):
         
         for g in self.genres_lst:
             
+            #Convert TF vectors to Binary
+            cv_arr_bin = np.where(crossval_X.toarray() > 0, 1, 0)
+            
             #Get the predictions for each Vector for this genre
-            predicted_Y = gnr_classes[ g ].predict( crossval_X.toarray() ) #For an one-class model, +1 or -1 is returned.
+            predicted_Y = gnr_classes[ g ].predict( cv_arr_bin ) #crossval_X.toarray() ) #For an one-class model, +1 or -1 is returned.
             
             #Keep the prediction per genre 
             predicted_Y_per_gnr.append( predicted_Y ) 
@@ -207,13 +213,13 @@ class CrossVal_OCSVM(object):
 
 if __name__ == '__main__':
     
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10.h5', 'w')
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
+    #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-BIN.h5', 'w')
+    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4grams-OC-SVM_kfolds-10_TM-BIN.h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
@@ -221,10 +227,10 @@ if __name__ == '__main__':
     featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
     N_Gram_size = 4
     
-    sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
-    #sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
+    #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
+    sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
-    crossV_OCSVM = CrossVal_OCSVM(sparse_W, CrossVal_OCSVM_res, corpus_filepath, genres)
+    crossV_OCSVM = CrossVal_OCSVM(sparse_CNG, CrossVal_OCSVM_res, corpus_filepath, genres)
     
     xhtml_file_l, cls_gnr_tgs = crossV_OCSVM.corpus_files_and_tags()
     
