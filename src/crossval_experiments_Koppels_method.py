@@ -245,9 +245,26 @@ def cosine_similarity(vector, centroid):
 
 def hamming_similarity(vector, centroid):
  
-    return 1.0 - spd.jaccard(centroid, vector)
+    return 1.0 - spd.hamming(centroid, vector)
 
 
+
+def correlation_similarity(vector, centroid):
+    
+    vector = vector[0]
+    centroid = np.array(centroid)[0]
+        
+    vector_ = np.where(vector > 0, 0, 1)
+    centroid_ = np.where(centroid > 0, 0, 1)
+   
+    s11 = np.dot(vector, centroid)
+    s00 = np.dot(vector_, centroid_)
+    s01 = np.dot(vector_, centroid)
+    s10 = np.dot(vector,centroid_)
+
+    return (s11*s00 - s01*s10) / np.sqrt((s10+s11)*(s01+s00)*(s11+s01)*(s00+s10))
+    
+    
 
 if __name__ == '__main__':
     
@@ -278,7 +295,7 @@ if __name__ == '__main__':
     #                                 sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=None)
     #Hamming Similarity
     crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
-                                     sigma_threshold, similarity_func=hamming_similarity, sim_min_val=0.0, norm_func=None)
+                                     sigma_threshold, similarity_func=correlation_similarity, sim_min_val=-1.0, norm_func=None)
     
     CrossVal_Kopples_method_res.close()
 
