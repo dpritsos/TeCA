@@ -24,9 +24,9 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
         
         for k in range(kfolds):
             
-            kfold_F1.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100'+'/Sigma0.9', name='F1_per_gnr' ) )
-            kfold_P.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100'+'/Sigma0.9', name='P_per_gnr' ) )
-            kfold_R.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100'+'/Sigma0.9', name='R_per_gnr' ) )
+            kfold_F1.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='F1_per_gnr' ) )
+            kfold_P.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='P_per_gnr' ) )
+            kfold_R.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='R_per_gnr' ) )
         
         F1_per_feat_size.append( np.mean(np.vstack(kfold_F1), axis=0) )
         P_per_feat_size.append( np.mean(np.vstack(kfold_P), axis=0) )
@@ -47,12 +47,12 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
     
     #Start Ploting figures
     #plt.figure(0)
-    #plt.title( "Corpus: Santini's | TermsType: Words | Text Modelling: TF | Koppels Method " )
+    #plt.title( "Corpus: Santini's | TermsType: Words | Text Modeling: TF | Koppels Method " )
     
     #Plot all F1 Scores for all genre and all features sizes in one plot 
     #plt.subplot(3,1, 1)
     plt.figure(0)
-    plt.title( "Corpus: Santini's | TermsType: Char4Grams | Text Modelling: TF | Koppels Method " )
+    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modeling: TF | Koppel's Method " )
     
     plt.xlabel( 'Features' )
     plt.ylabel( 'F1' ) 
@@ -67,7 +67,7 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
     #Plot all P Scores for all genre and all features sizes in one plot 
     #plt.subplot(3,1, 2)
     plt.figure(1)
-    plt.title( "Corpus: Santini's | TermsType: Char4Grams | Text Modelling: TF | Koppels Method " )
+    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modeling: TF | Koppel's Method " )
     
     plt.xlabel( 'Features' )
     plt.ylabel( 'P' ) 
@@ -82,7 +82,7 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
     #Plot all R Scores for all genre and all features sizes in one plot 
     #plt.subplot(3,1, 3)
     plt.figure(2)
-    plt.title( "Corpus: Santini's | TermsType: Char4Grams | Text Modelling: TF | Koppels Method " )
+    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modeling: TF | Koppel's Method " )
     plt.xlabel( 'Features' )
     plt.ylabel( 'R' ) 
     for g in range(R.shape[0]):
@@ -98,13 +98,14 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
 
 if __name__ == '__main__':
     
-    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     kfolds = 10
     featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000]
     gnr_num = 7
     
-        
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'r')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')    
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'r')
     
     plot_data(CrossVal_Kopples_method_res, kfolds, featr_size_lst, genres)
     
