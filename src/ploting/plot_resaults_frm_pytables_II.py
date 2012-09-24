@@ -52,8 +52,7 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
     #Plot all F1 Scores for all genre and all features sizes in one plot 
     #plt.subplot(3,1, 1)
     plt.figure(0)
-    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modeling: TF | Koppel's Method " )
-    
+    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modeling: BIN | Koppel's" )
     plt.xlabel( 'Features' )
     plt.ylabel( 'F1' ) 
     for g in range(F1.shape[0]):
@@ -67,8 +66,7 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
     #Plot all P Scores for all genre and all features sizes in one plot 
     #plt.subplot(3,1, 2)
     plt.figure(1)
-    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modeling: TF | Koppel's Method " )
-    
+    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modeling: BIN | Koppel's" )
     plt.xlabel( 'Features' )
     plt.ylabel( 'P' ) 
     for g in range(P.shape[0]):
@@ -82,7 +80,7 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
     #Plot all R Scores for all genre and all features sizes in one plot 
     #plt.subplot(3,1, 3)
     plt.figure(2)
-    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modeling: TF | Koppel's Method " )
+    plt.title( "Corpus: KI-04 | TermsType: Words | Text Modeling: BIN | Koppel's" )
     plt.xlabel( 'Features' )
     plt.ylabel( 'R' ) 
     for g in range(R.shape[0]):
@@ -104,9 +102,13 @@ if __name__ == '__main__':
     featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000]
     gnr_num = 7
     
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')    
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_Nu-Var_TM-BIN.h5', 'r')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')    
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'r')
-    
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')
+                                                                                    
     plot_data(CrossVal_Kopples_method_res, kfolds, featr_size_lst, genres)
     
     CrossVal_Kopples_method_res.close()
