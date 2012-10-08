@@ -67,7 +67,7 @@ class Eval_CrossVal_Koppels_method(object):
                         
                         P_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
                         R_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-                        F1_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+                        F05_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
                         
                         end = 0
                         for gnr_cnt in range(len(self.genres_lst)):
@@ -80,42 +80,38 @@ class Eval_CrossVal_Koppels_method(object):
                             P_per_gnr[gnr_cnt+1] = P[gnr_cnt+1]
                             R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]
                             R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  
-                            F1_per_gnr[gnr_cnt+1] = 2.0 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
-                            
-                        P_per_gnr[0] = precision_score(expected_Y, predicted_Y)   
-                        R_per_gnr[0] = recall_score(expected_Y, predicted_Y) 
-                        F1_per_gnr[0] = f1_score(expected_Y, predicted_Y)  
+                            F05_per_gnr[gnr_cnt+1] = 1.25 * P[gnr_cnt+1] * R[gnr_cnt+1] / ((0.25 * P[gnr_cnt+1]) + R[gnr_cnt+1]) 
+                             
+                        F05_per_gnr[0] = 0  
                         
                         #Maybe Later
                         #fpr, tpr, thresholds = roc_curve(expected_Y, predicted_Y)   
                         
                         #Creating a Group for this Sigma
                         grp = self.h5_res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters'+str(iters))
-                        storage_grp = self.h5_res.createGroup(grp, 'Sigma'+str(sigma_threshold)) 
+                        if sigma_threshold != 0.0:
+                            storage_grp = self.h5_res.getNode(grp, 'Sigma'+str(sigma_threshold))
+                        else: 
+                            storage_grp = grp
                         
-                        print self.h5_res.createArray(storage_grp, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
-                        print self.h5_res.createArray(storage_grp, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]                       
-                        print self.h5_res.createArray(storage_grp, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
-                        print self.h5_res.createArray(storage_grp, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
-                        print self.h5_res.createArray(storage_grp, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
+                        print self.h5_res.createArray(storage_grp, "F05_per_gnr", F05_per_gnr, "F05_statistic per Genre (F05[0]==0)")[:]
                         print                
                                      
                                         
                
 if __name__ == '__main__':
     
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
-    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'a')
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'a')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'a')
     
     kfolds = 10
     iter_l = [100]
     featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
-    sigma_threshold_list = [0.5, 0.6, 0.7, 0.8, 0.9]
+    sigma_threshold_list = [0.0, 0.5, 0.6, 0.7, 0.8, 0.9]
     
     eval_crossV_Koppels = Eval_CrossVal_Koppels_method(CrossVal_Kopples_method_res, corpus_filepath, genres)
     
