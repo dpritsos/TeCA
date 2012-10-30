@@ -47,7 +47,9 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
         plt.plot(R, P, color[i_fs] + symbol[i_fs] + line_type[i_fs], label=str(featr_size))
         plt.grid(True)    
     
-    plt.plot([0.0,1.0],[0.488, 0.488], 'k-', label='Baseline')
+    baseR = [0.89285714, 0.87785714, 0.855, 0.81071429, 0.76571429, 0.67714286, 0.49071429, 0.28214286, 0.19642857]
+    baseP = [0.27034187, 0.27364584, 0.27781598, 0.288708, 0.30126655, 0.32680512, 0.3793434, 0.43338069, 0.48654949]
+    plt.plot(baseR,baseP, '^k-', lw=2, color='grey', label='Baseline')
     plt.legend(loc=3 )        
     plt.Figure()
     plt.show()
@@ -66,8 +68,8 @@ if __name__ == '__main__':
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')    
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')
     

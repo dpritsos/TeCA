@@ -81,6 +81,7 @@ class CrossVal_OCSVM(object):
             
         #Initialise Predicted-Classes-Arrays List 
         predicted_Y_per_gnr = list()
+        predicted_Dist_per_gnr = list()
         
         for g in self.genres_lst:
             
@@ -89,17 +90,17 @@ class CrossVal_OCSVM(object):
             
             #Get the predictions for each Vector for this genre
             predicted_Y = gnr_classes[ g ].predict( cv_arr_bin ) #crossval_X.toarray() ) #For an one-class model, +1 or -1 is returned.
+            predicted_D = gnr_classes[ g ].decision_function( cv_arr_bin )
             
             #Keep the prediction per genre 
-            predicted_Y_per_gnr.append( predicted_Y ) 
+            predicted_Y_per_gnr.append( predicted_Y )
+            predicted_Dist_per_gnr.append( predicted_D ) 
             
         #Convert it to Array before returning
         predicted_Y_per_gnr = np.vstack( predicted_Y_per_gnr )
-        
-        print "Predicted_Y_per_gnr"
-        print predicted_Y_per_gnr
+        predicted_Dist_per_gnr = np.vstack( predicted_Dist_per_gnr )
     
-        return predicted_Y_per_gnr      
+        return (predicted_Y_per_gnr, predicted_Dist_per_gnr)      
         
     
     def evaluate(self, xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, nu_l, featr_size_lst, norm_func):
@@ -158,7 +159,7 @@ class CrossVal_OCSVM(object):
                         #Creating a Group for this number of iterations in h5 file under this features number under this k-fold
                         nu_group = self.h5_res.createGroup(feat_num_group, 'Nu'+str(nu), "OC-SVM's Nu parameter group of Results Arrays for this K-fold" )
                        
-                        predicted_Y_per_gnr = self.predict(gnr_classes, crossval_X) 
+                        predicted_Y_per_gnr, predicted_Dist_per_gnr = self.predict(gnr_classes, crossval_X) 
                         
                         print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
                         
@@ -201,9 +202,12 @@ class CrossVal_OCSVM(object):
                         
                         #Maybe Later
                         #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
-                        
-                        print self.h5_res.createArray(nu_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
-                        print self.h5_res.createArray(nu_group, 'predicted_Y_per_gnr', predicted_Y_per_gnr, "Predicted Y OC-SVM results per Document per nu (CrossValidation Set)")[:]                        
+            
+                        print self.h5_res.createArray(nu_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]
+                        print "Predicted_Y_per_gnr"                                         
+                        print self.h5_res.createArray(nu_group, 'predicted_Y_per_gnr', predicted_Y_per_gnr, "Predicted Y OC-SVM results per Document per nu (CrossValidation Set)")[:]
+                        print "predicted_Dist_per_gnr"
+                        print self.h5_res.createArray(nu_group, 'predicted_Dist_per_gnr', predicted_Dist_per_gnr, "predicted Distance of the samples X to the separating hyperplane for OC-SVM results per Document per nu (CrossValidation Set)")[:]              
                         print self.h5_res.createArray(nu_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0] == 0)")[:]
                         print self.h5_res.createArray(nu_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0] == 0)")[:]
                         print self.h5_res.createArray(nu_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0] == 0)")[:]

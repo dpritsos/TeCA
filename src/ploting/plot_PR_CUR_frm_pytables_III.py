@@ -57,8 +57,10 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
             plt.ylabel( 'P' ) 
             plt.plot(R, P, color[g_num] + symbol[g_num] + line_type[g_num], label=genres[g_num])
             plt.grid(True)
-                
-        plt.plot([0.0,1.0],[0.488, 0.488], 'k-', label='Baseline')
+        
+        baseR = [0.89285714, 0.87785714, 0.855, 0.81071429, 0.76571429, 0.67714286, 0.49071429, 0.28214286, 0.19642857]
+        baseP = [0.27034187, 0.27364584, 0.27781598, 0.288708, 0.30126655, 0.32680512, 0.3793434, 0.43338069, 0.48654949]
+        plt.plot(baseR, baseP, '^k-', lw=2, color='grey', label='Baseline')
         plt.legend(loc=3 ) 
     plt.Figure()
     plt.show()
@@ -68,8 +70,8 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
 
 if __name__ == '__main__':
     
-    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
-    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     kfolds = 10
     #featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000]
     featr_size_lst = [5000]
