@@ -69,10 +69,10 @@ class CrossVal_OCSVM(object):
             print "Fit Model for ", g
             print "Corpus_Mtrx", corpus_mtrx[inds_per_gnr[g], :].shape
             #Convert TF vectors to Binary 
-            crp_arr_bin = np.where(corpus_mtrx[inds_per_gnr[g], :].toarray() > 0, 1, 0)
+            #crp_arr_bin = np.where(corpus_mtrx[inds_per_gnr[g], :].toarray() > 0, 1, 0)
             
             #Fit OC-SVM Model to Data of this genre
-            gnr_classes[g].fit( crp_arr_bin) #corpus_mtrx[inds_per_gnr[g], :].toarray() )
+            gnr_classes[g].fit( corpus_mtrx[inds_per_gnr[g], :].toarray() )
         
         return (gnr_classes, inds_per_gnr)   
     
@@ -86,11 +86,11 @@ class CrossVal_OCSVM(object):
         for g in self.genres_lst:
             
             #Convert TF vectors to Binary
-            cv_arr_bin = np.where(crossval_X.toarray() > 0, 1, 0)
+            #cv_arr_bin = np.where(crossval_X.toarray() > 0, 1, 0)
             
             #Get the predictions for each Vector for this genre
-            predicted_Y = gnr_classes[ g ].predict( cv_arr_bin ) #crossval_X.toarray() ) #For an one-class model, +1 or -1 is returned.
-            predicted_D = gnr_classes[ g ].decision_function( cv_arr_bin )
+            predicted_Y = gnr_classes[ g ].predict( crossval_X.toarray() ) #For an one-class model, +1 or -1 is returned.
+            predicted_D = gnr_classes[ g ].decision_function( crossval_X.toarray() )
             
             #Keep the prediction per genre 
             predicted_Y_per_gnr.append( predicted_Y )
@@ -222,8 +222,8 @@ if __name__ == '__main__':
     #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-BIN.h5', 'w')
-    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4grams-OC-SVM_kfolds-10_TM-BIN.h5', 'w')
+    #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
+    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
