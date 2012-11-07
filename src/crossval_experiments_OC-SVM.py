@@ -94,7 +94,7 @@ class CrossVal_OCSVM(object):
             
             #Keep the prediction per genre 
             predicted_Y_per_gnr.append( predicted_Y )
-            predicted_Dist_per_gnr.append( predicted_D ) 
+            predicted_Dist_per_gnr.append( predicted_D.reshape( predicted_D.shape[0] ) ) 
             
         #Convert it to Array before returning
         predicted_Y_per_gnr = np.vstack( predicted_Y_per_gnr )
@@ -217,13 +217,13 @@ class CrossVal_OCSVM(object):
 
 if __name__ == '__main__':
     
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
-    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
+    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
+    #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
