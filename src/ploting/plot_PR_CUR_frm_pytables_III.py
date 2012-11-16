@@ -34,20 +34,20 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
                 pc_per_iter = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='predicted_classes_per_iter').read()
                 gnr_pred_cnt = np.where(pc_per_iter == g_tag, 1, 0) 
                 fold_ps = np.sum(gnr_pred_cnt, axis=0)/np.float(pc_per_iter.shape[0])   
-                
                 ps_per_fold.append(fold_ps) #Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='predicted_scores' ).read() )
+                
                 exp_y = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='expected_Y' ).read()
                 ey_per_fold.append( np.where(exp_y == g_tag, 1, 0) ) #Covert exp_y to Binary case and append for this fold
                 
             PS = np.hstack(ps_per_fold)
             EY = np.hstack(ey_per_fold)
-            
+
             inv_srd_idxs = np.argsort(PS)[::1]
             PS = PS[ inv_srd_idxs ]
             EY = EY[ inv_srd_idxs ]
             
             P, R, T= skm.precision_recall_curve(EY, PS)
-            
+           
             
             #Plot all F1 Scores for all genre and all features sizes in one plot 
             #plt.subplot(3,1, 1)
@@ -61,7 +61,7 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
         baseR = [0.89285714, 0.87785714, 0.855, 0.81071429, 0.76571429, 0.67714286, 0.49071429, 0.28214286, 0.19642857]
         baseP = [0.27034187, 0.27364584, 0.27781598, 0.288708, 0.30126655, 0.32680512, 0.3793434, 0.43338069, 0.48654949]
         plt.plot(baseR, baseP, '^k-', lw=2, color='grey', label='Baseline')
-        plt.legend(loc=3 ) 
+        plt.legend(loc=3) 
     plt.Figure()
     plt.show()
         
