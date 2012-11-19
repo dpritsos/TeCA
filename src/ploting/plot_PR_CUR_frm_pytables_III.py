@@ -42,7 +42,7 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
             PS = np.hstack(ps_per_fold)
             EY = np.hstack(ey_per_fold)
 
-            inv_srd_idxs = np.argsort(PS)[::1]
+            inv_srd_idxs = np.argsort(PS)[::-1]
             PS = PS[ inv_srd_idxs ]
             EY = EY[ inv_srd_idxs ]
             
