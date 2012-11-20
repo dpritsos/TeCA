@@ -25,10 +25,10 @@ def plot_data(Res, kfolds, featr_size_lst, nu_lst):
             for k in range(kfolds):     
                 
                 ds_per_gnr = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='predicted_Dist_per_gnr').read()
-                DS_lst.append( np.max(ds_per_gnr, axis=0)[0:-1:10] )
+                DS_lst.append( np.max(ds_per_gnr, axis=0)[::10] )
                 p_y = np.argmax(ds_per_gnr, axis=0)+1 
                 exp_y = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='expected_Y' ).read()
-                PY_lst.append( np.where(p_y[0:-1:10] == exp_y[0:-1:10], 1, 0) )
+                PY_lst.append( np.where(p_y[::10] == exp_y[::10], 1, 0) )
                 #pre_y_per_gnr = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='predicted_Y_per_gnr' ).read()
                 #print pre_y_per_gnr
                 #print np.argmax(pre_y_per_gnr, axis=0)+1
