@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.metrics as skm
 
-def plot_data(Res, kfolds, featr_size_lst, genres):
+def plot_data(Res, kfolds, featr_size_lst, genres, nu):
       
     color = ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k' ]
     symbol = [ "*", "^", "x", "+", "^" , "*", "+", "x" ]
@@ -19,7 +19,7 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
         #predicted_scores = list()
         #expected_Y = list()
         
-        plt.figure(fig)
+        plt.figure(num=fig, figsize=(8, 8), dpi=80, facecolor='w', edgecolor='k')
         fig += 1
         
         for g_num in range(len(genres)):
@@ -31,10 +31,10 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
             
             for k in range(kfolds):     
                 
-                ds_per_gnr = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu0.15', name='predicted_Dist_per_gnr').read()   
-                ds_per_fold.append( ds_per_gnr[g_num] ) 
-                exp_y = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu0.15', name='expected_Y' ).read()
-                ey_per_fold.append( np.where(exp_y == g_tag, 1, 0) ) #Covert exp_y to Binary case and append for this fold
+                ds_per_gnr = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='predicted_Dist_per_gnr').read()   
+                ds_per_fold.append( ds_per_gnr[g_num][::10] ) 
+                exp_y = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='expected_Y' ).read()
+                ey_per_fold.append( np.where(exp_y[::10] == g_tag, 1, 0) ) #Covert exp_y to Binary case and append for this fold
                 
             DS = np.hstack(ds_per_fold)
             EY = np.hstack(ey_per_fold)
@@ -45,11 +45,12 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
             
             P, R, T= skm.precision_recall_curve(EY, DS)
             
+            print R
             
             #Plot all F1 Scores for all genre and all features sizes in one plot 
             #plt.subplot(3,1, 1)
             
-            #plt.title( "Corpus: Santini's | TermsType: Words | Text Modeling: BIN | Koppel's" )
+            plt.title('(b)')
             plt.xlabel( 'R' )
             plt.ylabel( 'P' ) 
             plt.plot(R, P, color[g_num] + symbol[g_num] + line_type[g_num], label=genres[g_num])
@@ -64,23 +65,26 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
 
 if __name__ == '__main__':
     
-    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
-    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     kfolds = 10
     #featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000]
     featr_size_lst = [5000]
     gnr_num = 7
+    nu = 0.1
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')    
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')
     
                                                                                     
-    plot_data(CrossVal_Kopples_method_res, kfolds, featr_size_lst, genres)
+    plot_data(CrossVal_Kopples_method_res, kfolds, featr_size_lst, genres, nu)
     
     CrossVal_Kopples_method_res.close()
     
