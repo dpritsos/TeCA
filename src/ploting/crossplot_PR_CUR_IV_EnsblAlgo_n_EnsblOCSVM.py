@@ -5,6 +5,8 @@ import tables as tb
 import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.metrics as skm
+import PR_curves_to_11_standard_recall_levels as srl
+
 
 def plot_data(Res1, Res2, kfolds, featr_size_lst, nu):
       
@@ -54,17 +56,23 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst, nu):
         #Calculate P-R Curves for Ensemble OC-SVM
         P, R, T= skm.precision_recall_curve(PY, DS)
         
-        plt.plot(R, P, color[i_fs] + symbol[i_fs] + line_type[i_fs], label=str(featr_size)+" - O.S.E." )
+        x, y = srl.STD_AVG_PR(P, R)
+        
+        plt.plot(x, y, color[i_fs] + symbol[i_fs] + line_type[i_fs], label="O.S.E. - "+str(featr_size) )
+        
         #Calculate P-R Curves for Ensemble Algorithm
         P, R, T= skm.precision_recall_curve(TT, PS)
+        
+        x, y = srl.STD_AVG_PR(P, R)
+        
         #plt.title( ) 
-        plt.plot(R, P, color[i_fs+4] + symbol[i_fs+4] + line_type[i_fs+4], label=str(featr_size)+" - C.R.E." )
+        plt.plot(x, y, color[i_fs+4] + symbol[i_fs+4] + line_type[i_fs+4], label="C.R.E. - "+str(featr_size) )
         
         plt.title('(a)')
         plt.xlabel( 'R' )
         plt.ylabel( 'P' )
         plt.grid(True)    
-        #plt.legend(loc=3 )    
+        plt.legend(loc=3 )    
                               
     plt.Figure()
     plt.show()
@@ -80,11 +88,11 @@ if __name__ == '__main__':
     nu = 0.1 #[0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    #EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    #EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')  
+    EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')  
     
-    EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r') 
+    #EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    #EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r') 
                                                                                     
     plot_data(EnsOCSVM, EnsAlgo, kfolds, featr_size_lst, nu)
     

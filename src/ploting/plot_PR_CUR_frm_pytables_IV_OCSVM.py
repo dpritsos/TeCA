@@ -5,27 +5,8 @@ import tables as tb
 import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.metrics as skm
+import PR_curves_to_11_standard_recall_levels as srl
 
-
-def STD_AVG_PR(P, R):
-    
-    R_Levels = np.arange(0.0, 1.1, 0.1) 
-    
-    ipol_P = np.zeros_like(P, dtype=np.float64)
-    
-    max_p = 0
-    for i, p in enumerate(P):
-        if p > max_p:
-            max_p = p
-        ipol_P[i] = max_p     
-    
-    P_AVG = np.zeros(11, dtype=np.float64)
-    
-    for i, r in enumerate(R_Levels):
-        P_AVG[i] = np.average(ipol_P[np.where(R <= r)])
-    
-    return R_Levels, P_AVG
-        
 
 def plot_data(Res, kfolds, featr_size_lst, nu_lst):
       
@@ -62,12 +43,13 @@ def plot_data(Res, kfolds, featr_size_lst, nu_lst):
             PY = PY[ inv_srd_idxs ]
             
             P, R, T= skm.precision_recall_curve(PY, DS)
-            x, y = STD_AVG_PR(P, R)
+            
+            x, y = srl.STD_AVG_PR(P, R)
              
             #Plot all F1 Scores for all genre and all features sizes in one plot 
             #plt.subplot(3,1, 1)
             
-            plt.title( '(b)' )
+            plt.title( '(a)' )
             plt.xlabel( 'R' )
             plt.ylabel( 'P' ) 
             plt.plot(x, y, color[i_nu] + symbol[i_nu] + line_type[i_nu], label=str(nu))
@@ -78,9 +60,6 @@ def plot_data(Res, kfolds, featr_size_lst, nu_lst):
     plt.show()
     
         
-    
-                 
-
 if __name__ == '__main__':
     
     kfolds = 10
