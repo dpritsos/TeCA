@@ -60,7 +60,12 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
             plt.plot(x, y, color[g_num] + symbol[g_num] + line_type[g_num], label=genres[g_num])
             plt.grid(True)
             plt.legend(loc=3)
-             
+    
+    x = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    #y = [1.0, 1.0, 0.97190657, 0.92278167, 0.88407108, 0.86455453, 0.85036651, 0.84308633, 0.83109285, 0.81946031, 0.79872149] #Santinis - C4Grams
+    y = [1.0, 1.0, 0.97379638, 0.94235053, 0.89743401, 0.87974863, 0.86553602, 0.85686608, 0.84702267, 0.83625077, 0.81514552]
+    #y = [ 1., 1., 0.97591298, 0.91989472, 0.85962455, 0.82631012, 0.7482368,  0.72640206, 0.70890553, 0.66452836, 0.5594028 ] #KI-04 Char4Grams
+    plt.plot(x, y, 'k-', linewidth=2, label=genres[g_num])
     plt.Figure()
     plt.show()
         
@@ -79,8 +84,8 @@ if __name__ == '__main__':
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')    
     
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')

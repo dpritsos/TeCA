@@ -26,14 +26,25 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst, nu):
         for k in range(kfolds):     
             
             ds_per_gnr = Res1.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='predicted_Dist_per_gnr').read()
-            DS_lst.append( np.max(ds_per_gnr, axis=0)[::10] )
-            p_y = np.argmax(ds_per_gnr, axis=0)+1 
-            exp_y = Res1.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='expected_Y' ).read()
-            PY_lst.append( np.where(p_y[::10] == exp_y[::10], 1, 0) )
+            rpy_per_gnr = Res1.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='predicted_Y_per_gnr').read()
+            RPY = np.max(rpy_per_gnr, axis=0)[::]  
+            DS_lst.append( np.max(ds_per_gnr, axis=0)[::] )            
+            p_y = np.argmax(ds_per_gnr, axis=0)+1
+            #print p_y
+            p_y[ np.where(RPY < 0) ] = 0
+            #print p_y 
             
-            PS_lst.append( Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='predicted_scores' ).read() )
+            print "OC",np.sum(p_y == 0)/np.float(p_y.shape[0])
+            
+            exp_y = Res1.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='expected_Y' ).read()
+            PY_lst.append( np.where(p_y[::] == exp_y[::], 1, 0) )
+            
+            PS_lst.append( Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5', name='predicted_scores' ).read() )
             exp_y = Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='expected_Y' ).read()
-            pre_y = Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='predicted_Y' ).read()
+            pre_y = Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5', name='predicted_Y' ).read()
+            
+            print "KP",np.sum(pre_y == 0)/np.float(pre_y.shape[0])
+            
             TT_lst.append( np.where(exp_y == pre_y, 1, 0) ) #Covert exp_y to Binary case and append for this fold
             
         
@@ -57,6 +68,8 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst, nu):
         P, R, T= skm.precision_recall_curve(PY, DS)
         
         x, y = srl.STD_AVG_PR(P, R)
+        
+        print y
         
         plt.plot(x, y, color[i_fs] + symbol[i_fs] + line_type[i_fs], label="O.S.E. - "+str(featr_size) )
         
@@ -88,11 +101,11 @@ if __name__ == '__main__':
     nu = 0.1 #[0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')  
+    #EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    #EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')  
     
-    #EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    #EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r') 
+    EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r') 
                                                                                     
     plot_data(EnsOCSVM, EnsAlgo, kfolds, featr_size_lst, nu)
     
