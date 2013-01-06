@@ -19,3 +19,16 @@ def STD_AVG_PR(P, R):
         P_AVG[i] = np.average(ipol_P[np.where(R <= r)])
     
     return R_Levels, P_AVG
+
+
+def SMOOTH_PR(P):
+    
+    ipol_P = np.zeros_like(P, dtype=np.float64)
+    
+    max_p = 0
+    for i, p in enumerate(P):
+        if p > max_p:
+            max_p = p
+        ipol_P[i] = max_p     
+    
+    return ipol_P

@@ -11,8 +11,8 @@ import PR_curves_to_11_standard_recall_levels as srl
 def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
       
     color = ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k' ]
-    symbol = [ "*", "^", "x", "+", "*", "^", "x", "+" ]
-    line_type = [ "-", "-", "-", "-", "--" , "--", "--", "--" ]
+    symbol = [ "*", "+", "x", "+", "*", "^", "x", "+" ]
+    line_type = [ "--", "--", "--", "--", "-" , "-", "-", "-" ]
     
     plt.figure(num=None, figsize=(8, 8), dpi=80, facecolor='w', edgecolor='k')
     
@@ -23,10 +23,8 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
         PS_lst = list() #Ensemble Algo Predicted Scores
         TT_lst = list() #Ensemble Algo Truth Table
                 
-        for k in range(1):  
+        for k in range(kfolds):  
             
-            print "fold", k
-                        
             if featr_size in featr_size_lst2:
                 ds_per_gnr = Res1.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='predicted_Dist_per_gnr').read()
                 rpy_per_gnr = Res1.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='predicted_Y_per_gnr').read()
@@ -36,19 +34,12 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
                 #print p_y
                 p_y[ np.where(RPY < 0) ] = 0
                 #print p_y 
-                print "OC",np.sum(p_y == 0)/np.float(p_y.shape[0])
-                
                 exp_y = Res1.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='expected_Y' ).read()
                 PY_lst.append( np.where(p_y[::] == exp_y[::], 1, 0) )
             
-            PS_lst.append( Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5', name='predicted_scores' ).read() )
+            PS_lst.append( Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='predicted_scores' ).read() )
             exp_y = Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='expected_Y' ).read()
-            pre_y = Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5', name='predicted_Y' ).read()
-            
-            print "KP",np.sum(pre_y == 0)/np.float(pre_y.shape[0])
-            print pre_y
-            print exp_y
-            print np.where(exp_y == pre_y, 1, 0)
+            pre_y = Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='predicted_Y' ).read()
             
             TT_lst.append( np.where(exp_y == pre_y, 1, 0) ) #Covert exp_y to Binary case and append for this fold
             
@@ -71,7 +62,8 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
         PS = PS[ inv_srd_idx ]
         TT = TT[ inv_srd_idx ]
         
-       
+        #print PS
+        
         """
         #Calculate P-R Curves for Ensemble OC-SVM
         P, R, T= skm.precision_recall_curve(PY, DS)
@@ -85,32 +77,42 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
                 
         #Calculate P-R Curves for Ensemble Algorithm
         P, R, T= skm.precision_recall_curve(TT, PS)
-        print TT
-        print "\n\n",T,"\n\n"
-        print "PS", PS
-                
-        print P
+        
+        #print T
+        T = T[::-1]
+        R = R[::-1]
+        P = P[::-1]
+        a = np.max(np.where(T >= 0.9))
+        print a
+        print T
         print R
-        x, y = srl.STD_AVG_PR(P, R)
+        print P
+        #print np.where(PS >= 0.5)
         
-        print x
-        print y
-        #print y
+        plt.plot(R[a], P[a], color[i_fs] + symbol[i_fs], markeredgewidth=15)
         
+
+        #x, y = srl.STD_AVG_PR(P[::-1], R[::-1])
+        
+        x = R
+        y = srl.SMOOTH_PR(P[::-1])
+        y = y[::-1]
         #plt.title( ) 
-        plt.plot(x, y, color[i_fs+4] + symbol[i_fs+4] + line_type[i_fs+4], label="C.R.E. - "+str(featr_size) )
+        plt.plot(x, y, color[i_fs] + symbol[i_fs] + line_type[i_fs], label="C.R.E. - "+str(featr_size) )
         
         plt.title('(b)')
         plt.xlabel('R')
         plt.ylabel('P')  
     
-    #P, R, T= skm.precision_recall_curve(PY, DS)
+    P, R, T= skm.precision_recall_curve(PY, DS)
         
     #x, y = srl.STD_AVG_PR(P, R)
     
-    #print x, y
-        
-    #plt.plot(x, y, color[i_fs] + line_type[i_fs], linewidth=2, label="BASELINE" )  
+    x = R
+    y = srl.SMOOTH_PR(P)
+    
+           
+    plt.plot(x, y, color[i_fs+4] + line_type[i_fs+4], linewidth=2, label="BASELINE" )  
     
     plt.grid(True)    
     plt.legend(loc=3)
@@ -123,7 +125,7 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
 if __name__ == '__main__':
     
     kfolds = 10
-    featr_size_lst1 = [1000] #, 5000, 10000, 70000] #[1000, 5000, 10000, 20000, 50000, 70000]
+    featr_size_lst1 = [ 10000, 70000] #[1000, 5000, 10000, 20000, 50000, 70000]
     featr_size_lst2 = [10000]
     gnr_num = 7
     nu = 0.1#[0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
