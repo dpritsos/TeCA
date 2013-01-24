@@ -86,18 +86,18 @@ class CrossVal_Koppels_method(object):
             for i_vect, vect in enumerate(crossval_X[:, features_subspace]):
                 
                 #Convert TF vectors to Binary 
-                vect_bin = np.where(vect[:, :].toarray() > 0, 1, 0) #NOTE: with np.where Always use A[:] > x instead of A > x in case of Sparse Matrices
+                #vect_bin = np.where(vect[:, :].toarray() > 0, 1, 0) #NOTE: with np.where Always use A[:] > x instead of A > x in case of Sparse Matrices
                 #print vect.shape
                 
                 max_sim = sim_min_value
                 for cls_tag, g in enumerate(self.genres_lst):
                     
                     #Convert TF vectors to Binary
-                    gnr_cls_bin = np.where(gnr_classes[ g ][:, features_subspace] > 0, 1, 0)
+                    #gnr_cls_bin = np.where(gnr_classes[ g ][:, features_subspace] > 0, 1, 0)
                     #print gnr_cls_bin.shape
                     
                     #Measure Similarity
-                    sim_score = similarity_func(vect_bin, gnr_cls_bin)
+                    sim_score = similarity_func(vect, gnr_classes[ g ][:, features_subspace])
                     
                     #Just for debugging for 
                     #if sim_score < 0.0:
@@ -272,13 +272,13 @@ def correlation_similarity(vector, centroid):
 
 if __name__ == '__main__':
     
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Hamming.h5', 'w')
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Hamming.h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
@@ -287,19 +287,19 @@ if __name__ == '__main__':
     sigma_threshold = 0.8
     N_Gram_size = 4
     
-    sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
-    #sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
+    #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
+    sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
-    crossV_Koppels = CrossVal_Koppels_method(sparse_W, CrossVal_Kopples_method_res, corpus_filepath, genres)
+    crossV_Koppels = CrossVal_Koppels_method(sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath, genres)
     
     xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
     
     #Cosine Similarity
-    #crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
-    #                                 sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=None)
-    #Hamming Similarity
     crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
-                                     sigma_threshold, similarity_func=correlation_similarity, sim_min_val=-1.0, norm_func=None)
+                                     sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=None)
+    #Hamming Similarity
+    #crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
+    #                                 sigma_threshold, similarity_func=correlation_similarity, sim_min_val=-1.0, norm_func=None)
     
     CrossVal_Kopples_method_res.close()
 

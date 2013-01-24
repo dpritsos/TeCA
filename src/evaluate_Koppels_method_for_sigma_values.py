@@ -104,18 +104,18 @@ class Eval_CrossVal_Koppels_method(object):
                
 if __name__ == '__main__':
     
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'a')
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'w')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'a')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'a')
     
     kfolds = 10
     iter_l = [100]
     featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
-    sigma_threshold_list = [0.5, 0.6, 0.7, 0.8, 0.9]
+    sigma_threshold_list = [0.3, 0.5, 0.6, 0.7, 0.8, 0.9]
     
     eval_crossV_Koppels = Eval_CrossVal_Koppels_method(CrossVal_Kopples_method_res, corpus_filepath, genres)
     

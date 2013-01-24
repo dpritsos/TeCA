@@ -32,3 +32,52 @@ def SMOOTH_PR(P):
         ipol_P[i] = max_p     
     
     return ipol_P
+
+
+def NRST_SMOOTH_PR(P, R):
+    
+    R_Levels = np.arange(0.0, 1.1, 0.1)
+    
+    smoothed_P = SMOOTH_PR(P)
+    
+    idxs = np.zeros_like(R_Levels, dtype=np.int)
+    for i, r in enumerate(R_Levels):
+        idxs[i] = (np.abs(R - r)).argmin()
+    
+    return smoothed_P[idxs], R[idxs]
+
+
+def INTERPOL_SMOOTH_PR(P, R):
+    
+    R_Levels = np.arange(0.0, 1.1, 0.1)
+    
+    smthd_P = SMOOTH_PR(P)
+    #SOS
+    smthd_P = smthd_P[::-1]
+    
+    idxs = np.zeros_like(R_Levels, dtype=np.int)
+    
+    for i, r in enumerate(R_Levels[1::]):
+        lft_idx = np.max(np.where(R < r))
+        rgt_idx = np.max(np.where(R >= r))
+        
+        print smthd_P[lft_idx], ">", smthd_P[rgt_idx]
+        if smthd_P[lft_idx] >= smthd_P[rgt_idx]:
+            idxs[i+1] = lft_idx
+        elif smthd_P[lft_idx] < smthd_P[rgt_idx]:
+            idxs[i+1] = rgt_idx
+            
+        print lft_idx, rgt_idx, idxs[i+1] 
+    #idxs[0] = 0
+    #idxs[10] = smthd_P
+    
+    SP = smthd_P[idxs]
+    #SP[10] = 0
+    
+    print R_Levels
+    print SP
+             
+    return SP, R_Levels
+
+
+

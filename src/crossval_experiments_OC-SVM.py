@@ -217,18 +217,18 @@ class CrossVal_OCSVM(object):
 
 if __name__ == '__main__':
     
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
-    #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
+    #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
+    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
     nu_l = [0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
-    featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
+    featr_size_lst = [1000, 5000, 10000, 70000] #[1000, 5000, 10000, 20000, 50000, 70000]
     N_Gram_size = 4
     
     #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)

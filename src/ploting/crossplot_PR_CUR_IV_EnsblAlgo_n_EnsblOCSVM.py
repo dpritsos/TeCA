@@ -11,10 +11,10 @@ import PR_curves_to_11_standard_recall_levels as srl
 def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
       
     color = ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k' ]
-    symbol = [ "*", "+", "x", "+", "*", "^", "x", "+" ]
+    symbol = [ "^", "*", "x", "+", "*", "^", "x", "+" ]
     line_type = [ "--", "--", "--", "--", "-" , "-", "-", "-" ]
     
-    plt.figure(num=None, figsize=(8, 8), dpi=80, facecolor='w', edgecolor='k')
+    plt.figure(num=None, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
     
     for i_fs, featr_size in enumerate(featr_size_lst1):
           
@@ -84,34 +84,38 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
         P = P[::-1]
         a = np.max(np.where(T >= 0.9))
         print a
-        print T
-        print R
-        print P
+        #print T
+        #print R
+        #print P
         #print np.where(PS >= 0.5)
         
         plt.plot(R[a], P[a], color[i_fs] + symbol[i_fs], markeredgewidth=15)
         
 
-        #x, y = srl.STD_AVG_PR(P[::-1], R[::-1])
+        x, y = srl.STD_AVG_PR(P[::-1], R[::-1])
         
         x = R
-        y = srl.SMOOTH_PR(P[::-1])
-        y = y[::-1]
+        y, x = srl.INTERPOL_SMOOTH_PR(P[::-1], R)
+        y = y
         #plt.title( ) 
-        plt.plot(x, y, color[i_fs] + symbol[i_fs] + line_type[i_fs], label="C.R.E. - "+str(featr_size) )
+        plt.plot(x, y, color[i_fs] + symbol[i_fs] + line_type[i_fs], markeredgewidth=2, label="RFSE. - "+str(featr_size) )
         
-        plt.title('(b)')
+        #plt.title('(a)')
         plt.xlabel('R')
         plt.ylabel('P')  
     
+
     P, R, T= skm.precision_recall_curve(PY, DS)
         
     #x, y = srl.STD_AVG_PR(P, R)
     
-    x = R
-    y = srl.SMOOTH_PR(P)
+   
     
-           
+    R = R[::-1]
+    
+    
+    y, x = srl.INTERPOL_SMOOTH_PR(P, R)
+       
     plt.plot(x, y, color[i_fs+4] + line_type[i_fs+4], linewidth=2, label="BASELINE" )  
     
     plt.grid(True)    
@@ -125,18 +129,18 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
 if __name__ == '__main__':
     
     kfolds = 10
-    featr_size_lst1 = [ 10000, 70000] #[1000, 5000, 10000, 20000, 50000, 70000]
-    featr_size_lst2 = [10000]
+    featr_size_lst1 = [1000, 5000, 10000, 70000] #[1000, 5000, 10000, 20000, 50000, 70000]
+    featr_size_lst2 = [5000]
     gnr_num = 7
     nu = 0.1#[0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
 
-    #EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    #EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')  
+    EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')  
     
-    EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r') 
+    #EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    #EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r') 
 
                                                                                     
     plot_data(EnsOCSVM, EnsAlgo, kfolds, featr_size_lst1, featr_size_lst2, nu)
