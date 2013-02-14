@@ -15,9 +15,9 @@ import scipy.spatial.distance as spd
 from sklearn.metrics import precision_score, recall_score, f1_score, roc_curve
 from sklearn import cross_validation
 import sklearn.svm as svm
-import sklearn.svm.sparse as sp_svm
+#import sklearn.svm.sparse as sp_svm
 
-import html2vect.sparse.words as h2v_w
+import html2vect.sparse.wngrams as h2v_wcng
 import html2vect.sparse.cngrams as h2v_cng
 
 
@@ -116,20 +116,19 @@ class CrossVal_OCSVM(object):
             #Creating a Group for this k-fold in h5 file
             kfld_group = self.h5_res.createGroup('/', 'KFold'+str(k), "K-Fold group of Results Arrays" )
             
-            print "Creating DICTIONARY "
-            tf_d = dict() 
-            #Merge All Term-Frequency Dictionaries created by the Raw Texts            
-            for html_str in self.TF_TT.load_files( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' ):
-                tf_d = self.TF_TT.merge_tfds(tf_d, self.TF_TT.tf_dict( self.TF_TT._attrib_(html_str) ) )
+            print "Creating VOCABULARY" 
+            #Creating Dictionary      
+            tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='strict' )      
+            print list(tf_d)[0]
                  
             #SELECT VOCABILARY SIZE 
             for vocab_size in vocabilary_size:
-                resized_tf_d = self.TF_TT.keep_atleast(tf_d, vocab_size) #<---
+                resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) #<---
                 print len(resized_tf_d)
                 print resized_tf_d.items()[0:50]
                 
-                #Create The Terms-Index Dictionary that is shorted by Frequency descending order
-                tid = self.TF_TT.tf2tidx( resized_tf_d )
+                #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
+                tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
                 print tid.items()[0:50]
                 
                 print "Creating Sparse TF Matrix for CrossValidation"
@@ -223,15 +222,16 @@ if __name__ == '__main__':
     genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
     #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
-    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
+    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST)_TESTESTEST.h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
     nu_l = [0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
     featr_size_lst = [1000, 5000, 10000, 70000] #[1000, 5000, 10000, 20000, 50000, 70000]
     N_Gram_size = 4
+    W_N_Gram_size = 1
     
-    #sparse_W = h2v_w.Html2TF(attrib='text', lowercase=True, valid_html=False)
+     #sparse_WNG = h2v_wcng.Html2TF(W_N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
     crossV_OCSVM = CrossVal_OCSVM(sparse_CNG, CrossVal_OCSVM_res, corpus_filepath, genres)

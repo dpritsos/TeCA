@@ -178,16 +178,15 @@ if __name__=='__main__':
     csvm_crossval.exe()
     
     crp_crssvl_res.close()
-
+if __name__=='__main__':
     
+    kfolds = 10
+    nu_lst = [0.2, 0.8]
+    featr_size_lst = [1000]
+    crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/CSVM_LOWBOW_RES.h5', 'w')
+            
+    csvm_crossval = CSVM_CrossVal(crp_crssvl_res, corpus_filepath, authors)
+    csvm_crossval.exe()
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    crp_crssvl_res.close()
 
