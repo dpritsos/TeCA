@@ -1,24 +1,23 @@
-"""
-
-"""
+"""     """
 
 import sys
-sys.path.append('../../synergeticprocessing/src')
+#sys.path.append('../../synergeticprocessing/src')
 sys.path.append('../../html2vectors/src')
 import numpy as np
 import tables as tb
-#import html2tf.tables.cngrams as cng_tb
 
 import scipy.sparse as ssp
 import scipy.spatial.distance as spd
+
 from sklearn.metrics import precision_score, recall_score, f1_score, roc_curve
 from sklearn import cross_validation
+from sklearn import grid_search #.IterGrid
 
 import html2vect.sparse.wngrams as h2v_wcng
 import html2vect.sparse.cngrams as h2v_cng
 
 
-class CrossVal_Koppels_method(object):
+class ParamGridCrossValBase(object):
     
     def __init__(self, TF_TT, h5_res, corpus_path, genres):
         self.TF_TT = TF_TT
@@ -35,7 +34,7 @@ class CrossVal_Koppels_method(object):
             gnrs_file_lst = self.TF_TT.file_list_frmpaths(self.corpus_path, [ str( g + "/html/" ) ] )
             
             xhtml_file_l.extend( gnrs_file_lst )
-                 
+            
             cls_gnr_tgs.extend( [i+1]*len(gnrs_file_lst) )
                 
         return (xhtml_file_l, cls_gnr_tgs)
@@ -129,9 +128,23 @@ class CrossVal_Koppels_method(object):
     
     def evaluate(self, xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst, sigma_threshold, similarity_func, sim_min_val, norm_func):
         
+        
+
+        params_range = {
+            'kfolds' : 10
+            'max_vocab_size' : [100000]
+            'features_size' : [1000, 5000, 10000, 20000, 50000, 70000]
+            'training_iter' : [100]
+            'threshold' : [0.5]
+            'N_Grams_size' : [4]
+        } 
+
+
         #Convert lists to Arrays
         xhtml_file_l = np.array( xhtml_file_l )
         cls_gnr_tgs = np.array( cls_gnr_tgs )
+
+        grid_search.IterGrid()
         
         #Starting CrossValidation
         KF = cross_validation.StratifiedKFold(cls_gnr_tgs, kfolds, indices=True)
@@ -278,6 +291,17 @@ if __name__ == '__main__':
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Hamming.h5', 'w')
     CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-TESTTESTTEST.h5', 'w')
     
+
+    params_range = {
+        'kfolds' : 10,
+        'max_vocab_size' : [100000],
+        'features_size' : [1000, 5000, 10000, 20000, 50000, 70000],
+        'training_iter' : [100],
+        'threshold' : [0.5],
+        'N_Grams_size' : [4],
+    } 
+
+
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
     iter_l = [100]

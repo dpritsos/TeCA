@@ -118,7 +118,7 @@ class CrossVal_OCSVM(object):
             
             print "Creating VOCABULARY" 
             #Creating Dictionary      
-            tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='strict' )      
+            tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )      
             print list(tf_d)[0]
                  
             #SELECT VOCABILARY SIZE 

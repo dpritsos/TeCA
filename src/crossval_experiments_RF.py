@@ -20,7 +20,6 @@ import sklearn.ensemble as en
 import html2vect.sparse.wngrams as h2v_wcng
 import html2vect.sparse.cngrams as h2v_cng
 
-
         
 class CrossVal_RF(object):
     
@@ -70,12 +69,12 @@ class CrossVal_RF(object):
             print "Corpus_Mtrx", corpus_mtrx[inds_per_gnr[g], :]
            
             mean = np.zeros( corpus_mtrx.shape[1] )
-            mean[:] = np.random.multivariate_normal
-            mean = mean / mean.max()
+            mean[:] = 4
             print 'mean', mean.shape
             cov = np.eye( corpus_mtrx.shape[1] )
             print 'cov', cov.shape
             negative_samples = np.random.multivariate_normal(mean, cov, int(np.floor_divide(len(inds_per_gnr[g]), 2)) )
+            negative_samples = negative_samples / negative_samples.max()
             
             #Fit OC-SVM Model to Data of this genre
             positive_samples = corpus_mtrx[inds_per_gnr[g], :].toarray()
@@ -89,7 +88,7 @@ class CrossVal_RF(object):
 
             #Convert TF vectors to Binary 
             #samples_bin = np.where(samples > 0, 1, 0)
-            gnr_classes[g].fit(positive_samples, pos_tags)
+            gnr_classes[g].fit(samples, class_tags)
         
         return (gnr_classes, inds_per_gnr)   
     
@@ -138,9 +137,8 @@ class CrossVal_RF(object):
             
             print "Creating VOCABULARY" 
             #Creating Dictionary      
-            tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='strict' )      
-            print list(tf_d)[0]
-                 
+            tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )      
+                             
             #SELECT VOCABILARY SIZE 
             for vocab_size in vocabilary_size:
                 resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) #<---
@@ -236,28 +234,28 @@ class CrossVal_RF(object):
 
 if __name__ == '__main__':
     
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'w')
-    CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-RF_kfolds-10_TM-TF.h5', 'w')
+    CrossVal_RF_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-RF_kfolds-10_TM-TF.h5', 'w')
+    #CrossVal_OCSVM_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-RF_kfolds-10_TM-TF.h5', 'w')
     
     kfolds = 10
-    vocabilary_size = [10000] #[1000,3000,10000,100000]
+    vocabilary_size = [100000] #[1000,3000,10000,100000]
     #nu_l = [0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
     featr_size_lst = [5000] #[1000, 5000, 10000, 20000, 50000, 70000]
-    N_Gram_size = 2
+    N_Gram_size = 3
     W_N_Gram_size = 1
     
-    sparse_WNG = h2v_wcng.Html2TF(W_N_Gram_size, attrib='text', lowercase=True, valid_html=False)
-    #sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
+    #sparse_WNG = h2v_wcng.Html2TF(W_N_Gram_size, attrib='text', lowercase=True, valid_html=False)
+    sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
-    crossV_OCSVM = CrossVal_RF(sparse_WNG, CrossVal_OCSVM_res, corpus_filepath, genres)
+    crossV_RF = CrossVal_RF(sparse_CNG, CrossVal_RF_res, corpus_filepath, genres)
     
-    xhtml_file_l, cls_gnr_tgs = crossV_OCSVM.corpus_files_and_tags()
+    xhtml_file_l, cls_gnr_tgs = crossV_RF.corpus_files_and_tags()
     
-    crossV_OCSVM.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, featr_size_lst, norm_func=None)
+    crossV_RF.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, featr_size_lst, norm_func=None)
     
-    CrossVal_OCSVM_res.close()
+    CrossVal_RF_res.close()
