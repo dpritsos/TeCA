@@ -61,21 +61,21 @@ def INTERPOL_SMOOTH_PR(P, R):
         lft_idx = np.max(np.where(R < r))
         rgt_idx = np.max(np.where(R >= r))
         
-        print smthd_P[lft_idx], ">", smthd_P[rgt_idx]
+        #print smthd_P[lft_idx], ">", smthd_P[rgt_idx]
         if smthd_P[lft_idx] >= smthd_P[rgt_idx]:
             idxs[i+1] = lft_idx
         elif smthd_P[lft_idx] < smthd_P[rgt_idx]:
             idxs[i+1] = rgt_idx
             
-        print lft_idx, rgt_idx, idxs[i+1] 
+        #print lft_idx, rgt_idx, idxs[i+1] 
     #idxs[0] = 0
     #idxs[10] = smthd_P
     
     SP = smthd_P[idxs]
     #SP[10] = 0
     
-    print R_Levels
-    print SP
+    #print R_Levels
+    #print SP
              
     return SP, R_Levels
 

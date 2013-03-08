@@ -61,7 +61,7 @@ class ParamGridCrossValBase(object):
             #Merge All Term-Frequency Dictionaries created by the Raw Texts
             gnr_classes[g] = corpus_mtrx[inds_per_gnr[g], :].sum(axis=0)
         
-        return (gnr_classes, inds_per_gnr)   
+        return gnr_classes
     
     
     def predict(self, gnr_classes, crossval_X, crossval_Y, vocab_index_dct, featrs_size, similarity_func, sim_min_value, iters, sigma_threshold):
@@ -126,138 +126,137 @@ class ParamGridCrossValBase(object):
         return predicted_Y, predicted_scores, max_sim_scores_per_iter, predicted_classes_per_iter      
         
     
-    def evaluate(self, xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst, sigma_threshold, similarity_func, sim_min_val, norm_func):
-        
-        
+    def evaluate(self, *args):
 
-        params_range = {
-            'kfolds' : 10
-            'max_vocab_size' : [100000]
-            'features_size' : [1000, 5000, 10000, 20000, 50000, 70000]
-            'training_iter' : [100]
-            'threshold' : [0.5]
-            'N_Grams_size' : [4]
-        } 
-
+        xhtml_file_l = args[0]
+        cls_gnr_tgs = args[1]
+        norm_func = args[2]
+        similarity_func = args[3]
+        sim_min_val = args[4]
+        params_range = args[5]
 
         #Convert lists to Arrays
         xhtml_file_l = np.array( xhtml_file_l )
         cls_gnr_tgs = np.array( cls_gnr_tgs )
 
-        grid_search.IterGrid()
-        
-        #Starting CrossValidation
-        KF = cross_validation.StratifiedKFold(cls_gnr_tgs, kfolds, indices=True)
+        #Create CrossVal Folds
+        KF = cross_validation.StratifiedKFold(cls_gnr_tgs, params_range['kfolds'], indices=True)
+        idxs_per_folds = list()
         for k, (trn_idxs, crv_idxs) in enumerate(KF):
             
             #Creating a Group for this k-fold in h5 file
             kfld_group = self.h5_res.createGroup('/', 'KFold'+str(k), "K-Fold group of Results Arrays" )
+
+            print "FOLD K: ", k
+
+            params_range['kfolds'] = [k]
             
             print "Creating VOCABULARY" 
             #Creating Dictionary      
-            tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )      
-            print list(tf_d)[0]
-                 
-            #SELECT VOCABILARY SIZE 
-            for vocab_size in vocabilary_size:
-                resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) #<---
-                print len(resized_tf_d)
-                print resized_tf_d.items()[0:50]
-                
-                #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
-                tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
-                print tid.items()[0:50]
-                
-                print "Creating Sparse TF Matrix for CrossValidation"
-                #Create Sparse TF Vectors Sparse Matrix
-                corpus_mtrx = self.TF_TT.from_files( list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
-                                                         encoding='utf8', error_handling='replace' )
+            tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )
+            
+            #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
+            tid = self.TF_TT.tfdtools.tf2tidx( tf_d )
+            print tid.items()[0:50]
+
+            print "Creating Sparse TF Matrix for CrossValidation"
+            #Create Sparse TF Vectors Sparse Matrix
+            corpus_mtrx = self.TF_TT.from_files( list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
+                                                encoding='utf8', error_handling='replace' )
+
+            for params in grid_search.IterGrid(params_range):
+
+                print "Params: ", params
+                                                    #bs = cross_validation.Bootstrap(9, random_state=0)
+                #Set Experiment Parameters
+                iters = params['training_iter']
+                featrs_size = params['features_size']
+                sigma_threshold = params['threshold']
                 
                 print "Construct classes"
                 #Construct Genres Class Vectors form Training Set
-                gnr_classes, inds_per_gnr = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
+                gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
                 
                 #SELECT Cross Validation Set
                 crossval_Y = cls_gnr_tgs[ crv_idxs ]
                 mtrx = corpus_mtrx[0]
                 crossval_X = mtrx[crv_idxs, :] 
-                                
-                #SELECT FREATUR SIZE
-                for featrs_size in featr_size_lst:
                     
-                    #Creating a Group for this features size in h5 file under this k-fold
-                    feat_num_group = self.h5_res.createGroup(kfld_group, 'Feat'+str(featrs_size), "Features Number group of Results Arrays for this K-fold" )
-                    
-                    #SELECT DIFERENT ITERATIONS NUMBER
-                    for iters in iter_l:
-                        print "EVALUATE"
-                        
-                        #Creating a Group for this number of iterations in h5 file under this features number under this k-fold
-                        iters_group = self.h5_res.createGroup(feat_num_group, 'Iters'+str(iters), "Number of Iterations (for statistical prediction) group of Results Arrays for this K-fold" )
-                       
-                        predicted_Y,\
-                        predicted_scores,\
-                        max_sim_scores_per_iter,\
-                        predicted_classes_per_iter = self.predict(gnr_classes,\
-                                                                  crossval_X, crossval_Y,\
-                                                                  tid, featrs_size,\
-                                                                  similarity_func, sim_min_val,\
-                                                                  iters, sigma_threshold) 
-                        
-                        
-                        
-                        print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
-                        print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
-                        
-                        cv_tg_idxs = np.array( np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
-                        tp_n_fp = np.array( np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
-                        
-                        P_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-                        R_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-                        F1_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-                        
-                        end = 0
-                        for gnr_cnt in range(len(self.genres_lst)):
-                            start = end
-                            end = end + cv_tg_idxs[gnr_cnt+1]
-                            counts_per_grn_cv = np.histogram( predicted_Y[start:end], bins=np.arange(self.gnrs_num+2) )[0]
-                            #print counts_per_grn_cv
-                            #print tp_n_fp[gnr_cnt+1]
-                            P = counts_per_grn_cv.astype(np.float) / tp_n_fp[gnr_cnt+1]
-                            P_per_gnr[gnr_cnt+1] = P[gnr_cnt+1]
-                            R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]
-                            R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  
-                            F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
-                            
-                        P_per_gnr[0] = precision_score(crossval_Y, predicted_Y)   
-                        R_per_gnr[0] = recall_score(crossval_Y, predicted_Y) 
-                        F1_per_gnr[0] = f1_score(crossval_Y, predicted_Y)  
-                        
-                        #Maybe Later
-                        #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
-                        
-                        print self.h5_res.createArray(iters_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
-                        print self.h5_res.createArray(iters_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
-                        print self.h5_res.createArray(iters_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
-                        print self.h5_res.createArray(iters_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
-                        print self.h5_res.createArray(iters_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, "Max Similarity Score per Document per Iteration (CrossValidation Set)")[:]                        
-                        print self.h5_res.createArray(iters_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
-                        print self.h5_res.createArray(iters_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
-                        print self.h5_res.createArray(iters_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
-                        print                
-                                        
+                #Creating a Group for this features size in h5 file under this k-fold
+                try:
+                    feat_num_group = self.h5_res.getNode(kfld_group, 'Feat'+str(featrs_size))    
+                except:
+                    feat_num_group = self.h5_res.createGroup(kfld_group, 'Feat'+str(featrs_size),\
+                                    "Features Number group of Results Arrays for this K-fold" )
+                
+                #Creating a Group for this number of iterations in h5 file under this features number under this k-fold
+                try:
+                    iters_group = self.h5_res.createGroup(feat_num_group, 'Iters'+str(iters))
+                except:
+                    iters_group = self.h5_res.createGroup(feat_num_group, 'Iters'+str(iters),\
+                                "Number of Iterations (for statistical prediction) group of Results Arrays for this K-fold" )
                
+                print "EVALUATE"
+                
+                predicted_Y,\
+                predicted_scores,\
+                max_sim_scores_per_iter,\
+                predicted_classes_per_iter = self.predict(gnr_classes,\
+                                                          crossval_X, crossval_Y,\
+                                                          tid, featrs_size,\
+                                                          similarity_func, sim_min_val,\
+                                                          iters, sigma_threshold) 
+                
+                print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
+                print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
+                
+                cv_tg_idxs = np.array( np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
+                tp_n_fp = np.array( np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
+                
+                P_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+                R_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+                F1_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+                
+                end = 0
+                for gnr_cnt in range(len(self.genres_lst)):
+                    start = end
+                    end = end + cv_tg_idxs[gnr_cnt+1]
+                    counts_per_grn_cv = np.histogram( predicted_Y[start:end], bins=np.arange(self.gnrs_num+2) )[0]
+                    #print counts_per_grn_cv
+                    #print tp_n_fp[gnr_cnt+1]
+                    P = counts_per_grn_cv.astype(np.float) / tp_n_fp[gnr_cnt+1]
+                    P_per_gnr[gnr_cnt+1] = P[gnr_cnt+1]
+                    R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]
+                    R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  
+                    F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
+                    
+                P_per_gnr[0] = precision_score(crossval_Y, predicted_Y)   
+                R_per_gnr[0] = recall_score(crossval_Y, predicted_Y) 
+                F1_per_gnr[0] = f1_score(crossval_Y, predicted_Y)  
+                
+                #Maybe Later
+                #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
+                
+                print self.h5_res.createArray(iters_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
+                print self.h5_res.createArray(iters_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
+                print self.h5_res.createArray(iters_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
+                print self.h5_res.createArray(iters_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
+                print self.h5_res.createArray(iters_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, "Max Similarity Score per Document per Iteration (CrossValidation Set)")[:]                        
+                print self.h5_res.createArray(iters_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
+                print self.h5_res.createArray(iters_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
+                print self.h5_res.createArray(iters_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
+                print                
+                                           
+
 
 def cosine_similarity(vector, centroid):
  
     return vector * np.transpose(centroid) / ( np.linalg.norm(vector.todense()) * np.linalg.norm(centroid) )
 
 
-
 def hamming_similarity(vector, centroid):
  
     return 1.0 - spd.hamming(centroid, vector)
-
 
 
 def correlation_similarity(vector, centroid):
@@ -294,18 +293,15 @@ if __name__ == '__main__':
 
     params_range = {
         'kfolds' : 10,
-        'max_vocab_size' : [100000],
+        #'max_vocab_size' : [100000],
         'features_size' : [1000, 5000, 10000, 20000, 50000, 70000],
         'training_iter' : [100],
         'threshold' : [0.5],
-        'N_Grams_size' : [4],
+        #'N_Grams_size' : [4],
     } 
 
-
-    kfolds = 10
-    vocabilary_size = [100000] #[1000,3000,10000,100000]
-    iter_l = [100]
-    featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
+    #vocabilary_size = [100000] #[1000,3000,10000,100000]
+    #featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
     sigma_threshold = 0.8
     N_Gram_size = 4
     W_N_Gram_size = 1
@@ -313,13 +309,11 @@ if __name__ == '__main__':
     #sparse_WNG = h2v_wcng.Html2TF(W_N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
-    crossV_Koppels = CrossVal_Koppels_method(sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath, genres)
+    crossV_Koppels = ParamGridCrossValBase(sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath, genres)
     
     xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
-    
-    #Cosine Similarity
-    crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
-                                     sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=None)
+
+    crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, None, cosine_similarity, -1.0, params_range)
     #Hamming Similarity
     #crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
     #                                 sigma_threshold, similarity_func=correlation_similarity, sim_min_val=-1.0, norm_func=None)

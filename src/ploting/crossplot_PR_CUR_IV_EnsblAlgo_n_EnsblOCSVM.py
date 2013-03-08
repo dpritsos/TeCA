@@ -83,7 +83,6 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
         R = R[::-1]
         P = P[::-1]
         a = np.max(np.where(T >= 0.9))
-        print a
         #print T
         #print R
         #print P
@@ -115,7 +114,9 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
     
     
     y, x = srl.INTERPOL_SMOOTH_PR(P, R)
-       
+    
+    print y
+    
     plt.plot(x, y, color[i_fs+4] + line_type[i_fs+4], linewidth=2, label="BASELINE" )  
     
     plt.grid(True)    
@@ -131,13 +132,12 @@ if __name__ == '__main__':
     kfolds = 10
     featr_size_lst1 = [1000, 5000, 10000, 70000] #[1000, 5000, 10000, 20000, 50000, 70000]
     featr_size_lst2 = [5000]
-    gnr_num = 7
-    nu = 0.1#[0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
+    nu = 0.8#[0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
 
-    EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')  
+    EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
+    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')  
     
     #EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
     #EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r') 

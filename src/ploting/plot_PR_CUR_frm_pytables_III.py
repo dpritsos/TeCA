@@ -54,7 +54,7 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
             #Plot all F1 Scores for all genre and all features sizes in one plot 
             #plt.subplot(3,1, 1)
             
-            plt.title('(b)')
+            #plt.title('(b)')
             plt.xlabel( 'R' )
             plt.ylabel( 'P' ) 
             plt.plot(x, y, color[g_num] + symbol[g_num] + line_type[g_num], markeredgewidth=2, label=genres[g_num])
@@ -63,7 +63,9 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
     
     x = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     #y = [1.0, 0.99180105, 0.95199295, 0.91420888, 0.87752186, 0.85499961, 0.83838158, 0.82769073, 0.81960578, 0.81292258, 0.79052204] #Santinis - C4Grams
-    y = [1.0, 0.8738509, 0.8550707, 0.83857833, 0.82317997, 0.80869553, 0.79132285, 0.77017639, 0.75119419, 0.73222723, 0.71237772] #Santinis - Words
+    #y = [1.0, 0.8738509, 0.8550707, 0.83857833, 0.82317997, 0.80869553, 0.79132285, 0.77017639, 0.75119419, 0.73222723, 0.71237772] #Santinis - Words
+    #y = [ 1.0, 0.37853107, 0.3681592, 0.36532508, 0.35180723, 0.34285714, 0.33463542, 0.33463542, 0.32659933, 0.32484076, 0.32371506] #KI-04 Words
+    y = [ 1.0, 0.85, 0.81818182, 0.78461538, 0.72566372, 0.72566372, 0.70895522, 0.67073171, 0.60869565, 0.58436214, 0.54895105] #KI-04 Char4Grams
     plt.plot(x, y, 'k-', linewidth=2, label=genres[g_num])
     plt.Figure()
     plt.show()
@@ -73,18 +75,18 @@ def plot_data(Res, kfolds, featr_size_lst, genres):
 
 if __name__ == '__main__':
     
-    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "shop" ]
-    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
+    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     kfolds = 10
     #featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000]
     featr_size_lst = [5000]
-    gnr_num = 7
+    gnr_num = 8
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')    
     
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')

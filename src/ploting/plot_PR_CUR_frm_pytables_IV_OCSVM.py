@@ -64,7 +64,7 @@ if __name__ == '__main__':
     
     kfolds = 10
     featr_size_lst = [5000] #[1000, 5000, 10000, 20000, 50000, 70000]
-    gnr_num = 7
+    gnr_num = 8
     nu_lst = [0.05, 0.1, 0.5, 0.8] #[0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
     
     CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
