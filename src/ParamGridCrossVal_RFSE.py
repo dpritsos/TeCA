@@ -17,6 +17,7 @@ import html2vect.sparse.wngrams as h2v_wcng
 import html2vect.sparse.cngrams as h2v_cng
 
 
+
 class ParamGridCrossValBase(object):
     
     def __init__(self, TF_TT, h5_res, corpus_path, genres):
@@ -40,7 +41,7 @@ class ParamGridCrossValBase(object):
         return (xhtml_file_l, cls_gnr_tgs)
     
                       
-    def contruct_classes(self, trn_idxs, corpus_mtrx, cls_gnr_tgs):
+    def contruct_classes(self, trn_idxs, corpus_mtrx, cls_gnr_tgs, bagging_param):
         inds_per_gnr = dict()
         inds = list()
         last_gnr_tag = 1
@@ -58,23 +59,52 @@ class ParamGridCrossValBase(object):
     
         gnr_classes = dict()
         for g in self.genres_lst:
+            
+            #######
+            shuffled_train_idxs = np.random.permutation( inds_per_gnr[g] )
+            #print shuffled_train_idxs
+            #keep bagging_parram percent
+            bg_trn_ptg = int( np.trunc( shuffled_train_idxs.size * bagging_param ) )
+            #print bg_trn_ptg
+            bag_idxs = shuffled_train_idxs[0:bg_trn_ptg]
+            #print bag_idxs
+            ######
+        
             #Merge All Term-Frequency Dictionaries created by the Raw Texts
-            gnr_classes[g] = corpus_mtrx[inds_per_gnr[g], :].sum(axis=0)
+            gnr_classes[g] = corpus_mtrx[bag_idxs, :].mean(axis=0)
         
         return gnr_classes
     
     
-    def predict(self, gnr_classes, crossval_X, crossval_Y, vocab_index_dct, featrs_size, similarity_func, sim_min_value, iters, sigma_threshold):
+    def predict(self, *args):
+
+        #Put arguments into classes
+        bagging_param = args[0]
+        crossval_X =  args[1]  
+        crossval_Y =  args[2] 
+        vocab_index_dct = args[3] 
+        featrs_size =  args[4] 
+        similarity_func = args[5] 
+        sim_min_value =  args[6] 
+        iters =  args[7] 
+        sigma_threshold = args[8]
+        trn_idxs = args[9]  
+        corpus_mtrx = args[10]  
+        cls_gnr_tgs = args[11]  
             
         max_sim_scores_per_iter = np.zeros((iters, crossval_X.shape[0]))
         predicted_classes_per_iter = np.zeros((iters, crossval_X.shape[0]))
                     
         #Measure similarity for iters iterations i.e. for iters different feature subspaces Randomly selected 
         for I in range(iters):
+
+            print "Construct classes"
+            #Construct Genres Class Vectors form Training Set
+            gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx, cls_gnr_tgs, bagging_param)
             
             #Randomly select some of the available features
-            suffled_vocabilary_idxs = np.random.permutation( np.array(vocab_index_dct.values()) ) 
-            features_subspace = suffled_vocabilary_idxs[0:featrs_size]
+            shuffled_vocabilary_idxs = np.random.permutation( np.array(vocab_index_dct.values()) ) 
+            features_subspace = shuffled_vocabilary_idxs[0:featrs_size]
             
             #Initialised Predicted Classes and Maximum Similarity Scores Array for this i iteration 
             predicted_classes = np.zeros( crossval_X.shape[0] )
@@ -119,9 +149,9 @@ class ParamGridCrossValBase(object):
             #print genres_occs
             genres_probs = genres_occs.astype(np.float) / np.float(iters)
             #print genres_probs
-            #if np.max(genres_probs) >= sigma_threshold:
-            predicted_Y[i_prd_cls] = np.argmax( genres_probs )
-            predicted_scores[i_prd_cls] = np.max( genres_probs ) 
+            if np.max(genres_probs) >= sigma_threshold:
+                predicted_Y[i_prd_cls] = np.argmax( genres_probs )
+                predicted_scores[i_prd_cls] = np.max( genres_probs ) 
         
         return predicted_Y, predicted_scores, max_sim_scores_per_iter, predicted_classes_per_iter      
         
@@ -172,10 +202,13 @@ class ParamGridCrossValBase(object):
                 iters = params['training_iter']
                 featrs_size = params['features_size']
                 sigma_threshold = params['threshold']
+                bagging_param = params['bagging_param']
                 
+                """ It has been moved in predict() function for enabling Bagging with ease
                 print "Construct classes"
                 #Construct Genres Class Vectors form Training Set
                 gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
+                """
                 
                 #SELECT Cross Validation Set
                 crossval_Y = cls_gnr_tgs[ crv_idxs ]
@@ -195,17 +228,34 @@ class ParamGridCrossValBase(object):
                 except:
                     iters_group = self.h5_res.createGroup(feat_num_group, 'Iters'+str(iters),\
                                 "Number of Iterations (for statistical prediction) group of Results Arrays for this K-fold" )
+
+                #Creating a Group for this Sigma_thershold in h5 file under this features number under this k-fold
+                try:
+                    sigma_group = self.h5_res.createGroup(iters_group, 'Sigma'+str(sigma_threshold))
+                except:
+                    sigma_group = self.h5_res.createGroup(iters_group, 'Sigma'+str(sigma_threshold),\
+                                "<Comment>" )
+
+                #Creating a Group for this Bagging_Param in h5 file under this features number under this k-fold
+                try:
+                    bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param))
+                except:
+                    bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param),\
+                                "<Comment>" )
                
                 print "EVALUATE"
                 
                 predicted_Y,\
                 predicted_scores,\
                 max_sim_scores_per_iter,\
-                predicted_classes_per_iter = self.predict(gnr_classes,\
-                                                          crossval_X, crossval_Y,\
-                                                          tid, featrs_size,\
-                                                          similarity_func, sim_min_val,\
-                                                          iters, sigma_threshold) 
+                predicted_classes_per_iter = self.predict(\
+                                                bagging_param,\
+                                                crossval_X, crossval_Y,\
+                                                tid, featrs_size,\
+                                                similarity_func, sim_min_val,\
+                                                iters, sigma_threshold,\
+                                                trn_idxs, corpus_mtrx[0], cls_gnr_tgs,\
+                                             ) 
                 
                 print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
                 print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
@@ -237,14 +287,14 @@ class ParamGridCrossValBase(object):
                 #Maybe Later
                 #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
                 
-                print self.h5_res.createArray(iters_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
-                print self.h5_res.createArray(iters_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
-                print self.h5_res.createArray(iters_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
-                print self.h5_res.createArray(iters_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
-                print self.h5_res.createArray(iters_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, "Max Similarity Score per Document per Iteration (CrossValidation Set)")[:]                        
-                print self.h5_res.createArray(iters_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
-                print self.h5_res.createArray(iters_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
-                print self.h5_res.createArray(iters_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
+                print self.h5_res.createArray(bagg_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
+                print self.h5_res.createArray(bagg_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
+                print self.h5_res.createArray(bagg_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
+                print self.h5_res.createArray(bagg_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
+                print self.h5_res.createArray(bagg_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, "Max Similarity Score per Document per Iteration (CrossValidation Set)")[:]                        
+                print self.h5_res.createArray(bagg_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
+                print self.h5_res.createArray(bagg_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
+                print self.h5_res.createArray(bagg_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
                 print                
                                            
 
@@ -288,7 +338,7 @@ if __name__ == '__main__':
     genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Hamming.h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-TESTTESTTEST.h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_Bagging.h5', 'w')
     
 
     params_range = {
@@ -297,12 +347,13 @@ if __name__ == '__main__':
         'features_size' : [1000, 5000, 10000, 20000, 50000, 70000],
         'training_iter' : [100],
         'threshold' : [0.5],
+        'bagging_param' : [0.66],
         #'N_Grams_size' : [4],
     } 
 
     #vocabilary_size = [100000] #[1000,3000,10000,100000]
     #featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
-    sigma_threshold = 0.8
+    #sigma_threshold = 0.8
     N_Gram_size = 4
     W_N_Gram_size = 1
     
@@ -319,5 +370,3 @@ if __name__ == '__main__':
     #                                 sigma_threshold, similarity_func=correlation_similarity, sim_min_val=-1.0, norm_func=None)
     
     CrossVal_Kopples_method_res.close()
-
-

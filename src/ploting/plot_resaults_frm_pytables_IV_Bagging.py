@@ -21,9 +21,9 @@ def plot_data(Res, kfolds, featr_size_lst):
                 
         for k in range(kfolds):     
             
-            ps.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5', name='predicted_scores' ).read() )
-            exp_y = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='expected_Y' ).read()
-            pre_y = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5', name='predicted_Y' ).read()
+            ps.append( Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5/Bagg0.66', name='predicted_scores' ).read() )
+            exp_y = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5/Bagg0.66', name='expected_Y' ).read()
+            pre_y = Res.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5/Bagg0.66', name='predicted_Y' ).read()
             trueth_tbl.append( np.where(exp_y == pre_y, 1, 0) ) #Covert exp_y to Binary case and append for this fold
                 
         PS = np.hstack(ps)
@@ -58,7 +58,8 @@ if __name__ == '__main__':
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')    
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None.h5', 'r')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_Bagging.h5', 'r')
     
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Matthews_correlation.h5', 'r')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI-04_TT-Char4Grams-OC-SVM_kfolds-10_Nu-Var_TM-TF.h5', 'r')

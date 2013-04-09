@@ -60,7 +60,7 @@ class CrossVal_Koppels_method(object):
         gnr_classes = dict()
         for g in self.genres_lst:
             #Merge All Term-Frequency Dictionaries created by the Raw Texts
-            gnr_classes[g] = corpus_mtrx[inds_per_gnr[g], :].sum(axis=0)
+            gnr_classes[g] = corpus_mtrx[inds_per_gnr[g], :].sum(axis=0) #<-------
         
         return (gnr_classes, inds_per_gnr)   
     
@@ -103,10 +103,10 @@ class CrossVal_Koppels_method(object):
                     #    print "ERROR: Similarity score unexpected value ", sim_score
                     
                     #Assign the class tag this vector is most similar and keep the respective similarity score
-                    if sim_score > max_sim:
-                        predicted_classes[i_vect] = cls_tag + 1 #plus 1 is the real class tag 0 means uncategorised
-                        max_sim_scores[i_vect] = sim_score
-                        max_sim = sim_score
+                    #if sim_score > max_sim:
+                    predicted_classes[i_vect] = cls_tag + 1 #plus 1 is the real class tag 0 means uncategorised
+                    max_sim_scores[i_vect] = sim_score
+                    max_sim = sim_score
         
             #Store Predicted Classes and Scores for this i iteration
             max_sim_scores_per_iter[I,:] = max_sim_scores[:]
@@ -120,9 +120,9 @@ class CrossVal_Koppels_method(object):
             #print genres_occs
             genres_probs = genres_occs.astype(np.float) / np.float(iters)
             #print genres_probs
-            #if np.max(genres_probs) >= sigma_threshold:
-            predicted_Y[i_prd_cls] = np.argmax( genres_probs )
-            predicted_scores[i_prd_cls] = np.max( genres_probs ) 
+            if np.max(genres_probs) >= sigma_threshold:
+                predicted_Y[i_prd_cls] = np.argmax( genres_probs )
+                predicted_scores[i_prd_cls] = np.max( genres_probs ) 
         
         return predicted_Y, predicted_scores, max_sim_scores_per_iter, predicted_classes_per_iter      
         
@@ -190,8 +190,6 @@ class CrossVal_Koppels_method(object):
                                                                   tid, featrs_size,\
                                                                   similarity_func, sim_min_val,\
                                                                   iters, sigma_threshold) 
-                        
-                        
                         
                         print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
                         print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
@@ -270,19 +268,19 @@ def correlation_similarity(vector, centroid):
 
 if __name__ == '__main__':
     
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Hamming.h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-TESTTESTTEST.h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-0.5_(forVSBagging).h5', 'w')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-0.5_(forVSBagging).h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
     iter_l = [100]
-    featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
-    sigma_threshold = 0.8
+    featr_size_lst = [1000, 5000, 10000, 70000] #20000, 50000,
+    sigma_threshold = 0.5
     N_Gram_size = 4
     W_N_Gram_size = 1
     
