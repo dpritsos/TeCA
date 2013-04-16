@@ -70,6 +70,8 @@ class CrossVal_Koppels_method(object):
         max_sim_scores_per_iter = np.zeros((iters, crossval_X.shape[0]))
         predicted_classes_per_iter = np.zeros((iters, crossval_X.shape[0]))
                     
+        print "FEATURE SIZE: ",featrs_size
+
         #Measure similarity for iters iterations i.e. for iters different feature subspaces Randomly selected 
         for I in range(iters):
             
@@ -120,9 +122,9 @@ class CrossVal_Koppels_method(object):
             #print genres_occs
             genres_probs = genres_occs.astype(np.float) / np.float(iters)
             #print genres_probs
-            if np.max(genres_probs) >= sigma_threshold:
-                predicted_Y[i_prd_cls] = np.argmax( genres_probs )
-                predicted_scores[i_prd_cls] = np.max( genres_probs ) 
+            #if np.max(genres_probs) >= sigma_threshold:
+            predicted_Y[i_prd_cls] = np.argmax( genres_probs )
+            predicted_scores[i_prd_cls] = np.max( genres_probs ) 
         
         return predicted_Y, predicted_scores, max_sim_scores_per_iter, predicted_classes_per_iter      
         
@@ -142,8 +144,12 @@ class CrossVal_Koppels_method(object):
             
             print "Creating VOCABULARY" 
             #Creating Dictionary      
-            tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )      
-            print list(tf_d)[0]
+            #tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )
+
+            tf_d = dict() 
+            #Merge All Term-Frequency Dictionaries created by the Raw Texts            
+            for html_str in self.TF_TT.load_files( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' ):
+                tf_d = self.TF_TT.tfdtools.merge_tfds(tf_d, self.TF_TT.s2tf.tf_dict( self.TF_TT._attrib(html_str) ) )
                  
             #SELECT VOCABILARY SIZE 
             for vocab_size in vocabilary_size:
@@ -158,8 +164,8 @@ class CrossVal_Koppels_method(object):
                 print "Creating Sparse TF Matrix for CrossValidation"
                 #Create Sparse TF Vectors Sparse Matrix
                 corpus_mtrx = self.TF_TT.from_files( list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
-                                                         encoding='utf8', error_handling='replace' )
-                
+                                                         encoding='utf8', error_handling='replace' )              
+
                 print "Construct classes"
                 #Construct Genres Class Vectors form Training Set
                 gnr_classes, inds_per_gnr = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
@@ -279,7 +285,7 @@ if __name__ == '__main__':
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
     iter_l = [100]
-    featr_size_lst = [1000, 5000, 10000, 70000] #20000, 50000,
+    featr_size_lst = [5000] #, 5000, 10000, 70000] #20000, 50000,
     sigma_threshold = 0.5
     N_Gram_size = 4
     W_N_Gram_size = 1

@@ -69,7 +69,7 @@ class CrossVal_Mahal_method(object):
             gnr_classes_icov[g] = np.linalg.inv( cov )
             print gnr_classes_icov[g]
             print
-            gnr_classes_mean[g] = np.mean( subspace_subcorpus, axis=0) 
+            gnr_classes_mean[g] = np.mean(subspace_subcorpus, axis=0) 
         
         return (gnr_classes_icov, gnr_classes_mean)   
     
