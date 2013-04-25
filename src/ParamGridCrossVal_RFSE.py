@@ -98,7 +98,7 @@ class ParamGridCrossValBase(object):
         #Measure similarity for iters iterations i.e. for iters different feature subspaces Randomly selected 
         for I in range(iters):
 
-            print "Construct classes"
+            #print "Construct classes"
             #Construct Genres Class Vectors form Training Set
             gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx, cls_gnr_tgs, bagging_param)
             
@@ -182,24 +182,23 @@ class ParamGridCrossValBase(object):
             params_range['kfolds'] = [k]
             
             print "Creating VOCABULARY" 
-            #Creating Dictionary      
+            #Creating Vocabulary
             tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )
-            
-            #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
-            tid = self.TF_TT.tfdtools.tf2tidx( tf_d )
-            print tid.items()[0:50]
 
-            print "Creating Sparse TF Matrix for CrossValidation"
-            #Create Sparse TF Vectors Sparse Matrix
-            corpus_mtrx = self.TF_TT.from_files( list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
-                                                encoding='utf8', error_handling='replace' )
-
+            #Starting Parameters Grid Search 
+            corpus_mtrx_per_vocab_size_d = dict()
             for params in grid_search.IterGrid(params_range):
 
+                #Prevent execution of this loop in case feature_size is smaller than Vocabulary size
+                if params['features_size'] > params['vocab_size']:
+                    print "SKIPPEd Params: ", params
+                    continue                    
+
                 print "Params: ", params
-                                                    #bs = cross_validation.Bootstrap(9, random_state=0)
+                #bs = cross_validation.Bootstrap(9, random_state=0)
                 #Set Experiment Parameters
                 iters = params['training_iter']
+                vocab_size = params['vocab_size']
                 featrs_size = params['features_size']
                 sigma_threshold = params['threshold']
                 bagging_param = params['bagging_param']
@@ -209,6 +208,30 @@ class ParamGridCrossValBase(object):
                 #Construct Genres Class Vectors form Training Set
                 gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
                 """
+
+                #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size
+                resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) 
+
+                #Creating a Group for this Vocabulary size in h5 file under this k-fold
+                try:
+                    vocab_size_group = self.h5_res.getNode(kfld_group, 'Vocab'+str(len(resized_tf_d)))    
+                except:
+                    vocab_size_group = self.h5_res.createGroup(kfld_group, 'Vocab'+str(len(resized_tf_d)),\
+                                    "Vocabulary actual size group of Results Arrays for this K-fold" )
+
+                #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
+                tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
+                print tid.items()[0:50]
+
+                if vocab_size in corpus_mtrx_per_vocab_size_d:
+                    print "Sparse TF Matrix for CrossValidation already created"
+                    corpus_mtrx = corpus_mtrx_per_vocab_size_d[vocab_size]
+                else:
+                    print "Creating Sparse TF Matrix (for CrossValidation)"
+                    #Create Sparse TF Vectors Sparse Matrix
+                    corpus_mtrx = self.TF_TT.from_files( list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
+                                                        encoding='utf8', error_handling='replace' )
+                    corpus_mtrx_per_vocab_size_d[vocab_size] = corpus_mtrx
                 
                 #SELECT Cross Validation Set
                 crossval_Y = cls_gnr_tgs[ crv_idxs ]
@@ -217,28 +240,28 @@ class ParamGridCrossValBase(object):
                     
                 #Creating a Group for this features size in h5 file under this k-fold
                 try:
-                    feat_num_group = self.h5_res.getNode(kfld_group, 'Feat'+str(featrs_size))    
+                    feat_num_group = self.h5_res.getNode(vocab_size_group, 'Feat'+str(featrs_size))    
                 except:
-                    feat_num_group = self.h5_res.createGroup(kfld_group, 'Feat'+str(featrs_size),\
+                    feat_num_group = self.h5_res.createGroup(vocab_size_group, 'Feat'+str(featrs_size),\
                                     "Features Number group of Results Arrays for this K-fold" )
                 
                 #Creating a Group for this number of iterations in h5 file under this features number under this k-fold
                 try:
-                    iters_group = self.h5_res.createGroup(feat_num_group, 'Iters'+str(iters))
+                    iters_group = self.h5_res.getNode(feat_num_group, 'Iters'+str(iters))
                 except:
                     iters_group = self.h5_res.createGroup(feat_num_group, 'Iters'+str(iters),\
                                 "Number of Iterations (for statistical prediction) group of Results Arrays for this K-fold" )
 
                 #Creating a Group for this Sigma_thershold in h5 file under this features number under this k-fold
                 try:
-                    sigma_group = self.h5_res.createGroup(iters_group, 'Sigma'+str(sigma_threshold))
+                    sigma_group = self.h5_res.getNode(iters_group, 'Sigma'+str(sigma_threshold))
                 except:
                     sigma_group = self.h5_res.createGroup(iters_group, 'Sigma'+str(sigma_threshold),\
                                 "<Comment>" )
 
                 #Creating a Group for this Bagging_Param in h5 file under this features number under this k-fold
                 try:
-                    bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param))
+                    bagg_group = self.h5_res.getNode(sigma_group, 'Bagg'+str(bagging_param))
                 except:
                     bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param),\
                                 "<Comment>" )
@@ -337,17 +360,17 @@ if __name__ == '__main__':
     #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
-    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Hamming.h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_Bagging.h5', 'w')
+    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Bagging.h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch.h5', 'w')
     
 
     params_range = {
         'kfolds' : 10,
-        #'max_vocab_size' : [100000],
-        'features_size' : [1000, 5000, 10000, 20000, 50000, 70000],
+        'vocab_size' : [10000, 50000, 100000],
+        'features_size' : [1000, 5000, 10000, 70000],
         'training_iter' : [100],
-        'threshold' : [0.5],
-        'bagging_param' : [0.66],
+        'threshold' : [0.5, 0.8],
+        'bagging_param' : [0.33, 0.66],
         #'N_Grams_size' : [4],
     } 
 

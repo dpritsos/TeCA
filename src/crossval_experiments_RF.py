@@ -245,8 +245,8 @@ if __name__ == '__main__':
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
     #nu_l = [0.05, 0.07, 0.1, 0.15, 0.2, 0.3, 0.5, 0.7, 0.8]
-    featr_size_lst = [5000] #[1000, 5000, 10000, 20000, 50000, 70000]
-    N_Gram_size = 3
+    featr_size_lst = [1000, 5000, 10000, 70000]
+    N_Gram_size = 4
     W_N_Gram_size = 1
     
     #sparse_WNG = h2v_wcng.Html2TF(W_N_Gram_size, attrib='text', lowercase=True, valid_html=False)
