@@ -185,141 +185,142 @@ class ParamGridCrossValBase(object):
             #Creating Vocabulary
             tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )
 
-            #Starting Parameters Grid Search 
-            corpus_mtrx_per_vocab_size_d = dict()
-            for params in grid_search.IterGrid(params_range):
+        ####################################################################
+        #Starting Parameters Grid Search 
+        corpus_mtrx_per_vocab_size_d = dict()
+        for params in grid_search.IterGrid(params_range):
 
-                #Prevent execution of this loop in case feature_size is smaller than Vocabulary size
-                if params['features_size'] > params['vocab_size']:
-                    print "SKIPPEd Params: ", params
-                    continue                    
+            #Prevent execution of this loop in case feature_size is smaller than Vocabulary size
+            if params['features_size'] > params['vocab_size']:
+                print "SKIPPEd Params: ", params
+                continue                    
 
-                print "Params: ", params
-                #bs = cross_validation.Bootstrap(9, random_state=0)
-                #Set Experiment Parameters
-                iters = params['training_iter']
-                vocab_size = params['vocab_size']
-                featrs_size = params['features_size']
-                sigma_threshold = params['threshold']
-                bagging_param = params['bagging_param']
-                
-                """ It has been moved in predict() function for enabling Bagging with ease
-                print "Construct classes"
-                #Construct Genres Class Vectors form Training Set
-                gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
-                """
+            print "Params: ", params
+            #bs = cross_validation.Bootstrap(9, random_state=0)
+            #Set Experiment Parameters
+            iters = params['training_iter']
+            vocab_size = params['vocab_size']
+            featrs_size = params['features_size']
+            sigma_threshold = params['threshold']
+            bagging_param = params['bagging_param']
+            
+            """ It has been moved in predict() function for enabling Bagging with ease
+            print "Construct classes"
+            #Construct Genres Class Vectors form Training Set
+            gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
+            """
 
-                #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size
-                resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) 
+            #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size
+            resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) 
 
-                #Creating a Group for this Vocabulary size in h5 file under this k-fold
-                try:
-                    vocab_size_group = self.h5_res.getNode(kfld_group, 'Vocab'+str(len(resized_tf_d)))    
-                except:
-                    vocab_size_group = self.h5_res.createGroup(kfld_group, 'Vocab'+str(len(resized_tf_d)),\
-                                    "Vocabulary actual size group of Results Arrays for this K-fold" )
+            #Creating a Group for this Vocabulary size in h5 file under this k-fold
+            try:
+                vocab_size_group = self.h5_res.getNode(kfld_group, 'Vocab'+str(len(resized_tf_d)))    
+            except:
+                vocab_size_group = self.h5_res.createGroup(kfld_group, 'Vocab'+str(len(resized_tf_d)),\
+                                "Vocabulary actual size group of Results Arrays for this K-fold" )
 
-                #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
-                tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
-                print tid.items()[0:50]
+            #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
+            tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
+            print tid.items()[0:50]
 
-                if vocab_size in corpus_mtrx_per_vocab_size_d:
-                    print "Sparse TF Matrix for CrossValidation already created"
-                    corpus_mtrx = corpus_mtrx_per_vocab_size_d[vocab_size]
-                else:
-                    print "Creating Sparse TF Matrix (for CrossValidation)"
-                    #Create Sparse TF Vectors Sparse Matrix
-                    corpus_mtrx = self.TF_TT.from_files( list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
-                                                        encoding='utf8', error_handling='replace' )
-                    corpus_mtrx_per_vocab_size_d[vocab_size] = corpus_mtrx
+            if vocab_size in corpus_mtrx_per_vocab_size_d:
+                print "Sparse TF Matrix for CrossValidation already created"
+                corpus_mtrx = corpus_mtrx_per_vocab_size_d[vocab_size]
+            else:
+                print "Creating Sparse TF Matrix (for CrossValidation)"
+                #Create Sparse TF Vectors Sparse Matrix
+                corpus_mtrx = self.TF_TT.from_files( list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
+                                                    encoding='utf8', error_handling='replace' )
+                corpus_mtrx_per_vocab_size_d[vocab_size] = corpus_mtrx
+            
+            #SELECT Cross Validation Set
+            crossval_Y = cls_gnr_tgs[ crv_idxs ]
+            mtrx = corpus_mtrx[0]
+            crossval_X = mtrx[crv_idxs, :] 
                 
-                #SELECT Cross Validation Set
-                crossval_Y = cls_gnr_tgs[ crv_idxs ]
-                mtrx = corpus_mtrx[0]
-                crossval_X = mtrx[crv_idxs, :] 
-                    
-                #Creating a Group for this features size in h5 file under this k-fold
-                try:
-                    feat_num_group = self.h5_res.getNode(vocab_size_group, 'Feat'+str(featrs_size))    
-                except:
-                    feat_num_group = self.h5_res.createGroup(vocab_size_group, 'Feat'+str(featrs_size),\
-                                    "Features Number group of Results Arrays for this K-fold" )
-                
-                #Creating a Group for this number of iterations in h5 file under this features number under this k-fold
-                try:
-                    iters_group = self.h5_res.getNode(feat_num_group, 'Iters'+str(iters))
-                except:
-                    iters_group = self.h5_res.createGroup(feat_num_group, 'Iters'+str(iters),\
-                                "Number of Iterations (for statistical prediction) group of Results Arrays for this K-fold" )
+            #Creating a Group for this features size in h5 file under this k-fold
+            try:
+                feat_num_group = self.h5_res.getNode(vocab_size_group, 'Feat'+str(featrs_size))    
+            except:
+                feat_num_group = self.h5_res.createGroup(vocab_size_group, 'Feat'+str(featrs_size),\
+                                "Features Number group of Results Arrays for this K-fold" )
+            
+            #Creating a Group for this number of iterations in h5 file under this features number under this k-fold
+            try:
+                iters_group = self.h5_res.getNode(feat_num_group, 'Iters'+str(iters))
+            except:
+                iters_group = self.h5_res.createGroup(feat_num_group, 'Iters'+str(iters),\
+                            "Number of Iterations (for statistical prediction) group of Results Arrays for this K-fold" )
 
-                #Creating a Group for this Sigma_thershold in h5 file under this features number under this k-fold
-                try:
-                    sigma_group = self.h5_res.getNode(iters_group, 'Sigma'+str(sigma_threshold))
-                except:
-                    sigma_group = self.h5_res.createGroup(iters_group, 'Sigma'+str(sigma_threshold),\
-                                "<Comment>" )
+            #Creating a Group for this Sigma_thershold in h5 file under this features number under this k-fold
+            try:
+                sigma_group = self.h5_res.getNode(iters_group, 'Sigma'+str(sigma_threshold))
+            except:
+                sigma_group = self.h5_res.createGroup(iters_group, 'Sigma'+str(sigma_threshold),\
+                            "<Comment>" )
 
-                #Creating a Group for this Bagging_Param in h5 file under this features number under this k-fold
-                try:
-                    bagg_group = self.h5_res.getNode(sigma_group, 'Bagg'+str(bagging_param))
-                except:
-                    bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param),\
-                                "<Comment>" )
-               
-                print "EVALUATE"
+            #Creating a Group for this Bagging_Param in h5 file under this features number under this k-fold
+            try:
+                bagg_group = self.h5_res.getNode(sigma_group, 'Bagg'+str(bagging_param))
+            except:
+                bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param),\
+                            "<Comment>" )
+           
+            print "EVALUATE"
+            
+            predicted_Y,\
+            predicted_scores,\
+            max_sim_scores_per_iter,\
+            predicted_classes_per_iter = self.predict(\
+                                            bagging_param,\
+                                            crossval_X, crossval_Y,\
+                                            tid, featrs_size,\
+                                            similarity_func, sim_min_val,\
+                                            iters, sigma_threshold,\
+                                            trn_idxs, corpus_mtrx[0], cls_gnr_tgs,\
+                                         ) 
+            
+            print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
+            print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
+            
+            cv_tg_idxs = np.array( np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
+            tp_n_fp = np.array( np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
+            
+            P_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+            R_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+            F1_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+            
+            end = 0
+            for gnr_cnt in range(len(self.genres_lst)):
+                start = end
+                end = end + cv_tg_idxs[gnr_cnt+1]
+                counts_per_grn_cv = np.histogram( predicted_Y[start:end], bins=np.arange(self.gnrs_num+2) )[0]
+                #print counts_per_grn_cv
+                #print tp_n_fp[gnr_cnt+1]
+                P = counts_per_grn_cv.astype(np.float) / tp_n_fp[gnr_cnt+1]
+                P_per_gnr[gnr_cnt+1] = P[gnr_cnt+1]
+                R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]
+                R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  
+                F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
                 
-                predicted_Y,\
-                predicted_scores,\
-                max_sim_scores_per_iter,\
-                predicted_classes_per_iter = self.predict(\
-                                                bagging_param,\
-                                                crossval_X, crossval_Y,\
-                                                tid, featrs_size,\
-                                                similarity_func, sim_min_val,\
-                                                iters, sigma_threshold,\
-                                                trn_idxs, corpus_mtrx[0], cls_gnr_tgs,\
-                                             ) 
-                
-                print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
-                print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
-                
-                cv_tg_idxs = np.array( np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
-                tp_n_fp = np.array( np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
-                
-                P_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-                R_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-                F1_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-                
-                end = 0
-                for gnr_cnt in range(len(self.genres_lst)):
-                    start = end
-                    end = end + cv_tg_idxs[gnr_cnt+1]
-                    counts_per_grn_cv = np.histogram( predicted_Y[start:end], bins=np.arange(self.gnrs_num+2) )[0]
-                    #print counts_per_grn_cv
-                    #print tp_n_fp[gnr_cnt+1]
-                    P = counts_per_grn_cv.astype(np.float) / tp_n_fp[gnr_cnt+1]
-                    P_per_gnr[gnr_cnt+1] = P[gnr_cnt+1]
-                    R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]
-                    R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  
-                    F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
-                    
-                P_per_gnr[0] = precision_score(crossval_Y, predicted_Y)   
-                R_per_gnr[0] = recall_score(crossval_Y, predicted_Y) 
-                F1_per_gnr[0] = f1_score(crossval_Y, predicted_Y)  
-                
-                #Maybe Later
-                #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
-                
-                print self.h5_res.createArray(bagg_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
-                print self.h5_res.createArray(bagg_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
-                print self.h5_res.createArray(bagg_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
-                print self.h5_res.createArray(bagg_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
-                print self.h5_res.createArray(bagg_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, "Max Similarity Score per Document per Iteration (CrossValidation Set)")[:]                        
-                print self.h5_res.createArray(bagg_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
-                print self.h5_res.createArray(bagg_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
-                print self.h5_res.createArray(bagg_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
-                print                
-                                           
+            P_per_gnr[0] = precision_score(crossval_Y, predicted_Y)   
+            R_per_gnr[0] = recall_score(crossval_Y, predicted_Y) 
+            F1_per_gnr[0] = f1_score(crossval_Y, predicted_Y)  
+            
+            #Maybe Later
+            #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
+            
+            print self.h5_res.createArray(bagg_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
+            print self.h5_res.createArray(bagg_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
+            print self.h5_res.createArray(bagg_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
+            print self.h5_res.createArray(bagg_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
+            print self.h5_res.createArray(bagg_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, "Max Similarity Score per Document per Iteration (CrossValidation Set)")[:]                        
+            print self.h5_res.createArray(bagg_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
+            print self.h5_res.createArray(bagg_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
+            print self.h5_res.createArray(bagg_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
+            print                
+            #####################################################################                         
 
 
 def cosine_similarity(vector, centroid):
