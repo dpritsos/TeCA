@@ -3,6 +3,10 @@
 import sys
 #sys.path.append('../../synergeticprocessing/src')
 sys.path.append('../../html2vectors/src')
+
+import json
+import os
+
 import numpy as np
 import tables as tb
 
@@ -20,12 +24,13 @@ import html2vect.sparse.cngrams as h2v_cng
 
 class ParamGridCrossValBase(object):
     
-    def __init__(self, TF_TT, h5_res, corpus_path, genres):
+    def __init__(self, TF_TT, h5_res, corpus_path, genres, voc_path=None):
         self.TF_TT = TF_TT
         self.corpus_path = corpus_path
         self.genres_lst = genres
         self.gnrs_num = len(genres)
         self.h5_res = h5_res
+        self.crps_voc_path = voc_path
 
 
     def corpus_files_and_tags(self):
@@ -169,23 +174,34 @@ class ParamGridCrossValBase(object):
         xhtml_file_l = np.array( xhtml_file_l )
         cls_gnr_tgs = np.array( cls_gnr_tgs )
 
+
         #Create CrossVal Folds
-        KF = cross_validation.StratifiedKFold(cls_gnr_tgs, params_range['kfolds'], indices=True)
-        idxs_per_folds = list()
-        for k, (trn_idxs, crv_idxs) in enumerate(KF):
-            
-            #Creating a Group for this k-fold in h5 file
-            kfld_group = self.h5_res.createGroup('/', 'KFold'+str(k), "K-Fold group of Results Arrays" )
+        KF = cross_validation.StratifiedKFold(cls_gnr_tgs, len(params_range['kfolds']), indices=True)
+        
+        trn_idxs = list()
+        crv_idxs = list()
+        tf_d = list()
 
-            print "FOLD K: ", k
+        for k, (trn, crv) in enumerate(KF):
 
-            params_range['kfolds'] = [k]
-            
-            print "Creating VOCABULARY" 
-            #Creating Vocabulary
-            tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )
+            trn_idxs[k] = trn
+            crv_idxs[k] = crv
+            voc_filename = self.crps_voc_path+'/kfold_Voc_'+str(k)+'.voc'
 
-        ####################################################################
+            if os.path.exists(voc_filename):
+                #Loading Vocavulary
+                print "Loadinging VOCABULARY for k-fold=",k
+                with open(voc_filename, 'r') as f:
+                    tf_d[k] = json.load(f, encoding=encoding) 
+
+            else:
+                #Creating Vocabulary
+                print "Creating VOCABULARY for k-fold=",k 
+                tf_d[k] = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )
+
+                with open(voc_filename, 'w', encoding) as f:
+                    json.dump(tf_d[k], encoding=encoding)
+
         #Starting Parameters Grid Search 
         corpus_mtrx_per_vocab_size_d = dict()
         for params in grid_search.IterGrid(params_range):
@@ -198,6 +214,7 @@ class ParamGridCrossValBase(object):
             print "Params: ", params
             #bs = cross_validation.Bootstrap(9, random_state=0)
             #Set Experiment Parameters
+            k = params_range['kfolds']
             iters = params['training_iter']
             vocab_size = params['vocab_size']
             featrs_size = params['features_size']
@@ -208,7 +225,14 @@ class ParamGridCrossValBase(object):
             print "Construct classes"
             #Construct Genres Class Vectors form Training Set
             gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
+
             """
+
+            #Creating a Group for this k-fold in h5 file
+            try:
+                kfld_group = self.h5_res.getNode('/', 'KFold'+str(k))
+            except:
+                kfld_group = self.h5_res.createGroup('/', 'KFold'+str(k), "K-Fold group of Results Arrays")
 
             #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size
             resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) 
@@ -358,6 +382,7 @@ if __name__ == '__main__':
     
     #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
     corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies"
     #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
@@ -366,7 +391,7 @@ if __name__ == '__main__':
     
 
     params_range = {
-        'kfolds' : 10,
+        'kfolds' : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         'vocab_size' : [10000, 50000, 100000],
         'features_size' : [1000, 5000, 10000, 70000],
         'training_iter' : [100],
@@ -384,7 +409,8 @@ if __name__ == '__main__':
     #sparse_WNG = h2v_wcng.Html2TF(W_N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)
     
-    crossV_Koppels = ParamGridCrossValBase(sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath, genres)
+    crossV_Koppels = ParamGridCrossValBase( sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath,\
+                                            genres, kfolds_vocs_filepath )
     
     xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
 
