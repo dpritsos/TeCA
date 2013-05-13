@@ -6,6 +6,7 @@ sys.path.append('../../html2vectors/src')
 
 import json
 import os
+import cPickle as pickle
 
 import numpy as np
 import tables as tb
@@ -79,7 +80,7 @@ class ParamGridCrossValBase(object):
             gnr_classes[g] = corpus_mtrx[bag_idxs, :].mean(axis=0)
         
         return gnr_classes
-    
+
     
     def predict(self, *args):
 
@@ -169,6 +170,7 @@ class ParamGridCrossValBase(object):
         similarity_func = args[3]
         sim_min_val = args[4]
         params_range = args[5]
+        encoding = args[6]
 
         #Convert lists to Arrays
         xhtml_file_l = np.array( xhtml_file_l )
@@ -184,23 +186,59 @@ class ParamGridCrossValBase(object):
 
         for k, (trn, crv) in enumerate(KF):
 
-            trn_idxs[k] = trn
-            crv_idxs[k] = crv
-            voc_filename = self.crps_voc_path+'/kfold_Voc_'+str(k)+'.voc'
+            voc_filename = self.crps_voc_path+'/kfold_Voc_'+str(k)+'.vtf'
+            pkl_voc_filename = self.crps_voc_path+'/kfold_Voc_'+str(k)+'.pkl'
+            trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'
+            crv_filename = self.crps_voc_path+'/kfold_crv_'+str(k)+'.idx'
 
-            if os.path.exists(voc_filename):
+            #Load or Save K-Fold Cross-Validation corpus vector selection-indecies 
+            if os.path.exists(trn_filename) and os.path.exists(crv_filename):
+                #Load Training Indeces 
+                print "Loading Training Indices for k-fold=", k
+                with open(trn_filename, 'r') as f:
+                    trn_idxs.append( np.array( json.load(f, encoding=encoding) ) )
+
+                #Load Cross-validation Indeces
+                print "Loading Cross-validation Indices for k-fold=", k
+                with open(crv_filename, 'r') as f:
+                    crv_idxs.append( np.array( json.load(f, encoding=encoding) ) )
+
+            else:
+                #Keep k-fold (stratified) Training Indices
+                trn_idxs.append(trn)
+
+                #Keep k-fold (stratified) Cross-validation Indices
+                crv_idxs.append(crv)
+                
+                #Save Trainging Indeces
+                print "Saving Training Indices for k-fold=", k
+                with open(trn_filename, 'w') as f:
+                    json.dump( list( trn_idxs[k] ), f, encoding=encoding)
+
+                #Save Cross-validation Indeces
+                print "Saving Cross-validation Indices for k-fold=", k
+                with open(crv_filename, 'w') as f:
+                    json.dump( list( crv_idxs[k] ), f, encoding=encoding)               
+
+            #Load or Create K-fold Cross-Validation Vocabulary for each fold
+            if os.path.exists(voc_filename) and os.path.exists(pkl_voc_filename):
                 #Loading Vocavulary
                 print "Loadinging VOCABULARY for k-fold=",k
-                with open(voc_filename, 'r') as f:
-                    tf_d[k] = json.load(f, encoding=encoding) 
+                with open(pkl_voc_filename, 'r') as f:
+                    tf_d.append( pickle.load(f) )
 
             else:
                 #Creating Vocabulary
-                print "Creating VOCABULARY for k-fold=",k 
-                tf_d[k] = self.TF_TT.build_vocabulary( list( xhtml_file_l[trn_idxs] ), encoding='utf8', error_handling='replace' )
+                print "Creating Vocabulary for k-fold=",k 
+                tf_d.append( self.TF_TT.build_vocabulary( list( xhtml_file_l[ trn_idxs[k] ] ), encoding=encoding, error_handling='replace' ) )
 
-                with open(voc_filename, 'w', encoding) as f:
-                    json.dump(tf_d[k], encoding=encoding)
+                #Saving Vocabulary
+                print "Saving Vocabulary"
+                with open(pkl_voc_filename, 'w') as f:
+                    pickle.dump(tf_d[k], f)
+
+                with open(voc_filename, 'w') as f:
+                    json.dump(tf_d[k], f, encoding=encoding)
 
         #Starting Parameters Grid Search 
         corpus_mtrx_per_vocab_size_d = dict()
@@ -214,7 +252,7 @@ class ParamGridCrossValBase(object):
             print "Params: ", params
             #bs = cross_validation.Bootstrap(9, random_state=0)
             #Set Experiment Parameters
-            k = params_range['kfolds']
+            k = params['kfolds']
             iters = params['training_iter']
             vocab_size = params['vocab_size']
             featrs_size = params['features_size']
@@ -235,7 +273,7 @@ class ParamGridCrossValBase(object):
                 kfld_group = self.h5_res.createGroup('/', 'KFold'+str(k), "K-Fold group of Results Arrays")
 
             #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size
-            resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) 
+            resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d[k], vocab_size) 
 
             #Creating a Group for this Vocabulary size in h5 file under this k-fold
             try:
@@ -259,9 +297,9 @@ class ParamGridCrossValBase(object):
                 corpus_mtrx_per_vocab_size_d[vocab_size] = corpus_mtrx
             
             #SELECT Cross Validation Set
-            crossval_Y = cls_gnr_tgs[ crv_idxs ]
+            crossval_Y = cls_gnr_tgs[ crv_idxs[k] ]
             mtrx = corpus_mtrx[0]
-            crossval_X = mtrx[crv_idxs, :] 
+            crossval_X = mtrx[crv_idxs[k], :] 
                 
             #Creating a Group for this features size in h5 file under this k-fold
             try:
@@ -292,7 +330,6 @@ class ParamGridCrossValBase(object):
                             "<Comment>" )
            
             print "EVALUATE"
-            
             predicted_Y,\
             predicted_scores,\
             max_sim_scores_per_iter,\
@@ -302,7 +339,7 @@ class ParamGridCrossValBase(object):
                                             tid, featrs_size,\
                                             similarity_func, sim_min_val,\
                                             iters, sigma_threshold,\
-                                            trn_idxs, corpus_mtrx[0], cls_gnr_tgs,\
+                                            trn_idxs[k], corpus_mtrx[0], cls_gnr_tgs,\
                                          ) 
             
             print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
@@ -343,8 +380,7 @@ class ParamGridCrossValBase(object):
             print self.h5_res.createArray(bagg_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
             print self.h5_res.createArray(bagg_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
             print self.h5_res.createArray(bagg_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
-            print                
-            #####################################################################                         
+            print                                    
 
 
 def cosine_similarity(vector, centroid):
@@ -382,7 +418,8 @@ if __name__ == '__main__':
     
     #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
     corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies"
+    kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams"
+    #kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_Words"
     #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
     genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
@@ -392,11 +429,11 @@ if __name__ == '__main__':
 
     params_range = {
         'kfolds' : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        'vocab_size' : [10000, 50000, 100000],
-        'features_size' : [1000, 5000, 10000, 70000],
+        'vocab_size' : [10000], #, 50000, 100000],
+        'features_size' : [1000], #, 5000, 10000, 70000],
         'training_iter' : [100],
-        'threshold' : [0.5, 0.8],
-        'bagging_param' : [0.33, 0.66],
+        'threshold' : [0.5], #[0.5, 0.8],
+        'bagging_param' : [0.33] #[0.33, 0.66],
         #'N_Grams_size' : [4],
     } 
 
@@ -414,7 +451,7 @@ if __name__ == '__main__':
     
     xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
 
-    crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, None, cosine_similarity, -1.0, params_range)
+    crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, None, cosine_similarity, -1.0, params_range, 'utf-8')
     #Hamming Similarity
     #crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
     #                                 sigma_threshold, similarity_func=correlation_similarity, sim_min_val=-1.0, norm_func=None)
