@@ -282,8 +282,8 @@ class ParamGridCrossValBase(object):
 
             #Loading Vocavulary
             print "Loadinging VOCABULARY for k-fold=",k
-            with open(pkl_voc_filename, 'r') as voc_f:
-                tf_d = pickle.load(voc_f)
+            with open(pkl_voc_filename, 'r') as f:
+                tf_d = pickle.load(f)
             
             #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size
             resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) 
@@ -304,8 +304,8 @@ class ParamGridCrossValBase(object):
             if os.path.exists(corpus_mtrx_fname):
                 print "Loading Sparse TF Matrix for CrossValidation for K-fold=", k, " and Vocabulary size=", vocab_size
                 #Loading Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
-                with open(corpus_mtrx_fname, 'r') as crp_mtr_f:
-                    corpus_mtrx = pickle.load(crp_mtr_f)
+                with open(corpus_mtrx_fname, 'r') as f:
+                    corpus_mtrx = pickle.load(f)
 
             else:
                 print "Creating Sparse TF Matrix (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
@@ -315,8 +315,8 @@ class ParamGridCrossValBase(object):
 
                 #Saving TF Vecrors Matrix
                 print "Saving Sparse TF Matrix (for CrossValidation)"
-                with open(corpus_mtrx_fname, 'w') as crp_mtr_f:
-                    pickle.dump(corpus_mtrx, crp_mtr_f)
+                with open(corpus_mtrx_fname, 'w') as f:
+                    pickle.dump(corpus_mtrx, f)
                 
             #Load Training Indeces 
             trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'
