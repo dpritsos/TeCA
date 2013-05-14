@@ -31,7 +31,7 @@
 			"file": "src/ParamGridCrossVal_RFSE.py",
 			"settings":
 			{
-				"buffer_size": 17650,
+				"buffer_size": 21429,
 				"line_ending": "Unix"
 			}
 		},
@@ -39,7 +39,7 @@
 			"file": "src/crossval_experiments_Koppels_method.py",
 			"settings":
 			{
-				"buffer_size": 15662,
+				"buffer_size": 16037,
 				"line_ending": "Unix"
 			}
 		},
@@ -88,6 +88,8 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/test.py",
+		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies/kfold_Voc_0.voc",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/crossval_experiments_RF.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_n_EnsblOCSVM.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
@@ -139,6 +141,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"trn_idxs",
+			"crv_idxs",
 			"dx = [0].extend(dx)",
 			"None",
 			"import",
@@ -162,7 +166,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -170,15 +174,15 @@
 					"file": "src/ParamGridCrossVal_RFSE.py",
 					"settings":
 					{
-						"buffer_size": 17650,
+						"buffer_size": 21429,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2373,
-								2373
+								10454,
+								10454
 							]
 						],
 						"settings":
@@ -188,7 +192,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3576.0,
+						"translation.y": 4546.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -198,15 +202,15 @@
 					"file": "src/crossval_experiments_Koppels_method.py",
 					"settings":
 					{
-						"buffer_size": 15662,
+						"buffer_size": 16037,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								11270,
-								11270
+								0,
+								0
 							]
 						],
 						"settings":
@@ -348,6 +352,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 198.0,
+	"side_bar_width": 137.0,
 	"status_bar_visible": true
 }
