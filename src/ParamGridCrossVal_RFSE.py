@@ -180,10 +180,6 @@ class ParamGridCrossValBase(object):
         #Create CrossVal Folds
         KF = cross_validation.StratifiedKFold(cls_gnr_tgs, len(params_range['kfolds']), indices=True)
         
-        trn_idxs = list()
-        crv_idxs = list()
-        tf_d = list()
-
         for k, (trn, crv) in enumerate(KF):
 
             voc_filename = self.crps_voc_path+'/kfold_Voc_'+str(k)+'.vtf'
@@ -191,19 +187,9 @@ class ParamGridCrossValBase(object):
             trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'
             crv_filename = self.crps_voc_path+'/kfold_crv_'+str(k)+'.idx'
 
-            #Load or Save K-Fold Cross-Validation corpus vector selection-indecies 
-            if os.path.exists(trn_filename) and os.path.exists(crv_filename):
-                #Load Training Indeces 
-                print "Loading Training Indices for k-fold=", k
-                with open(trn_filename, 'r') as f:
-                    trn_idxs.append( np.array( json.load(f, encoding=encoding) ) )
-
-                #Load Cross-validation Indeces
-                print "Loading Cross-validation Indices for k-fold=", k
-                with open(crv_filename, 'r') as f:
-                    crv_idxs.append( np.array( json.load(f, encoding=encoding) ) )
-
-            else:
+            #Save K-Fold Cross-Validation corpus vector selection-indecies if does not exists
+            if not os.path.exists(trn_filename) or not os.path.exists(crv_filename):
+              
                 #Keep k-fold (stratified) Training Indices
                 trn_idxs.append(trn)
 
@@ -213,35 +199,29 @@ class ParamGridCrossValBase(object):
                 #Save Trainging Indeces
                 print "Saving Training Indices for k-fold=", k
                 with open(trn_filename, 'w') as f:
-                    json.dump( list( trn_idxs[k] ), f, encoding=encoding)
+                    json.dump( trn, f, encoding=encoding)
 
                 #Save Cross-validation Indeces
                 print "Saving Cross-validation Indices for k-fold=", k
                 with open(crv_filename, 'w') as f:
-                    json.dump( list( crv_idxs[k] ), f, encoding=encoding)               
+                    json.dump( crv, f, encoding=encoding)               
 
             #Load or Create K-fold Cross-Validation Vocabulary for each fold
-            if os.path.exists(voc_filename) and os.path.exists(pkl_voc_filename):
-                #Loading Vocavulary
-                print "Loadinging VOCABULARY for k-fold=",k
-                with open(pkl_voc_filename, 'r') as f:
-                    tf_d.append( pickle.load(f) )
-
-            else:
+            if not os.path.exists(voc_filename) or not os.path.exists(pkl_voc_filename):
+         
                 #Creating Vocabulary
                 print "Creating Vocabulary for k-fold=",k 
-                tf_d.append( self.TF_TT.build_vocabulary( list( xhtml_file_l[ trn_idxs[k] ] ), encoding=encoding, error_handling='replace' ) )
+                tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[ trn_idxs[k] ] ), encoding=encoding, error_handling='replace' )
 
                 #Saving Vocabulary
                 print "Saving Vocabulary"
                 with open(pkl_voc_filename, 'w') as f:
-                    pickle.dump(tf_d[k], f)
+                    pickle.dump(tf_d, f)
 
                 with open(voc_filename, 'w') as f:
-                    json.dump(tf_d[k], f, encoding=encoding)
+                    json.dump(tf_d, f, encoding=encoding)
 
         #Starting Parameters Grid Search 
-        corpus_mtrx_per_vocab_size_d = dict()
         for params in grid_search.IterGrid(params_range):
 
             #Prevent execution of this loop in case feature_size is smaller than Vocabulary size
@@ -258,49 +238,14 @@ class ParamGridCrossValBase(object):
             featrs_size = params['features_size']
             sigma_threshold = params['threshold']
             bagging_param = params['bagging_param']
-            
-            """ It has been moved in predict() function for enabling Bagging with ease
-            print "Construct classes"
-            #Construct Genres Class Vectors form Training Set
-            gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
-
-            """
-
-            #Creating a Group for this k-fold in h5 file
-            try:
-                kfld_group = self.h5_res.getNode('/', 'KFold'+str(k))
-            except:
-                kfld_group = self.h5_res.createGroup('/', 'KFold'+str(k), "K-Fold group of Results Arrays")
-
-            #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size
-            resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d[k], vocab_size) 
 
             #Creating a Group for this Vocabulary size in h5 file under this k-fold
             try:
-                vocab_size_group = self.h5_res.getNode(kfld_group, 'Vocab'+str(len(resized_tf_d)))    
+                vocab_size_group = self.h5_res.getNode('/', 'Vocab'+str(vocab_size))    
             except:
-                vocab_size_group = self.h5_res.createGroup(kfld_group, 'Vocab'+str(len(resized_tf_d)),\
+                vocab_size_group = self.h5_res.createGroup('/', 'Vocab'+str(vocab_size),\
                                 "Vocabulary actual size group of Results Arrays for this K-fold" )
 
-            #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
-            tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
-            print tid.items()[0:50]
-
-            if vocab_size in corpus_mtrx_per_vocab_size_d:
-                print "Sparse TF Matrix for CrossValidation already created"
-                corpus_mtrx = corpus_mtrx_per_vocab_size_d[vocab_size]
-            else:
-                print "Creating Sparse TF Matrix (for CrossValidation)"
-                #Create Sparse TF Vectors Sparse Matrix
-                corpus_mtrx = self.TF_TT.from_files( list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
-                                                    encoding='utf8', error_handling='replace' )
-                corpus_mtrx_per_vocab_size_d[vocab_size] = corpus_mtrx
-            
-            #SELECT Cross Validation Set
-            crossval_Y = cls_gnr_tgs[ crv_idxs[k] ]
-            mtrx = corpus_mtrx[0]
-            crossval_X = mtrx[crv_idxs[k], :] 
-                
             #Creating a Group for this features size in h5 file under this k-fold
             try:
                 feat_num_group = self.h5_res.getNode(vocab_size_group, 'Feat'+str(featrs_size))    
@@ -328,8 +273,78 @@ class ParamGridCrossValBase(object):
             except:
                 bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param),\
                             "<Comment>" )
-           
+
+            #Creating a Group for this k-fold in h5 file
+            try:
+                kfld_group = self.h5_res.getNode(bagg_group, 'KFold'+str(k))
+            except:
+                kfld_group = self.h5_res.createGroup(bagg_group, 'KFold'+str(k), "K-Fold group of Results Arrays")
+
+            #Loading Vocavulary
+            print "Loadinging VOCABULARY for k-fold=",k
+            with open(pkl_voc_filename, 'r') as voc_f:
+                tf_d = pickle.load(voc_f)
+            
+            #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size
+            resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) 
+
+            #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
+            tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
+            print tid.items()[0:5]
+
+            #keep as pytables group attribute the actual Vocabulary size
+            if k == 0:
+                vocab_size_group._v_attrs.real_voc_size_per_kfold = [len(resized_tf_d)]
+            else:
+                vocab_size_group._v_attrs.real_voc_size_per_kfold += [len(resized_tf_d)]
+
+            #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
+            corpus_mtrx_fname = self.crps_voc_path+'/kfold_VocSize_'+str(k)+str(vocab_size)+'.pkl'
+
+            if os.path.exists(corpus_mtrx_fname):
+                print "Loading Sparse TF Matrix for CrossValidation for K-fold=", k, " and Vocabulary size=", vocab_size
+                #Loading Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
+                with open(corpus_mtrx_fname, 'r') as crp_mtr_f:
+                    corpus_mtrx = pickle.load(crp_mtr_f)
+
+            else:
+                print "Creating Sparse TF Matrix (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
+                #Creating TF Vectors Sparse Matrix
+                corpus_mtrx = self.TF_TT.from_files(list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
+                                                    encoding='utf8', error_handling='replace' )[0]
+
+                #Saving TF Vecrors Matrix
+                print "Saving Sparse TF Matrix (for CrossValidation)"
+                with open(corpus_mtrx_fname, 'w') as crp_mtr_f:
+                    pickle.dump(corpus_mtrx, crp_mtr_f)
+                
+            #Load Training Indeces 
+            trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'
+            print "Loading Training Indices for k-fold=", k
+            with open(trn_filename, 'r') as f:
+                trn_idxs = np.array( json.load(f, encoding=encoding) )
+
+            """ 
+            It has been moved in predict() function for enabling Bagging with ease
+            print "Construct classes"
+            #Construct Genres Class Vectors form Training Set
+            gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)
+
+            """
+
+            #Load Cross-validation Indeces
+            crv_filename = self.crps_voc_path+'/kfold_crv_'+str(k)+'.idx'
+            print "Loading Cross-validation Indices for k-fold=", k
+            with open(crv_filename, 'r') as f:
+                crv_idxs = np.array( json.load(f, encoding=encoding) )
+
+            #Select Cross Validation Set
+            crossval_Y = cls_gnr_tgs[ crv_idxs ]
+            mtrx = corpus_mtrx
+            crossval_X = mtrx[crv_idxs, :]
+                
             print "EVALUATE"
+            #Evaluating Classification Method
             predicted_Y,\
             predicted_scores,\
             max_sim_scores_per_iter,\
@@ -339,9 +354,10 @@ class ParamGridCrossValBase(object):
                                             tid, featrs_size,\
                                             similarity_func, sim_min_val,\
                                             iters, sigma_threshold,\
-                                            trn_idxs[k], corpus_mtrx[0], cls_gnr_tgs,\
+                                            trn_idxs, corpus_mtrx, cls_gnr_tgs,\
                                          ) 
             
+            #Calculating Scores Precision, Recall and F1 Statistic
             print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
             print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
             
@@ -372,14 +388,15 @@ class ParamGridCrossValBase(object):
             #Maybe Later
             #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   
             
-            print self.h5_res.createArray(bagg_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
-            print self.h5_res.createArray(bagg_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
-            print self.h5_res.createArray(bagg_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
-            print self.h5_res.createArray(bagg_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
-            print self.h5_res.createArray(bagg_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, "Max Similarity Score per Document per Iteration (CrossValidation Set)")[:]                        
-            print self.h5_res.createArray(bagg_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
-            print self.h5_res.createArray(bagg_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
-            print self.h5_res.createArray(bagg_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
+            #Saving results
+            print self.h5_res.createArray(kfld_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
+            print self.h5_res.createArray(kfld_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
+            print self.h5_res.createArray(kfld_group, 'predicted_classes_per_iter', predicted_classes_per_iter, "Predicted Classes per Document per Iteration (CrossValidation Set)")[:]
+            print self.h5_res.createArray(kfld_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
+            print self.h5_res.createArray(kfld_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, "Max Similarity Score per Document per Iteration (CrossValidation Set)")[:]                        
+            print self.h5_res.createArray(kfld_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
+            print self.h5_res.createArray(kfld_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
+            print self.h5_res.createArray(kfld_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
             print                                    
 
 
