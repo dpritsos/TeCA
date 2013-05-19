@@ -441,22 +441,18 @@ if __name__ == '__main__':
     genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Bagging.h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch.h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'w')
     
 
     params_range = {
         'kfolds' : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-        'vocab_size' : [10000], #, 50000, 100000],
-        'features_size' : [1000], #, 5000, 10000, 70000],
+        'vocab_size' : [10000, 50000, 100000],
+        'features_size' : [1000, 5000, 10000, 70000],
         'training_iter' : [100],
-        'threshold' : [0.5], #[0.5, 0.8],
-        'bagging_param' : [0.33] #[0.33, 0.66],
-        #'N_Grams_size' : [4],
+        'threshold' : [0.5, 0.8],
+        'bagging_param' : [0.33, 0.66],
     } 
 
-    #vocabilary_size = [100000] #[1000,3000,10000,100000]
-    #featr_size_lst = [1000, 5000, 10000, 20000, 50000, 70000] 
-    #sigma_threshold = 0.8
     N_Gram_size = 4
     W_N_Gram_size = 1
     
