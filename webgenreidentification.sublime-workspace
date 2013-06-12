@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"to",
+				"todense"
+			],
+			[
 				"va",
 				"values"
 			],
@@ -18,10 +22,6 @@
 			[
 				"py",
 				"pyplot  (module)"
-			],
-			[
-				"to",
-				"toarray"
 			]
 		]
 	},
@@ -31,31 +31,23 @@
 			"file": "src/ParamGridCrossVal_RFSE.py",
 			"settings":
 			{
-				"buffer_size": 21429,
+				"buffer_size": 22124,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/crossval_experiments_Koppels_method.py",
+			"file": "src/ploting/plot_RFSE_Per_Genre_New.py",
 			"settings":
 			{
-				"buffer_size": 16037,
+				"buffer_size": 5389,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_n_EnsblOCSVM.py",
+			"file": "src/ploting/plot_RFSE_Full_Corpus_New.py",
 			"settings":
 			{
-				"buffer_size": 5746,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
-			"settings":
-			{
-				"buffer_size": 5644,
+				"buffer_size": 4233,
 				"line_ending": "Unix"
 			}
 		}
@@ -88,16 +80,23 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_PR_CUR_frm_pytables_III.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_n_EnsblOCSVM.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/crossval_experiments_Koppels_method.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/Generatevectors_Tables_script.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/experiments.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/generatevectors.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/generatevectors_tables.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/parallel_experiment_script.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/parallel_generatevectors_script.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/trainevaloneclssvm.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_resaults_frm_pytables_IV_Bagging.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/test.py",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies/kfold_Voc_0.voc",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/crossval_experiments_RF.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_n_EnsblOCSVM.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_resaults_frm_pytables_IV_Bagging.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_PR_CUR_frm_pytables_IV.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/crossval_experiments_Koppels_method.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/PR_curves_to_11_standard_recall_levels.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_PR_CUR_frm_pytables_III.py",
 		"/home/dimitrios/Documents/pan13tools/pan13performance.py",
 		"/home/dimitrios/Desktop/pan13performance.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/TEST.py",
@@ -141,6 +140,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			")\n",
+			"y_true",
+			"tid",
+			"tf_d",
 			"trn_idxs",
 			"crv_idxs",
 			"dx = [0].extend(dx)",
@@ -166,7 +169,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -174,15 +177,15 @@
 					"file": "src/ParamGridCrossVal_RFSE.py",
 					"settings":
 					{
-						"buffer_size": 21429,
+						"buffer_size": 22124,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								10454,
-								10454
+								16392,
+								16392
 							]
 						],
 						"settings":
@@ -192,25 +195,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4546.0,
+						"translation.y": 4163.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/crossval_experiments_Koppels_method.py",
+					"file": "src/ploting/plot_RFSE_Per_Genre_New.py",
 					"settings":
 					{
-						"buffer_size": 16037,
+						"buffer_size": 5389,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								3790,
+								3790
 							]
 						],
 						"settings":
@@ -220,25 +223,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4029.0,
+						"translation.y": 1479.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_n_EnsblOCSVM.py",
+					"file": "src/ploting/plot_RFSE_Full_Corpus_New.py",
 					"settings":
 					{
-						"buffer_size": 5746,
+						"buffer_size": 4233,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5212,
-								5212
+								1964,
+								1964
 							]
 						],
 						"settings":
@@ -248,35 +251,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 867.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
-					"settings":
-					{
-						"buffer_size": 5644,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3044,
-								3044
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 612.0,
+						"translation.y": 1071.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -286,7 +261,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 0.0
+		"height": 34.0
 	},
 	"input":
 	{
@@ -317,7 +292,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 241.0
+		"height": 148.0
 	},
 	"replace":
 	{
@@ -352,6 +327,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 137.0,
+	"side_bar_width": 144.0,
 	"status_bar_visible": true
 }
