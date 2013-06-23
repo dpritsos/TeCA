@@ -35,16 +35,30 @@ class ParamGridCrossValBase(object):
 
 
     def corpus_files_and_tags(self):
-        xhtml_file_l = list()
-        cls_gnr_tgs = list()
-        for i, g in enumerate(self.genres_lst):
-            gnrs_file_lst = self.TF_TT.file_list_frmpaths(self.corpus_path, [ str( g + "/html/" ) ] )
-            
-            xhtml_file_l.extend( gnrs_file_lst )
-            
-            cls_gnr_tgs.extend( [i+1]*len(gnrs_file_lst) )
+        #Creating a Group for this Vocabulary size in h5 file under this k-fold
+        try:
+            print "LOADING HTML FILE LIST FROM H5 File" 
+            html_file_l = self.h5_res.getNode('/', 'HTML_File_List')
+            cls_gnr_tgs = self.h5_res.getNode('/', 'Class_Genres_Tags')
+
+        except:
+            print "CREATING"
+            html_file_l = list()
+            cls_gnr_tgs = list()
+            for i, g in enumerate(self.genres_lst):
+                gnrs_file_lst = self.TF_TT.file_list_frmpaths(self.corpus_path, [ str( g + "/html/" ) ] )
                 
-        return (xhtml_file_l, cls_gnr_tgs)
+                html_file_l.extend( gnrs_file_lst )
+                
+                cls_gnr_tgs.extend( [i+1]*len(gnrs_file_lst) )
+
+            html_file_l = self.h5_res.createArray('/', 'HTML_File_List', np.array(html_file_l),\
+                "HTML File List as founded in the Ext4 file system by python built-it os (python 2.7.x) lib" )
+
+            cls_gnr_tgs = self.h5_res.createArray('/', 'Class_Genres_Tags', cls_gnr_tgs,\
+                "Assigned Genre Tags to files list Array" )
+    
+        return (html_file_l.read(), cls_gnr_tgs.read())
     
                       
     def contruct_classes(self, trn_idxs, corpus_mtrx, cls_gnr_tgs, bagging_param):
@@ -164,18 +178,13 @@ class ParamGridCrossValBase(object):
     
     def evaluate(self, *args):
 
-        xhtml_file_l = args[0]
+        html_file_l = args[0]
         cls_gnr_tgs = args[1]
         norm_func = args[2]
         similarity_func = args[3]
         sim_min_val = args[4]
         params_range = args[5]
         encoding = args[6]
-
-        #Convert lists to Arrays
-        xhtml_file_l = np.array( xhtml_file_l )
-        cls_gnr_tgs = np.array( cls_gnr_tgs )
-
 
         #Create CrossVal Folds
         KF = cross_validation.StratifiedKFold(cls_gnr_tgs, len(params_range['kfolds']), indices=True)
@@ -211,7 +220,7 @@ class ParamGridCrossValBase(object):
          
                 #Creating Vocabulary
                 print "Creating Vocabulary for k-fold=",k 
-                tf_d = self.TF_TT.build_vocabulary( list( xhtml_file_l[ trn_idxs[k] ] ), encoding=encoding, error_handling='replace' )
+                tf_d = self.TF_TT.build_vocabulary( list( html_file_l[ trn_idxs[k] ] ), encoding=encoding, error_handling='replace' )
 
                 #Saving Vocabulary
                 print "Saving Vocabulary"
@@ -262,16 +271,16 @@ class ParamGridCrossValBase(object):
 
             #Creating a Group for this Sigma_thershold in h5 file under this features number under this k-fold
             try:
-                sigma_group = self.h5_res.getNode(iters_group, 'Sigma'+str(sigma_threshold))
+                sigma_group = self.h5_res.getNode(iters_group, 'Sigma'+str(sigma_threshold).replace('.',''))
             except:
-                sigma_group = self.h5_res.createGroup(iters_group, 'Sigma'+str(sigma_threshold),\
+                sigma_group = self.h5_res.createGroup(iters_group, 'Sigma'+str(sigma_threshold).replace('.',''),\
                             "<Comment>" )
 
             #Creating a Group for this Bagging_Param in h5 file under this features number under this k-fold
             try:
-                bagg_group = self.h5_res.getNode(sigma_group, 'Bagg'+str(bagging_param))
+                bagg_group = self.h5_res.getNode(sigma_group, 'Bagg'+str(bagging_param).replace('.',''))
             except:
-                bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param),\
+                bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param).replace('.',''),\
                             "<Comment>" )
 
             #Creating a Group for this k-fold in h5 file
@@ -310,7 +319,7 @@ class ParamGridCrossValBase(object):
             else:
                 print "Creating Sparse TF Matrix (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
                 #Creating TF Vectors Sparse Matrix
-                corpus_mtrx = self.TF_TT.from_files(list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
+                corpus_mtrx = self.TF_TT.from_files(list( html_file_l ), tid_dictionary=tid, norm_func=norm_func,\
                                                     encoding='utf8', error_handling='replace' )[0]
 
                 #Saving TF Vecrors Matrix
@@ -339,6 +348,8 @@ class ParamGridCrossValBase(object):
                 crv_idxs = np.array( json.load(f, encoding=encoding) )
 
             #Select Cross Validation Set
+            print type(crv_idxs)
+            print type(cls_gnr_tgs)
             crossval_Y = cls_gnr_tgs[ crv_idxs ]
             mtrx = corpus_mtrx
             crossval_X = mtrx[crv_idxs, :]
@@ -450,7 +461,7 @@ if __name__ == '__main__':
         'features_size' : [1000, 5000, 10000, 70000],
         'training_iter' : [100],
         'threshold' : [0.5, 0.8],
-        'bagging_param' : [0.33, 0.66],
+        'bagging_param' : [0.66],
     } 
 
     N_Gram_size = 4
@@ -462,9 +473,9 @@ if __name__ == '__main__':
     crossV_Koppels = ParamGridCrossValBase( sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath,\
                                             genres, kfolds_vocs_filepath )
     
-    xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
+    html_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
 
-    crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, None, cosine_similarity, -1.0, params_range, 'utf-8')
+    crossV_Koppels.evaluate(html_file_l, cls_gnr_tgs, None, cosine_similarity, -1.0, params_range, 'utf-8')
     #Hamming Similarity
     #crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
     #                                 sigma_threshold, similarity_func=correlation_similarity, sim_min_val=-1.0, norm_func=None)
