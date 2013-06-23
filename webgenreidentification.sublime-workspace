@@ -31,7 +31,24 @@
 			"file": "src/ParamGridCrossVal_RFSE.py",
 			"settings":
 			{
-				"buffer_size": 22124,
+				"buffer_size": 22786,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\"\"\"     \"\"\"\n\nimport sys\n#sys.path.append('../../synergeticprocessing/src')\nsys.path.append('../../html2vectors/src')\n\nimport json\nimport os\nimport cPickle as pickle\n\nimport numpy as np\nimport tables as tb\n\nimport scipy.sparse as ssp\nimport scipy.spatial.distance as spd\n\nfrom sklearn.metrics import precision_score, recall_score, f1_score, roc_curve\nfrom sklearn import cross_validation\nfrom sklearn import grid_search #.IterGrid\n\nimport html2vect.sparse.wngrams as h2v_wcng\nimport html2vect.sparse.cngrams as h2v_cng\n\n\n\nclass ParamGridCrossValBase(object):\n    \n    def __init__(self, TF_TT, h5_res, corpus_path, genres, voc_path=None):\n        self.TF_TT = TF_TT\n        self.corpus_path = corpus_path\n        self.genres_lst = genres\n        self.gnrs_num = len(genres)\n        self.h5_res = h5_res\n        self.crps_voc_path = voc_path\n\n\n    def corpus_files_and_tags(self):\n        #Creating a Group for this Vocabulary size in h5 file under this k-fold\n        try:\n            print \"LOADING HTML FILE LIST FROM H5 File\" \n            html_file_l = self.h5_res.getNode('/', 'HTML_File_List')\n            cls_gnr_tgs = self.h5_res.getNode('/', 'Class_Genres_Tags')\n\n        except:\n            print \"CREATING\"\n            html_file_l = list()\n            cls_gnr_tgs = list()\n            for i, g in enumerate(self.genres_lst):\n                gnrs_file_lst = self.TF_TT.file_list_frmpaths(self.corpus_path, [ str( g + \"/html/\" ) ] )\n                \n                html_file_l.extend( gnrs_file_lst )\n                \n                cls_gnr_tgs.extend( [i+1]*len(gnrs_file_lst) )\n\n            html_file_l = self.h5_res.createArray('/', 'HTML_File_List', np.array(html_file_l),\\\n                \"HTML File List as founded in the Ext4 file system by python built-it os (python 2.7.x) lib\" )\n\n            cls_gnr_tgs = self.h5_res.createArray('/', 'Class_Genres_Tags', np.array(cls_gnr_tgs),\\\n                \"Assigned Genre Tags to files list Array\" )\n    \n        return (html_file_l.read(), cls_gnr_tgs.read())\n    \n                      \n    def contruct_classes(self, trn_idxs, corpus_mtrx, cls_gnr_tgs, bagging_param):\n        inds_per_gnr = dict()\n        inds = list()\n        last_gnr_tag = 1\n        \n        for trn_idx in trn_idxs:\n            \n            if cls_gnr_tgs[trn_idx] != last_gnr_tag:\n                inds_per_gnr[ self.genres_lst[last_gnr_tag - 1] ] = inds\n                last_gnr_tag = cls_gnr_tgs[trn_idx]\n                inds = []\n            \n            inds.append( trn_idx )    \n        \n        inds_per_gnr[ self.genres_lst[last_gnr_tag - 1] ] = inds \n    \n        gnr_classes = dict()\n        for g in self.genres_lst:\n            \n            #######\n            shuffled_train_idxs = np.random.permutation( inds_per_gnr[g] )\n            #print shuffled_train_idxs\n            #keep bagging_parram percent\n            bg_trn_ptg = int( np.trunc( shuffled_train_idxs.size * bagging_param ) )\n            #print bg_trn_ptg\n            bag_idxs = shuffled_train_idxs[0:bg_trn_ptg]\n            #print bag_idxs\n            ######\n        \n            #Merge All Term-Frequency Dictionaries created by the Raw Texts\n            gnr_classes[g] = corpus_mtrx[bag_idxs, :].mean(axis=0)\n        \n        return gnr_classes\n\n    \n    def predict(self, *args):\n\n        #Put arguments into classes\n        bagging_param = args[0]\n        crossval_X =  args[1]  \n        crossval_Y =  args[2] \n        vocab_index_dct = args[3] \n        featrs_size =  args[4] \n        similarity_func = args[5] \n        sim_min_value =  args[6] \n        iters =  args[7] \n        sigma_threshold = args[8]\n        trn_idxs = args[9]  \n        corpus_mtrx = args[10]  \n        cls_gnr_tgs = args[11]  \n            \n        max_sim_scores_per_iter = np.zeros((iters, crossval_X.shape[0]))\n        predicted_classes_per_iter = np.zeros((iters, crossval_X.shape[0]))\n                    \n        #Measure similarity for iters iterations i.e. for iters different feature subspaces Randomly selected \n        for I in range(iters):\n\n            #print \"Construct classes\"\n            #Construct Genres Class Vectors form Training Set\n            gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx, cls_gnr_tgs, bagging_param)\n            \n            #Randomly select some of the available features\n            shuffled_vocabilary_idxs = np.random.permutation( np.array(vocab_index_dct.values()) ) \n            features_subspace = shuffled_vocabilary_idxs[0:featrs_size]\n            \n            #Initialised Predicted Classes and Maximum Similarity Scores Array for this i iteration \n            predicted_classes = np.zeros( crossval_X.shape[0] )\n            max_sim_scores = np.zeros( crossval_X.shape[0] )\n            \n            #Measure similarity for each Cross-Validation-Set vector to each available Genre Class(i.e. Class-Vector). For This feature_subspace\n            for i_vect, vect in enumerate(crossval_X[:, features_subspace]):\n                \n                #Convert TF vectors to Binary \n                #vect_bin = np.where(vect[:, :].toarray() > 0, 1, 0) #NOTE: with np.where Always use A[:] > x instead of A > x in case of Sparse Matrices\n                #print vect.shape\n                \n                max_sim = sim_min_value\n                for cls_tag, g in enumerate(self.genres_lst):\n                    \n                    #Convert TF vectors to Binary\n                    #gnr_cls_bin = np.where(gnr_classes[ g ][:, features_subspace] > 0, 1, 0)\n                    #print gnr_cls_bin.shape\n                    \n                    #Measure Similarity\n                    sim_score = similarity_func(vect, gnr_classes[ g ][:, features_subspace])\n                    \n                    #Just for debugging for \n                    #if sim_score < 0.0:\n                    #    print \"ERROR: Similarity score unexpected value \", sim_score\n                    \n                    #Assign the class tag this vector is most similar and keep the respective similarity score\n                    if sim_score > max_sim:\n                        predicted_classes[i_vect] = cls_tag + 1 #plus 1 is the real class tag 0 means uncategorised\n                        max_sim_scores[i_vect] = sim_score\n                        max_sim = sim_score\n        \n            #Store Predicted Classes and Scores for this i iteration\n            max_sim_scores_per_iter[I,:] = max_sim_scores[:]\n            predicted_classes_per_iter[I,:] = predicted_classes[:]\n                                              \n        predicted_Y = np.zeros((crossval_Y.shape[0]), dtype=np.float)\n        predicted_scores = np.zeros((crossval_Y.shape[0]), dtype=np.float)\n        \n        for i_prd_cls, prd_cls in enumerate(predicted_classes_per_iter.transpose()):\n            genres_occs = np.histogram( prd_cls.astype(np.int), bins=np.arange(self.gnrs_num+2))[0] #One Bin per Genre plus one i.e the first to be always zero\n            #print genres_occs\n            genres_probs = genres_occs.astype(np.float) / np.float(iters)\n            #print genres_probs\n            if np.max(genres_probs) >= sigma_threshold:\n                predicted_Y[i_prd_cls] = np.argmax( genres_probs )\n                predicted_scores[i_prd_cls] = np.max( genres_probs ) \n        \n        return predicted_Y, predicted_scores, max_sim_scores_per_iter, predicted_classes_per_iter      \n        \n    \n    def evaluate(self, *args):\n\n        html_file_l = args[0]\n        cls_gnr_tgs = args[1]\n        norm_func = args[2]\n        similarity_func = args[3]\n        sim_min_val = args[4]\n        params_range = args[5]\n        encoding = args[6]\n\n        #Create CrossVal Folds\n        KF = cross_validation.StratifiedKFold(cls_gnr_tgs, len(params_range['kfolds']), indices=True)\n        \n        for k, (trn, crv) in enumerate(KF):\n\n            voc_filename = self.crps_voc_path+'/kfold_Voc_'+str(k)+'.vtf'\n            pkl_voc_filename = self.crps_voc_path+'/kfold_Voc_'+str(k)+'.pkl'\n            trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'\n            crv_filename = self.crps_voc_path+'/kfold_crv_'+str(k)+'.idx'\n\n            #Save K-Fold Cross-Validation corpus vector selection-indecies if does not exists\n            if not os.path.exists(trn_filename) or not os.path.exists(crv_filename):\n              \n                #Keep k-fold (stratified) Training Indices\n                trn_idxs.append(trn)\n\n                #Keep k-fold (stratified) Cross-validation Indices\n                crv_idxs.append(crv)\n                \n                #Save Trainging Indeces\n                print \"Saving Training Indices for k-fold=\", k\n                with open(trn_filename, 'w') as f:\n                    json.dump( trn, f, encoding=encoding)\n\n                #Save Cross-validation Indeces\n                print \"Saving Cross-validation Indices for k-fold=\", k\n                with open(crv_filename, 'w') as f:\n                    json.dump( crv, f, encoding=encoding)               \n\n            #Load or Create K-fold Cross-Validation Vocabulary for each fold\n            if not os.path.exists(voc_filename) or not os.path.exists(pkl_voc_filename):\n         \n                #Creating Vocabulary\n                print \"Creating Vocabulary for k-fold=\",k \n                tf_d = self.TF_TT.build_vocabulary( list( html_file_l[ trn_idxs[k] ] ), encoding=encoding, error_handling='replace' )\n\n                #Saving Vocabulary\n                print \"Saving Vocabulary\"\n                with open(pkl_voc_filename, 'w') as f:\n                    pickle.dump(tf_d, f)\n\n                with open(voc_filename, 'w') as f:\n                    json.dump(tf_d, f, encoding=encoding)\n\n        #Starting Parameters Grid Search \n        for params in grid_search.IterGrid(params_range):\n\n            #Prevent execution of this loop in case feature_size is smaller than Vocabulary size\n            if params['features_size'] > params['vocab_size']:\n                print \"SKIPPEd Params: \", params\n                continue                    \n\n            print \"Params: \", params\n            #bs = cross_validation.Bootstrap(9, random_state=0)\n            #Set Experiment Parameters\n            k = params['kfolds']\n            iters = params['training_iter']\n            vocab_size = params['vocab_size']\n            featrs_size = params['features_size']\n            sigma_threshold = params['threshold']\n            bagging_param = params['bagging_param']\n\n            #Creating a Group for this Vocabulary size in h5 file under this k-fold\n            try:\n                vocab_size_group = self.h5_res.getNode('/', 'Vocab'+str(vocab_size))    \n            except:\n                vocab_size_group = self.h5_res.createGroup('/', 'Vocab'+str(vocab_size),\\\n                                \"Vocabulary actual size group of Results Arrays for this K-fold\" )\n\n            #Creating a Group for this features size in h5 file under this k-fold\n            try:\n                feat_num_group = self.h5_res.getNode(vocab_size_group, 'Feat'+str(featrs_size))    \n            except:\n                feat_num_group = self.h5_res.createGroup(vocab_size_group, 'Feat'+str(featrs_size),\\\n                                \"Features Number group of Results Arrays for this K-fold\" )\n            \n            #Creating a Group for this number of iterations in h5 file under this features number under this k-fold\n            try:\n                iters_group = self.h5_res.getNode(feat_num_group, 'Iters'+str(iters))\n            except:\n                iters_group = self.h5_res.createGroup(feat_num_group, 'Iters'+str(iters),\\\n                            \"Number of Iterations (for statistical prediction) group of Results Arrays for this K-fold\" )\n\n            #Creating a Group for this Sigma_thershold in h5 file under this features number under this k-fold\n            try:\n                sigma_group = self.h5_res.getNode(iters_group, 'Sigma'+str(sigma_threshold).replace('.',''))\n            except:\n                sigma_group = self.h5_res.createGroup(iters_group, 'Sigma'+str(sigma_threshold).replace('.',''),\\\n                            \"<Comment>\" )\n\n            #Creating a Group for this Bagging_Param in h5 file under this features number under this k-fold\n            try:\n                bagg_group = self.h5_res.getNode(sigma_group, 'Bagg'+str(bagging_param).replace('.',''))\n            except:\n                bagg_group = self.h5_res.createGroup(sigma_group, 'Bagg'+str(bagging_param).replace('.',''),\\\n                            \"<Comment>\" )\n\n            #Creating a Group for this k-fold in h5 file\n            try:\n                kfld_group = self.h5_res.getNode(bagg_group, 'KFold'+str(k))\n            except:\n                kfld_group = self.h5_res.createGroup(bagg_group, 'KFold'+str(k), \"K-Fold group of Results Arrays\")\n\n            #Loading Vocavulary\n            print \"Loadinging VOCABULARY for k-fold=\",k\n            with open(pkl_voc_filename, 'r') as f:\n                tf_d = pickle.load(f)\n            \n            #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size\n            resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) \n\n            #Create The Terms-Index Vocabulary that is shorted by Frequency descending order\n            tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )\n            print tid.items()[0:5]\n\n            #keep as pytables group attribute the actual Vocabulary size\n            if k == 0:\n                vocab_size_group._v_attrs.real_voc_size_per_kfold = [len(resized_tf_d)]\n            else:\n                vocab_size_group._v_attrs.real_voc_size_per_kfold += [len(resized_tf_d)]\n\n            #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size\n            corpus_mtrx_fname = self.crps_voc_path+'/kfold_VocSize_'+str(k)+str(vocab_size)+'.pkl'\n\n            if os.path.exists(corpus_mtrx_fname):\n                print \"Loading Sparse TF Matrix for CrossValidation for K-fold=\", k, \" and Vocabulary size=\", vocab_size\n                #Loading Coprus Matrix (Spase) for this combination or kfold and vocabulary_size\n                with open(corpus_mtrx_fname, 'r') as f:\n                    corpus_mtrx = pickle.load(f)\n\n            else:\n                print \"Creating Sparse TF Matrix (for CrossValidation) for K-fold=\", k, \" and Vocabulary size=\", vocab_size\n                #Creating TF Vectors Sparse Matrix\n                corpus_mtrx = self.TF_TT.from_files(list( html_file_l ), tid_dictionary=tid, norm_func=norm_func,\\\n                                                    encoding='utf8', error_handling='replace' )[0]\n\n                #Saving TF Vecrors Matrix\n                print \"Saving Sparse TF Matrix (for CrossValidation)\"\n                with open(corpus_mtrx_fname, 'w') as f:\n                    pickle.dump(corpus_mtrx, f)\n                \n            #Load Training Indeces \n            trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'\n            print \"Loading Training Indices for k-fold=\", k\n            with open(trn_filename, 'r') as f:\n                trn_idxs = np.array( json.load(f, encoding=encoding) )\n\n            \"\"\" \n            It has been moved in predict() function for enabling Bagging with ease\n            print \"Construct classes\"\n            #Construct Genres Class Vectors form Training Set\n            gnr_classes = self.contruct_classes(trn_idxs, corpus_mtrx[0], cls_gnr_tgs)\n\n            \"\"\"\n\n            #Load Cross-validation Indeces\n            crv_filename = self.crps_voc_path+'/kfold_crv_'+str(k)+'.idx'\n            print \"Loading Cross-validation Indices for k-fold=\", k\n            with open(crv_filename, 'r') as f:\n                crv_idxs = np.array( json.load(f, encoding=encoding) )\n\n            #Select Cross Validation Set\n            crossval_Y = cls_gnr_tgs[ crv_idxs ]\n            mtrx = corpus_mtrx\n            crossval_X = mtrx[crv_idxs, :]\n                \n            print \"EVALUATE\"\n            #Evaluating Classification Method\n            predicted_Y,\\\n            predicted_scores,\\\n            max_sim_scores_per_iter,\\\n            predicted_classes_per_iter = self.predict(\\\n                                            bagging_param,\\\n                                            crossval_X, crossval_Y,\\\n                                            tid, featrs_size,\\\n                                            similarity_func, sim_min_val,\\\n                                            iters, sigma_threshold,\\\n                                            trn_idxs, corpus_mtrx, cls_gnr_tgs,\\\n                                         ) \n            \n            #Calculating Scores Precision, Recall and F1 Statistic\n            print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))\n            print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))\n            \n            cv_tg_idxs = np.array( np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)\n            tp_n_fp = np.array( np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)\n            \n            P_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)\n            R_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)\n            F1_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)\n            \n            end = 0\n            for gnr_cnt in range(len(self.genres_lst)):\n                start = end\n                end = end + cv_tg_idxs[gnr_cnt+1]\n                counts_per_grn_cv = np.histogram( predicted_Y[start:end], bins=np.arange(self.gnrs_num+2) )[0]\n                #print counts_per_grn_cv\n                #print tp_n_fp[gnr_cnt+1]\n                P = counts_per_grn_cv.astype(np.float) / tp_n_fp[gnr_cnt+1]\n                P_per_gnr[gnr_cnt+1] = P[gnr_cnt+1]\n                R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]\n                R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  \n                F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) \n                \n            P_per_gnr[0] = precision_score(crossval_Y, predicted_Y)   \n            R_per_gnr[0] = recall_score(crossval_Y, predicted_Y) \n            F1_per_gnr[0] = f1_score(crossval_Y, predicted_Y)  \n            \n            #Maybe Later\n            #fpr, tpr, thresholds = roc_curve(crossval_Y, predicted_Y)   \n            \n            #Saving results\n            print self.h5_res.createArray(kfld_group, 'expected_Y', crossval_Y, \"Expected Classes per Document (CrossValidation Set)\")[:]                                         \n            print self.h5_res.createArray(kfld_group, 'predicted_Y', predicted_Y, \"predicted Classes per Document (CrossValidation Set)\")[:]\n            print self.h5_res.createArray(kfld_group, 'predicted_classes_per_iter', predicted_classes_per_iter, \"Predicted Classes per Document per Iteration (CrossValidation Set)\")[:]\n            print self.h5_res.createArray(kfld_group, 'predicted_scores', predicted_scores, \"predicted Scores per Document (CrossValidation Set)\")[:]\n            print self.h5_res.createArray(kfld_group, 'max_sim_scores_per_iter', max_sim_scores_per_iter, \"Max Similarity Score per Document per Iteration (CrossValidation Set)\")[:]                        \n            print self.h5_res.createArray(kfld_group, \"P_per_gnr\", P_per_gnr, \"Precision per Genre (P[0]==Global P)\")[:]\n            print self.h5_res.createArray(kfld_group, \"R_per_gnr\", R_per_gnr, \"Recall per Genre (R[0]==Global R)\")[:]\n            print self.h5_res.createArray(kfld_group, \"F1_per_gnr\", F1_per_gnr, \"F1_statistic per Genre (F1[0]==Global F1)\")[:]\n            print                                    \n\n\ndef cosine_similarity(vector, centroid):\n \n    return vector * np.transpose(centroid) / ( np.linalg.norm(vector.todense()) * np.linalg.norm(centroid) )\n\n\ndef hamming_similarity(vector, centroid):\n \n    return 1.0 - spd.hamming(centroid, vector)\n\n\ndef correlation_similarity(vector, centroid):\n    \n    vector = vector[0]\n    centroid = np.array(centroid)[0]\n        \n    vector_ = np.where(vector > 0, 0, 1)\n    centroid_ = np.where(centroid > 0, 0, 1)\n   \n    s11 = np.dot(vector, centroid)\n    s00 = np.dot(vector_, centroid_)\n    s01 = np.dot(vector_, centroid)\n    s10 = np.dot(vector,centroid_)\n    \n    denom = np.sqrt((s10+s11)*(s01+s00)*(s11+s01)*(s00+s10))\n    if denom == 0.0:\n        denom = 1.0\n        \n    return (s11*s00 - s01*s10) / denom\n    \n    \n\nif __name__ == '__main__':\n    \n    #corpus_filepath = \"/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/\"\n    corpus_filepath = \"/home/dimitrios/Synergy-Crawler/KI-04/\"\n    kfolds_vocs_filepath = \"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams\"\n    #kfolds_vocs_filepath = \"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_Words\"\n    #genres = [ \"blog\", \"eshop\", \"faq\", \"frontpage\", \"listing\", \"php\", \"spage\" ]\n    genres = [ \"article\", \"discussion\", \"download\", \"help\", \"linklist\", \"portrait\", \"portrait_priv\", \"shop\" ]\n    #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')\n    #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Bagging.h5', 'w')\n    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'w')\n    \n\n    params_range = {\n        'kfolds' : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],\n        'vocab_size' : [10000, 50000, 100000],\n        'features_size' : [1000, 5000, 10000, 70000],\n        'training_iter' : [100],\n        'threshold' : [0.5, 0.8],\n        'bagging_param' : [0.66],\n    } \n\n    N_Gram_size = 4\n    W_N_Gram_size = 1\n    \n    #sparse_WNG = h2v_wcng.Html2TF(W_N_Gram_size, attrib='text', lowercase=True, valid_html=False)\n    sparse_CNG = h2v_cng.Html2TF(N_Gram_size, attrib='text', lowercase=True, valid_html=False)\n    \n    crossV_Koppels = ParamGridCrossValBase( sparse_CNG, CrossVal_Kopples_method_res, corpus_filepath,\\\n                                            genres, kfolds_vocs_filepath )\n    \n    html_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()\n\n    crossV_Koppels.evaluate(html_file_l, cls_gnr_tgs, None, cosine_similarity, -1.0, params_range, 'utf-8')\n    #Hamming Similarity\n    #crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\\\n    #                                 sigma_threshold, similarity_func=correlation_similarity, sim_min_val=-1.0, norm_func=None)\n    \n    CrossVal_Kopples_method_res.close()\n",
+			"settings":
+			{
+				"buffer_size": 22786,
+				"line_ending": "Unix",
+				"name": "\"\"\"     \"\"\""
+			}
+		},
+		{
+			"file": "src/ploting/plot_PR_CUR_frm_pytables_III.py",
+			"settings":
+			{
+				"buffer_size": 4774,
 				"line_ending": "Unix"
 			}
 		},
@@ -48,6 +65,14 @@
 			"settings":
 			{
 				"buffer_size": 4233,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/ploting/plothistograms_script.py",
+			"settings":
+			{
+				"buffer_size": 1663,
 				"line_ending": "Unix"
 			}
 		}
@@ -140,6 +165,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"roc_curve",
+			"crossval_Y",
+			"html_file_l",
 			")\n",
 			"y_true",
 			"tid",
@@ -177,15 +205,15 @@
 					"file": "src/ParamGridCrossVal_RFSE.py",
 					"settings":
 					{
-						"buffer_size": 22124,
+						"buffer_size": 22786,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								16392,
-								16392
+								22786,
+								22786
 							]
 						],
 						"settings":
@@ -195,13 +223,67 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4163.0,
+						"translation.y": 3169.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
+					"settings":
+					{
+						"buffer_size": 22786,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								22786,
+								22786
+							]
+						],
+						"settings":
+						{
+							"auto_name": "\"\"\"     \"\"\"",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 7292.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/ploting/plot_PR_CUR_frm_pytables_III.py",
+					"settings":
+					{
+						"buffer_size": 4774,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
 					"file": "src/ploting/plot_RFSE_Per_Genre_New.py",
 					"settings":
 					{
@@ -223,13 +305,13 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1479.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 4,
 					"file": "src/ploting/plot_RFSE_Full_Corpus_New.py",
 					"settings":
 					{
@@ -252,6 +334,34 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 1071.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "src/ploting/plothistograms_script.py",
+					"settings":
+					{
+						"buffer_size": 1663,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -292,7 +402,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 148.0
+		"height": 258.0
 	},
 	"replace":
 	{
