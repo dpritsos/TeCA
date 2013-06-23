@@ -1,4 +1,28 @@
-"""     """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+############################# FOR NOW IT IS JUST a COPY OF ParamGridCrossVal.py ##############################
+
+
+
+
+
+
+
+
+
 
 import sys
 #sys.path.append('../../synergeticprocessing/src')
@@ -33,34 +57,7 @@ class ParamGridCrossValBase(object):
         self.h5_res = h5_res
         self.crps_voc_path = voc_path
 
-
-    def corpus_files_and_tags(self):
-        #Creating a Group for this Vocabulary size in h5 file under this k-fold
-        try:
-            print "LOADING HTML FILE LIST FROM H5 File" 
-            html_file_l = self.h5_res.getNode('/', 'HTML_File_List')
-            cls_gnr_tgs = self.h5_res.getNode('/', 'Class_Genres_Tags')
-
-        except:
-            print "CREATING"
-            html_file_l = list()
-            cls_gnr_tgs = list()
-            for i, g in enumerate(self.genres_lst):
-                gnrs_file_lst = self.TF_TT.file_list_frmpaths(self.corpus_path, [ str( g + "/html/" ) ] )
-                
-                html_file_l.extend( gnrs_file_lst )
-                
-                cls_gnr_tgs.extend( [i+1]*len(gnrs_file_lst) )
-
-            html_file_l = self.h5_res.createArray('/', 'HTML_File_List', np.array(html_file_l),\
-                "HTML File List as founded in the Ext4 file system by python built-it os (python 2.7.x) lib" )
-
-            cls_gnr_tgs = self.h5_res.createArray('/', 'Class_Genres_Tags', np.array(cls_gnr_tgs),\
-                "Assigned Genre Tags to files list Array" )
-    
-        return (html_file_l.read(), cls_gnr_tgs.read())
-    
-                      
+                     
     def contruct_classes(self, trn_idxs, corpus_mtrx, cls_gnr_tgs, bagging_param):
         inds_per_gnr = dict()
         inds = list()
