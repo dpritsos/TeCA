@@ -199,28 +199,23 @@ class ParamGridCrossValBase(object):
             #Save K-Fold Cross-Validation corpus vector selection-indecies if does not exists
             if not os.path.exists(trn_filename) or not os.path.exists(crv_filename):
               
-                #Keep k-fold (stratified) Training Indices
-                trn_idxs.append(trn)
-
-                #Keep k-fold (stratified) Cross-validation Indices
-                crv_idxs.append(crv)
-                
                 #Save Trainging Indeces
                 print "Saving Training Indices for k-fold=", k
                 with open(trn_filename, 'w') as f:
-                    json.dump( trn, f, encoding=encoding)
+                    json.dump( list(trn), f, encoding=encoding)
 
                 #Save Cross-validation Indeces
                 print "Saving Cross-validation Indices for k-fold=", k
                 with open(crv_filename, 'w') as f:
-                    json.dump( crv, f, encoding=encoding)               
+                    json.dump( list(crv), f, encoding=encoding)               
 
             #Load or Create K-fold Cross-Validation Vocabulary for each fold
             if not os.path.exists(voc_filename) or not os.path.exists(pkl_voc_filename):
          
                 #Creating Vocabulary
                 print "Creating Vocabulary for k-fold=",k 
-                tf_d = self.TF_TT.build_vocabulary( list( html_file_l[ trn_idxs[k] ] ), encoding=encoding, error_handling='replace' )
+                print  html_file_l[32]
+                tf_d = self.TF_TT.build_vocabulary( list( html_file_l[trn] ), encoding=encoding, error_handling='replace' )
 
                 #Saving Vocabulary
                 print "Saving Vocabulary"
