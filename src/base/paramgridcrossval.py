@@ -29,14 +29,25 @@ class ParamGridCrossValBase(object):
 
 
     def corpus_files_and_tags(self):
-        #Creating a Group for this Vocabulary size in h5 file under this k-fold
-        try:
-            print "LOADING HTML FILE LIST FROM H5 File" 
-            html_file_l = self.h5_res.getNode('/', 'HTML_File_List')
-            cls_gnr_tgs = self.h5_res.getNode('/', 'Class_Genres_Tags')
 
-        except:
-            print "CREATING"
+        corpus_files_lst_path = self.crps_voc_path+'/Corpus_filename_shorted.lst'
+        corpus_tags_lst_path = self.crps_voc_path+'/Corpus_tags_shorted.lst'
+
+        if os.path.exists(corpus_files_lst_path) and  os.path.exists(corpus_files_lst_path):
+            
+            print "Loading HTML Filenames and Classes Tags Lists" 
+            
+            #Load Filename and classes Tags lists
+            with open(corpus_files_lst_path, 'r') as f:
+                html_file_l = json.load(f, encoding='utf-8')
+
+            with open(corpus_tags_lst_path, 'r') as f:
+                cls_gnr_tgs = json.load(f, encoding='utf-8')
+            
+        else:
+            
+            print "Creating and Saving HTML Filenames and Classes Tags Lists"
+            
             html_file_l = list()
             cls_gnr_tgs = list()
             for i, g in enumerate(self.genres_lst):
@@ -46,16 +57,19 @@ class ParamGridCrossValBase(object):
                 
                 cls_gnr_tgs.extend( [i+1]*len(gnrs_file_lst) )
 
-            html_file_l = self.h5_res.createArray('/', 'HTML_File_List', np.array(html_file_l),\
-                "HTML File List as founded in the Ext4 file system by python built-it os (python 2.7.x) lib" )
+            #Saving Filename and classes Tags lists
+            with open(corpus_files_lst_path, 'w') as f:
+                #HTML File List as founded in the Ext4 file system by python built-it os (python 2.7.x) lib
+                json.dump(html_file_l, f, encoding='utf-8')
 
-            cls_gnr_tgs = self.h5_res.createArray('/', 'Class_Genres_Tags', np.array(cls_gnr_tgs),\
-                "Assigned Genre Tags to files list Array" )
+            with open(corpus_tags_lst_path, 'w') as f:
+                #Assigned Genre Tags to files list Array
+                json.dump(cls_gnr_tgs, f, encoding='utf-8')
     
-        return (html_file_l.read(), cls_gnr_tgs.read())
+        return (np.array(html_file_l), np.array(cls_gnr_tgs))
 
 
-    def Calculate_P_R_F1(crossval_Y, predicted_Y):
+    def calculate_p_r_f1(self, crossval_Y, predicted_Y):
 
         #Calculating Scores Precision, Recall and F1 Statistic
         print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
@@ -108,30 +122,24 @@ class ParamGridCrossValBase(object):
             crv_filename = self.crps_voc_path+'/kfold_crv_'+str(k)+'.idx'
 
             #Save K-Fold Cross-Validation corpus vector selection-indecies if does not exists
-            if not os.path.exists(trn_filename) or not os.path.exists(crv_filename):
-              
-                #Keep k-fold (stratified) Training Indices
-                trn_idxs.append(trn)
-
-                #Keep k-fold (stratified) Cross-validation Indices
-                crv_idxs.append(crv)
+            #Create K-fold Cross-Validation Vocabulary for each fold
+            #Stratified Indecies and respective Vocabularies should be syncornisied therefore 
+            #there saving-files should be created all together if one or more are missing
+            if not os.path.exists(trn_filename) or not os.path.exists(crv_filename) or not os.path.exists(voc_filename) or not os.path.exists(pkl_voc_filename):
                 
                 #Save Trainging Indeces
                 print "Saving Training Indices for k-fold=", k
                 with open(trn_filename, 'w') as f:
-                    json.dump( trn, f, encoding=encoding)
+                    json.dump( list(trn), f, encoding=encoding)
 
                 #Save Cross-validation Indeces
                 print "Saving Cross-validation Indices for k-fold=", k
                 with open(crv_filename, 'w') as f:
-                    json.dump( crv, f, encoding=encoding)               
-
-            #Load or Create K-fold Cross-Validation Vocabulary for each fold
-            if not os.path.exists(voc_filename) or not os.path.exists(pkl_voc_filename):
+                    json.dump( list(crv), f, encoding=encoding)               
          
                 #Creating Vocabulary
-                print "Creating Vocabulary for k-fold=",k 
-                tf_d = self.TF_TT.build_vocabulary( list( html_file_l[ trn_idxs[k] ] ), encoding=encoding, error_handling='replace' )
+                print "Creating Vocabulary for k-fold=",k
+                tf_d = self.TF_TT.build_vocabulary( list( html_file_l[trn] ), encoding='utf-8', error_handling='replace' )
 
                 #Saving Vocabulary
                 print "Saving Vocabulary"
@@ -146,7 +154,7 @@ class ParamGridCrossValBase(object):
 
             #Prevent execution of this loop in case feature_size is smaller than Vocabulary size
             if params['features_size'] > params['vocab_size']:
-                print "SKIPPEd Params: ", params
+                print "Skipped Params: ", params
                 continue                    
 
             print "Params: ", params
@@ -158,16 +166,16 @@ class ParamGridCrossValBase(object):
 
             #Creating a Group for this Vocabulary size in h5 file under this k-fold
             try:
-                vocab_size_group = self.h5_res.getNode('/', 'Vocab'+str(vocab_size))    
+                vocab_size_group = self.h5_res.getNode('/', 'vocab_size'+str(vocab_size))    
             except:
-                vocab_size_group = self.h5_res.createGroup('/', 'Vocab'+str(vocab_size),\
+                vocab_size_group = self.h5_res.createGroup('/', 'vocab_size'+str(vocab_size),\
                                 "Vocabulary actual size group of Results Arrays for this K-fold" )
 
             #Creating a Group for this features size in h5 file under this k-fold
             try:
-                feat_num_group = self.h5_res.getNode(vocab_size_group, 'Feat'+str(featrs_size))    
+                feat_num_group = self.h5_res.getNode(vocab_size_group, 'features_size'+str(featrs_size))    
             except:
-                feat_num_group = self.h5_res.createGroup(vocab_size_group, 'Feat'+str(featrs_size),\
+                feat_num_group = self.h5_res.createGroup(vocab_size_group, 'features_size'+str(featrs_size),\
                                 "Features Number group of Results Arrays for this K-fold" )
             
             ###Create the group sequence respectively to the models parameters:
@@ -210,7 +218,7 @@ class ParamGridCrossValBase(object):
                 vocab_size_group._v_attrs.real_voc_size_per_kfold += [len(resized_tf_d)]
 
             #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
-            corpus_mtrx_fname = self.crps_voc_path+'/kfold_VocSize_'+str(k)+str(vocab_size)+'.pkl'
+            corpus_mtrx_fname = self.crps_voc_path+'/kfold_CorpusMatrix_'+str(k)+str(vocab_size)+'.pkl'
 
             if os.path.exists(corpus_mtrx_fname):
                 print "Loading Sparse TF Matrix for CrossValidation for K-fold=", k, " and Vocabulary size=", vocab_size
@@ -228,6 +236,24 @@ class ParamGridCrossValBase(object):
                 print "Saving Sparse TF Matrix (for CrossValidation)"
                 with open(corpus_mtrx_fname, 'w') as f:
                     pickle.dump(corpus_mtrx, f)
+
+            #Save Documents Sizes for this experiment (i.e. this kfold, this text representation,ie terms types, etc.)
+            #Creating a Group for this features size in h5 file under this k-fold
+            try:
+                #If already exists don't try to save it again
+                self.h5_res.getNode(vocab_size_group, 'docs_term_counts')    
+            except:
+                #Save the Webpages term counts (Char N-grans or Word N-Grams)
+                docs_term_counts = self.h5_res.createArray(vocab_size_group, 'docs_term_counts', corpus_mtrx.sum(axis=1))
+
+            #Perform default (division by max value) normalisation for corpus matrix 'corpus_mtrx'
+            #Should I perform Standarisation/Normalisation by substracting mean value from vector variables?
+            print corpus_mtrx
+            print 
+            print 
+            corpus_mtrx = ssp.csr_matrix( corpus_mtrx.todense() / np.max(corpus_mtrx.todense(), axis=1) )
+            print corpus_mtrx
+            print
                 
             #Load Training Indeces 
             trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'
@@ -248,30 +274,19 @@ class ParamGridCrossValBase(object):
 
             print "EVALUATE"
             #Evaluating Classification Method
-            """max_sim_scores_per_iter,\
-            predicted_classes_per_iter"""
-
             predicted_Y, predicted_scores,\
-            model_specific_d = self.model.predict(\
+            model_specific_d = self.model.eval(\
                                     trn_idxs, crv_idxs,\
                                     corpus_mtrx, cls_gnr_tgs, tid,\
                                     params\
                                 ) 
 
-            """bagging_param,\
-                                            crossval_X, crossval_Y,\
-                                            tid, featrs_size,\
-                                            similarity_func, sim_min_val,\
-                                            iters, sigma_threshold,\
-                                            trn_idxs, corpus_mtrx, cls_gnr_tgs,\
-                                         ) """
-            
             #Select Cross Validation Set
             crossval_Y = cls_gnr_tgs[ crv_idxs ]
             #mtrx = corpus_mtrx
             #crossval_X = mtrx[crv_idxs, :]
                 
-            P_per_gnr, R_per_gnr, F1_per_gnr = Calculate_P_R_F1(crossval_Y, predicted_Y)
+            P_per_gnr, R_per_gnr, F1_per_gnr = self.calculate_p_r_f1(crossval_Y, predicted_Y)
                         
             #Saving results
             print self.h5_res.createArray(kfld_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
@@ -281,9 +296,8 @@ class ParamGridCrossValBase(object):
             print self.h5_res.createArray(kfld_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
             print self.h5_res.createArray(kfld_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
             
-            for name, value in model_specific_d:
-                print self.h5_res.createArray(kfld_group, name, value, "<Comment>")[:]
-                print self.h5_res.createArray(kfld_group, name, value, "<Comment>")[:]                        
+            for name, value in model_specific_d.items():
+                print self.h5_res.createArray(kfld_group, name, value, "<Comment>")[:]             
             
         #Return Resuls H5 File handler class
         return self.h5_res                                    
