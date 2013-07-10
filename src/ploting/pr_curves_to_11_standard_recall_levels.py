@@ -38,7 +38,7 @@ def nrst_smooth_pr(P, R):
     
     R_Levels = np.arange(0.0, 1.1, 0.1)
     
-    smoothed_P = SMOOTH_PR(P)
+    smoothed_P = smooth_pr_curve(P)
     
     idxs = np.zeros_like(R_Levels, dtype=np.int)
     for i, r in enumerate(R_Levels):
@@ -51,7 +51,7 @@ def interpol_soothed_pr_curve(P, R):
     
     R_Levels = np.arange(0.0, 1.1, 0.1)
     
-    smthd_P = SMOOTH_PR(P)
+    smthd_P = smooth_pr_curve(P)
     #SOS
     smthd_P = smthd_P[::-1]
     
@@ -78,6 +78,3 @@ def interpol_soothed_pr_curve(P, R):
     #print SP
              
     return SP, R_Levels
-
-
-

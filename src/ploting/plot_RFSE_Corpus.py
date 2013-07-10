@@ -1,14 +1,16 @@
 
 
 
-
-
+import tables as tb
+import matplotlib.pyplot as plt
+from curve_pr_rfse import zero_class_dist, prcurve
+from sklearn import grid_search
 
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 params_range = {
-    '1.Vocab' : [10000, 50000, 100000],
-    '2.Feat' : [1000, 5000],
+    '1.Vocab' : [100000],
+    '2.Feat' : [1000, 5000, 10000, 70000],
     '3.Bagging' : [0.66],
     '4.Iterations' : [100],
     '5.Sigma' : [0.5],
@@ -31,9 +33,9 @@ for i, params in enumerate(grid_search.IterGrid(params_range)):
     params_path = "/".join( [ key.split('.')[1] + str(value).replace('.','') for key, value in sorted( params.items() ) ] )
     params_path = '/' + params_path
     
-    X, Y, mark_X, mark_Y = prcurve(res_h5file, kfolds, params_path, genre_tag=3)
+    X, Y, mark_X, mark_Y = prcurve(res_h5file, kfolds, params_path, genre_tag=None)
 
-    Zero_Dist_lst.append( zero_class_dist(res_h5file, kfolds, params_path, genre_tag=3) )
+    Zero_Dist_lst.append( zero_class_dist(res_h5file, kfolds, params_path, genre_tag=None) )
 
     plt.plot(X, Y, color[i] + symbol[i] + line_type[i], markeredgewidth=2, label="("+str(i+1)+") RFSE"+params_path  )
     
@@ -49,7 +51,6 @@ plt.subplot(2, 1, 2)
 plt.boxplot(Zero_Dist_lst)
 
 plt.show()
-
                                                                            
 
 res_h5file.close()

@@ -15,26 +15,25 @@ from wrappedmodels.rfse import RFSE_Wrapped, cosine_similarity
 import tables as tb
     
   
-#corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+#corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
 
-kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams"
-#kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_Words"
+#kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams"
+kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Kfolds_Vocs_Inds_4Grams"
 
-#genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
-#crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
+genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+#genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
 
-#method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_Bagging.h5', 'w')
-method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'w')
+method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_TEST_NOBAGG.h5', 'w')
+#method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'w')
 
 params_range = {
     'kfolds' : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    'vocab_size' : [10000, 50000, 100000],
+    'vocab_size' : [100000], #[10000, 50000, 100000],
     'features_size' : [1000, 5000, 10000, 70000],
     'Iterations' : [100],
     'Sigma' : [0.5],
-    'Bagging' : [0.66],
+    #'Bagging' : [0.66],
 } 
 
 #word_n_gram_size = 1

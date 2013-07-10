@@ -1,13 +1,10 @@
 
 "Precision Recall Curves"
 
-import tables as tb
+
 import numpy as np
-import matplotlib.pyplot as plt
 import sklearn.metrics as skm
 import pr_curves_to_11_standard_recall_levels as srl
-
-from sklearn import grid_search
 
 
 def prcurve(res_h5file, kfolds, params_path, genre_tag=None, mark_thres=None):
