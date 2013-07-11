@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"path",
+				"params_path"
+			],
+			[
 				"corp",
 				"corpus_mtrx"
 			],
@@ -39,7 +43,7 @@
 			"file": "src/RFSE_paramgrid_crossval.py",
 			"settings":
 			{
-				"buffer_size": 2276,
+				"buffer_size": 2174,
 				"line_ending": "Unix"
 			}
 		},
@@ -47,7 +51,7 @@
 			"file": "src/base/paramgridcrossval.py",
 			"settings":
 			{
-				"buffer_size": 14477,
+				"buffer_size": 14505,
 				"line_ending": "Unix",
 				"name": "\"\"\"     \"\"\""
 			}
@@ -56,7 +60,15 @@
 			"file": "src/wrappedmodels/rfse.py",
 			"settings":
 			{
-				"buffer_size": 8740,
+				"buffer_size": 8777,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/ploting/plot_RFSE_Corpus.py",
+			"settings":
+			{
+				"buffer_size": 1852,
 				"line_ending": "Unix"
 			}
 		},
@@ -64,23 +76,15 @@
 			"file": "src/ploting/curve_pr_rfse.py",
 			"settings":
 			{
-				"buffer_size": 4501,
+				"buffer_size": 3334,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/home/dimitrios/Desktop/Sublime Text 2/sublime_plugin.py",
+			"file": "src/ploting/pr_curves_to_11_standard_recall_levels.py",
 			"settings":
 			{
-				"buffer_size": 0,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/ploting_deprecated/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
-			"settings":
-			{
-				"buffer_size": 5644,
+				"buffer_size": 1757,
 				"line_ending": "Unix"
 			}
 		}
@@ -113,11 +117,22 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/pr_curves_to_11_standard_recall_levels.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting_deprecated/plot_resaults_frm_pytables_II.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_RFSE_Per_Genre_New.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_RFSE_Full_Corpus_New.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/experiments_My_Mahalanobis_method.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ParamGridCrossVal_RFSE.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/plot_RFSE_full_Corpus.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/intersect_script.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/__init__.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting_deprecated/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
+		"/home/dimitrios/Desktop/Sublime Text 2/sublime_plugin.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/PR_curves_to_11_standard_recall_levels.py",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/Corpus_tags_shorted.lst",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/Corpus_filename_shorted.lst",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/crossval_experiments_OC-SVM.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/crossval_experiments_Koppels_method.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ParamGridCrossVal_RFSE.py",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_crv_0.idx",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_trn_0.idx",
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/html2terms.py",
@@ -135,8 +150,6 @@
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/wrapped_models/RFSE.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/RFSE.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plothistograms_script.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_RFSE_Full_Corpus_New.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_RFSE_Per_Genre_New.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/crossval_experiments_SVM_TF(Sparse)_multiclass.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/crossval_experiments_RF.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
@@ -152,7 +165,6 @@
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/test.py",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies/kfold_Voc_0.voc",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_PR_CUR_frm_pytables_IV.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/PR_curves_to_11_standard_recall_levels.py",
 		"/home/dimitrios/Documents/pan13tools/pan13performance.py",
 		"/home/dimitrios/Desktop/pan13performance.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/TEST.py",
@@ -194,6 +206,21 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"grid_search",
+			"srl",
+			"skm",
+			"np",
+			"nrst_smooth_pr",
+			")\n",
+			"h5_node_path",
+			"Res",
+			"TT",
+			"fold_ps",
+			"PY_lst",
+			"g_tag",
+			"path_str",
+			"i_fs",
+			"path_str",
 			", ",
 			"trn_idxs",
 			"trn",
@@ -273,7 +300,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -281,15 +308,15 @@
 					"file": "src/RFSE_paramgrid_crossval.py",
 					"settings":
 					{
-						"buffer_size": 2276,
+						"buffer_size": 2174,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1567,
-								1567
+								1065,
+								1065
 							]
 						],
 						"settings":
@@ -299,7 +326,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 204.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -309,15 +336,15 @@
 					"file": "src/base/paramgridcrossval.py",
 					"settings":
 					{
-						"buffer_size": 14477,
+						"buffer_size": 14505,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6566,
-								6566
+								7191,
+								7191
 							]
 						],
 						"settings":
@@ -328,7 +355,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2703.0,
+						"translation.y": 2550.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -338,15 +365,15 @@
 					"file": "src/wrappedmodels/rfse.py",
 					"settings":
 					{
-						"buffer_size": 8740,
+						"buffer_size": 8777,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3729,
-								3729
+								1872,
+								1872
 							]
 						],
 						"settings":
@@ -356,25 +383,25 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 408.0,
+						"translation.y": 714.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 3,
-					"file": "src/ploting/curve_pr_rfse.py",
+					"file": "src/ploting/plot_RFSE_Corpus.py",
 					"settings":
 					{
-						"buffer_size": 4501,
+						"buffer_size": 1852,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								379,
-								379
+								313,
+								313
 							]
 						],
 						"settings":
@@ -391,18 +418,18 @@
 				},
 				{
 					"buffer": 4,
-					"file": "/home/dimitrios/Desktop/Sublime Text 2/sublime_plugin.py",
+					"file": "src/ploting/curve_pr_rfse.py",
 					"settings":
 					{
-						"buffer_size": 0,
+						"buffer_size": 3334,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								131,
+								131
 							]
 						],
 						"settings":
@@ -419,18 +446,18 @@
 				},
 				{
 					"buffer": 5,
-					"file": "src/ploting_deprecated/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
+					"file": "src/ploting/pr_curves_to_11_standard_recall_levels.py",
 					"settings":
 					{
-						"buffer_size": 5644,
+						"buffer_size": 1757,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1757,
+								1757
 							]
 						],
 						"settings":
@@ -440,7 +467,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1608.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -481,7 +508,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 258.0
+		"height": 184.0
 	},
 	"replace":
 	{
@@ -516,6 +543,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 188.0,
+	"side_bar_width": 208.0,
 	"status_bar_visible": true
 }

@@ -9,14 +9,16 @@ from sklearn import grid_search
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 params_range = {
-    '1.Vocab' : [100000],
-    '2.Feat' : [1000, 5000, 10000, 70000],
-    '3.Bagging' : [0.66],
+    '1.vocab_size' : [100000],
+    '2.features_size' : [1000, 5000, 10000, 70000],
+    #'3.Bagging' : [0.66],
     '4.Iterations' : [100],
-    '5.Sigma' : [0.5],
+    '3.Sigma' : [0.5],
 } 
 
-res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'r')
+#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'r')
+res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_TEST_NOBAGG.h5', 'r')
+
 
 
 color = ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k' ]
