@@ -57,7 +57,7 @@ class RFSE_Wrapped(object):
                 raise Exception('contruct_classes(): Bagging triggerd with not bagging_param argument')
 
             #Merge All Term-Frequency Dictionaries created by the Raw Texts
-            gnr_classes[g] = corpus_mtrx[bag_idxs, :].sum(axis=0) # JUST FOR TEST BE AWARE mean(axis=0)
+            gnr_classes[g] = corpus_mtrx[bag_idxs, :].mean(axis=0)
         
         return gnr_classes
 
