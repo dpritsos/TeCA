@@ -4,7 +4,7 @@
 
 import sys
 sys.path.append('../../synergeticprocessing/src')
-sys.path.append('../../html2vectors/src')
+sys.path.append('../../../html2vectors/src')
 import numpy as np
 import tables as tb
 #import html2tf.tables.cngrams as cng_tb
@@ -274,13 +274,13 @@ def correlation_similarity(vector, centroid):
 
 if __name__ == '__main__':
     
-    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-    corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
-    #genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-    genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
+    corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+    #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
+    genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+    #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-0.5_(forVSBagging).h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-0.5_(forVSBagging).h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]

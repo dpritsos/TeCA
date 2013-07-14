@@ -28,7 +28,7 @@ class ParamGridCrossValBase(object):
         self.crps_voc_path = voc_path
 
 
-    def corpus_files_and_tags(self):
+    def corpus_files_and_tags(self, gnr_file_idx=None, iidx=None):
 
         corpus_files_lst_path = self.crps_voc_path+'/Corpus_filename_shorted.lst'
         corpus_tags_lst_path = self.crps_voc_path+'/Corpus_tags_shorted.lst'
@@ -50,12 +50,42 @@ class ParamGridCrossValBase(object):
             
             html_file_l = list()
             cls_gnr_tgs = list()
-            for i, g in enumerate(self.genres_lst):
-                gnrs_file_lst = self.TF_TT.file_list_frmpaths(self.corpus_path, [ str( g + "/html/" ) ] )
+            if gnr_file_idx and iidx:
+                #Get the index file showing the respective genre of each file of the given corpus
+                with open(self.corpus_path+gnr_file_idx, 'r') as f:
+                    #Getting the list of tuples (index, file) using the index-of-index list (iidx) argument
+                    #iidx[0] == the splittig character, iidx[1] == the field that contains the filename , 
+                    #iidx[2] == the field that containd the genre of the file
+                    gnrs_file_lst = [ (line.split( iidx[0] )[ iidx[2] ], line.split( iidx[0] )[ iidx[1] ]) for line.split( iidx[0] ) in f ]
                 
-                html_file_l.extend( gnrs_file_lst )
+                #Sort the above tuples list based on genre 
+                sorted(gnrs_file_lst, key=lambda gnrs_file_lst: gnrs_file_lst[0])
                 
-                cls_gnr_tgs.extend( [i+1]*len(gnrs_file_lst) )
+                #just for debugging remove it right after
+                print gnrs_file_lst
+
+                #Get the filenames as sorted above
+                html_file_l = [ element[1] for element in gnrs_file_lst ]
+                
+                #Build the class-genre-tag list by assigning as a tag the index number of the list of genre given as argument to this
+                #class, i.e. ParamGridCrossValBase()
+                cls_gnr_tgs = [ genres_lst.index( element[0] ) for element[1] in gnrs_file_lst ]
+
+            elif gnr_file_idx == None  and iidx == None:
+                #Get the list of Genre argument as given to this Class and build html-file-list and class-genres-tags list
+                for i, g in enumerate(self.genres_lst):
+                    #Get all files located to the genre's path 'g'
+                    gnrs_file_lst = self.TF_TT.file_list_frmpaths(self.corpus_path, [ str( g + "/html/" ) ] )
+                    
+                    #Extends the list of html files with the set of files form genre 'g'
+                    html_file_l.extend( gnrs_file_lst )
+                    
+                    #Extends the list of html files with the set of class tag form genre 'g', i.e. the index of the 
+                    #genre's list given as argument to this class ( ParamGridCrossValBase() ).
+                    cls_gnr_tgs.extend( [i+1]*len(gnrs_file_lst) )
+
+            else:
+                raise Exception("Both Genre-of-Files-Index and Index-of-Index arguments should be given or 'None' of them")
 
             #Saving Filename and classes Tags lists
             with open(corpus_files_lst_path, 'w') as f:
@@ -211,12 +241,6 @@ class ParamGridCrossValBase(object):
             tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
             print tid.items()[0:5]
 
-            #keep as pytables group attribute the actual Vocabulary size
-            if k == 0:
-                vocab_size_group._v_attrs.real_voc_size_per_kfold = [len(resized_tf_d)]
-            else:
-                vocab_size_group._v_attrs.real_voc_size_per_kfold += [len(resized_tf_d)]
-
             #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
             corpus_mtrx_fname = self.crps_voc_path+'/kfold_CorpusMatrix_'+str(k)+str(vocab_size)+'.pkl'
 
@@ -237,23 +261,30 @@ class ParamGridCrossValBase(object):
                 with open(corpus_mtrx_fname, 'w') as f:
                     pickle.dump(corpus_mtrx, f)
 
-            #Save Documents Sizes for this experiment (i.e. this kfold, this text representation,ie terms types, etc.)
-            #Creating a Group for this features size in h5 file under this k-fold
-            try:
-                #If already exists don't try to save it again
-                self.h5_res.getNode(vocab_size_group, 'docs_term_counts')    
-            except:
+            #Save Vocabulary and Documents Sizes for this experiment (i.e. this kfold, this text representation, etc.)
+            #Save them for an other fold only if the Vocabulary size is different (Most likely same-sized Vocabularies means identical ones)
+            #
+            #For the first k-fold just save them all 
+            if k == 0:
+                #keep as pytables group attribute the actual Vocabulary size
+                vocab_size_group._v_attrs.real_voc_size = [(k, len(resized_tf_d))]
+                
                 #Save the Webpages term counts (Char N-grans or Word N-Grams)
                 docs_term_counts = self.h5_res.createArray(vocab_size_group, 'docs_term_counts', corpus_mtrx.sum(axis=1))
 
+            else:
+                #For the rest of k-folds save the current Vocabulary and the Corpus Documents sizes if current Vocabulary size is different to the previous ones
+                if len(resized_tf_d) not in vocab_size_group._v_attrs.real_voc_size:
+                    
+                    #Add the Vocabulary size on the list of real Vocabilary sized for each fold
+                    vocab_size_group._v_attrs.real_voc_size += [(k,len(resized_tf_d))]
+
+                    #If Vocabulary is different the the Document term counts will be differnet, then save them again
+                    docs_term_counts = self.h5_res.createArray(vocab_size_group, 'docs_term_counts'+str(k), corpus_mtrx.sum(axis=1))
+
             #Perform default (division by max value) normalisation for corpus matrix 'corpus_mtrx'
             #Should I perform Standarisation/Normalisation by substracting mean value from vector variables?
-            print corpus_mtrx
-            print 
-            print 
             corpus_mtrx = ssp.csr_matrix( corpus_mtrx.todense() / np.max(corpus_mtrx.todense(), axis=1) )
-            print corpus_mtrx
-            print
                 
             #Load Training Indeces 
             trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'
