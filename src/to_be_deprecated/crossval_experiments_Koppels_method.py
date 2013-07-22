@@ -122,9 +122,9 @@ class CrossVal_Koppels_method(object):
             #print genres_occs
             genres_probs = genres_occs.astype(np.float) / np.float(iters)
             #print genres_probs
-            #if np.max(genres_probs) >= sigma_threshold:
-            predicted_Y[i_prd_cls] = np.argmax( genres_probs )
-            predicted_scores[i_prd_cls] = np.max( genres_probs ) 
+            if np.max(genres_probs) >= sigma_threshold:
+                predicted_Y[i_prd_cls] = np.argmax( genres_probs )
+                predicted_scores[i_prd_cls] = np.max( genres_probs ) 
         
         return predicted_Y, predicted_scores, max_sim_scores_per_iter, predicted_classes_per_iter      
         
@@ -280,7 +280,7 @@ if __name__ == '__main__':
     #genres = [ "article", "discussion", "download", "help", "linklist", "portrait", "portrait_priv", "shop" ]
     #crp_crssvl_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santini_TT-Words_TM-Derivative(+-).h5', 'w')
     #CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-0.5_(forVSBagging).h5', 'w')
-    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'w')
+    CrossVal_Kopples_method_res = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG_2.h5', 'w')
     
     kfolds = 10
     vocabilary_size = [100000] #[1000,3000,10000,100000]
@@ -297,9 +297,17 @@ if __name__ == '__main__':
     
     xhtml_file_l, cls_gnr_tgs = crossV_Koppels.corpus_files_and_tags()
     
+    #Just for Verifying it will return the same resaults to the new version
+    def norm_func_Max( f_mtrx, len_d):
+        print f_mtrx.toarray()
+        print float(f_mtrx.toarray().max())
+        print f_mtrx.toarray() / float(f_mtrx.toarray().max())
+        return f_mtrx.toarray() / float(f_mtrx.toarray().max())
+
+
     #Cosine Similarity
     crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
-                                     sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=None)
+                                     sigma_threshold, similarity_func=cosine_similarity, sim_min_val=-1.0, norm_func=norm_func_Max)
     #Hamming Similarity
     #crossV_Koppels.evaluate(xhtml_file_l, cls_gnr_tgs, kfolds, vocabilary_size, iter_l, featr_size_lst,\
     #                                 sigma_threshold, similarity_func=correlation_similarity, sim_min_val=-1.0, norm_func=None)

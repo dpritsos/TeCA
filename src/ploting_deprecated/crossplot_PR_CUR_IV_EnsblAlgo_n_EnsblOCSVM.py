@@ -37,9 +37,9 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
                 exp_y = Res1.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Nu'+str(nu), name='expected_Y' ).read()
                 PY_lst.append( np.where(p_y[::] == exp_y[::], 1, 0) )
             
-            PS_lst.append( Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5', name='predicted_scores' ).read() )
+            PS_lst.append( Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='predicted_scores' ).read() )
             exp_y = Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='expected_Y' ).read()
-            pre_y = Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100/Sigma0.5', name='predicted_Y' ).read()
+            pre_y = Res2.getNode('/KFold'+str(k)+'/Feat'+str(featr_size)+'/Iters100', name='predicted_Y' ).read()
             
             TT_lst.append( np.where(exp_y == pre_y, 1, 0) ) #Covert exp_y to Binary case and append for this fold
             
@@ -117,7 +117,7 @@ def plot_data(Res1, Res2, kfolds, featr_size_lst1, featr_size_lst2, nu):
     
     print y
     
-    plt.plot(x, y, color[i_fs+4] + line_type[i_fs+4], linewidth=2, label="BASELINE" )  
+    #plt.plot(x, y, color[i_fs+4] + line_type[i_fs+4], linewidth=2, label="BASELINE" )  
     
     plt.grid(True)    
     plt.legend(loc=3)
@@ -141,7 +141,7 @@ if __name__ == '__main__':
     #EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-0.5_(forVSBagging).h5', 'r')  
     
     EnsOCSVM = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-OC-SVM_kfolds-10_TM-TF_(DIST).h5', 'r')
-    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Char4Grams-Koppels_method_kfolds-10_SigmaThreshold-None_nrmMAX.h5', 'r') 
+    EnsAlgo = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG_2.h5', 'r') 
 
                                                                                     
     plot_data(EnsOCSVM, EnsAlgo, kfolds, featr_size_lst1, featr_size_lst2, nu)

@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"Exc",
+				"execution"
+			],
+			[
 				"path",
 				"params_path"
 			],
@@ -43,7 +47,7 @@
 			"file": "src/RFSE_paramgrid_crossval.py",
 			"settings":
 			{
-				"buffer_size": 2174,
+				"buffer_size": 2619,
 				"line_ending": "Unix"
 			}
 		},
@@ -51,7 +55,7 @@
 			"file": "src/base/paramgridcrossval.py",
 			"settings":
 			{
-				"buffer_size": 14505,
+				"buffer_size": 16767,
 				"line_ending": "Unix",
 				"name": "\"\"\"     \"\"\""
 			}
@@ -60,7 +64,7 @@
 			"file": "src/wrappedmodels/rfse.py",
 			"settings":
 			{
-				"buffer_size": 8777,
+				"buffer_size": 8740,
 				"line_ending": "Unix"
 			}
 		},
@@ -68,7 +72,7 @@
 			"file": "src/ploting/plot_RFSE_Corpus.py",
 			"settings":
 			{
-				"buffer_size": 1852,
+				"buffer_size": 1968,
 				"line_ending": "Unix"
 			}
 		},
@@ -77,14 +81,6 @@
 			"settings":
 			{
 				"buffer_size": 3334,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/ploting/pr_curves_to_11_standard_recall_levels.py",
-			"settings":
-			{
-				"buffer_size": 1757,
 				"line_ending": "Unix"
 			}
 		}
@@ -117,12 +113,21 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ParamGridCrossVal_RFSE.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting_deprecated/crossplot_PR_CUR_IV_EnsblAlgo_n_EnsblOCSVM.py",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/to_be_deprecated/crossval_experiments_Koppels_method.py",
+		"/home/dimitrios/Desktop/Clothing.csv",
+		"/home/dimitrios/Desktop/prosfora_paralia.txt",
+		"/home/dimitrios/Desktop/testt.txt",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting_deprecated/plot_resaults_frm_OCSVM_Sparse.py",
+		"/home/dimitrios/Synergy-Crawler/MGC/structure.rdf.u8",
+		"/home/dimitrios/Synergy-Crawler/PGS/idxf_d.txt",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/to_be_deprecated/crossplot_PR_CUR_IV_EnsblAlgo_n_EnsblOCSVM.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/pr_curves_to_11_standard_recall_levels.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting_deprecated/plot_resaults_frm_pytables_II.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_RFSE_Per_Genre_New.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_RFSE_Full_Corpus_New.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/experiments_My_Mahalanobis_method.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ParamGridCrossVal_RFSE.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/plot_RFSE_full_Corpus.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/intersect_script.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/__init__.py",
@@ -206,6 +211,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"vocab_size_group",
+			"plt",
+			";",
+			"genre_file_lst",
+			"corpus_path",
+			"attrib",
+			"gnr_classes",
 			"grid_search",
 			"srl",
 			"skm",
@@ -300,7 +312,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -308,15 +320,15 @@
 					"file": "src/RFSE_paramgrid_crossval.py",
 					"settings":
 					{
-						"buffer_size": 2174,
+						"buffer_size": 2619,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1065,
-								1065
+								2064,
+								2064
 							]
 						],
 						"settings":
@@ -326,7 +338,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 204.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -336,15 +348,15 @@
 					"file": "src/base/paramgridcrossval.py",
 					"settings":
 					{
-						"buffer_size": 14505,
+						"buffer_size": 16767,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7191,
-								7191
+								13618,
+								13618
 							]
 						],
 						"settings":
@@ -355,7 +367,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2550.0,
+						"translation.y": 4157.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -365,15 +377,15 @@
 					"file": "src/wrappedmodels/rfse.py",
 					"settings":
 					{
-						"buffer_size": 8777,
+						"buffer_size": 8740,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1872,
-								1872
+								4814,
+								4814
 							]
 						],
 						"settings":
@@ -383,7 +395,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 714.0,
+						"translation.y": 2958.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -393,15 +405,15 @@
 					"file": "src/ploting/plot_RFSE_Corpus.py",
 					"settings":
 					{
-						"buffer_size": 1852,
+						"buffer_size": 1968,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								313,
-								313
+								1029,
+								1029
 							]
 						],
 						"settings":
@@ -411,7 +423,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 306.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -428,36 +440,8 @@
 						"selection":
 						[
 							[
-								131,
-								131
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "src/ploting/pr_curves_to_11_standard_recall_levels.py",
-					"settings":
-					{
-						"buffer_size": 1757,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1757,
-								1757
+								264,
+								264
 							]
 						],
 						"settings":
@@ -508,7 +492,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 184.0
+		"height": 354.0
 	},
 	"replace":
 	{
@@ -543,6 +527,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 208.0,
+	"side_bar_width": 296.0,
 	"status_bar_visible": true
 }

@@ -56,7 +56,7 @@ class ParamGridCrossValBase(object):
                     #Getting the list of tuples (index, file) using the index-of-index list (iidx) argument
                     #iidx[0] == the splittig character, iidx[1] == the field that contains the filename , 
                     #iidx[2] == the field that containd the genre of the file
-                    gnrs_file_lst = [ (line.split( iidx[0] )[ iidx[2] ], line.split( iidx[0] )[ iidx[1] ]) for line.split( iidx[0] ) in f ]
+                    gnrs_file_lst = [ (line.split( iidx[0] )[ iidx[2] ], line.split( iidx[0] )[ iidx[1] ]) for line in f ]
                 
                 #Sort the above tuples list based on genre 
                 sorted(gnrs_file_lst, key=lambda gnrs_file_lst: gnrs_file_lst[0])
@@ -221,7 +221,7 @@ class ParamGridCrossValBase(object):
                     except:
                         next_group = self.h5_res.createGroup(next_group, pname+str(pvalue).replace('.',''), "<Comment>" )   
 
-            ###END- Group sequence creation
+            ###END- Group creation sequence 
 
             #Creating a Group for this k-fold in h5 file
             try:
@@ -229,7 +229,7 @@ class ParamGridCrossValBase(object):
             except:
                 kfld_group = self.h5_res.createGroup(next_group, 'KFold'+str(k), "K-Fold group of Results Arrays")
 
-            #Loading Vocavulary
+            #Loading Vocabulary
             print "Loadinging VOCABULARY for k-fold=",k
             with open(pkl_voc_filename, 'r') as f:
                 tf_d = pickle.load(f)
@@ -254,23 +254,22 @@ class ParamGridCrossValBase(object):
                 print "Creating Sparse TF Matrix (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
                 #Creating TF Vectors Sparse Matrix
                 corpus_mtrx = self.TF_TT.from_files(list( html_file_l ), tid_dictionary=tid, norm_func=norm_func,\
-                                                    encoding='utf8', error_handling='replace' )[0]
+                                                    encoding='utf8', error_handling='replace' )[0] #<--- Be carefull with zero index
 
                 #Saving TF Vecrors Matrix
                 print "Saving Sparse TF Matrix (for CrossValidation)"
                 with open(corpus_mtrx_fname, 'w') as f:
                     pickle.dump(corpus_mtrx, f)
 
-            #Save Vocabulary and Documents Sizes for this experiment (i.e. this kfold, this text representation, etc.)
+            ###Saving Vocabulary and Documents Sizes for this experiment (i.e. this kfold, this text representation, etc.):
             #Save them for an other fold only if the Vocabulary size is different (Most likely same-sized Vocabularies means identical ones)
-            #
             #For the first k-fold just save them all 
             if k == 0:
                 #keep as pytables group attribute the actual Vocabulary size
                 vocab_size_group._v_attrs.real_voc_size = [(k, len(resized_tf_d))]
                 
                 #Save the Webpages term counts (Char N-grans or Word N-Grams)
-                docs_term_counts = self.h5_res.createArray(vocab_size_group, 'docs_term_counts', corpus_mtrx.sum(axis=1))
+                docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', corpus_mtrx.sum(axis=1))
 
             else:
                 #For the rest of k-folds save the current Vocabulary and the Corpus Documents sizes if current Vocabulary size is different to the previous ones
@@ -280,7 +279,8 @@ class ParamGridCrossValBase(object):
                     vocab_size_group._v_attrs.real_voc_size += [(k,len(resized_tf_d))]
 
                     #If Vocabulary is different the the Document term counts will be differnet, then save them again
-                    docs_term_counts = self.h5_res.createArray(vocab_size_group, 'docs_term_counts'+str(k), corpus_mtrx.sum(axis=1))
+                    docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', corpus_mtrx.sum(axis=1))
+            ###END - Saving Block
 
             #Perform default (division by max value) normalisation for corpus matrix 'corpus_mtrx'
             #Should I perform Standarisation/Normalisation by substracting mean value from vector variables?
@@ -298,11 +298,6 @@ class ParamGridCrossValBase(object):
             with open(crv_filename, 'r') as f:
                 crv_idxs = np.array( json.load(f, encoding=encoding) )
 
-            #Select Cross Validation Set
-            #crossval_Y = cls_gnr_tgs[ crv_idxs ]
-            #mtrx = corpus_mtrx
-            #crossval_X = mtrx[crv_idxs, :]
-
             print "EVALUATE"
             #Evaluating Classification Method
             predicted_Y, predicted_scores,\
@@ -314,8 +309,6 @@ class ParamGridCrossValBase(object):
 
             #Select Cross Validation Set
             crossval_Y = cls_gnr_tgs[ crv_idxs ]
-            #mtrx = corpus_mtrx
-            #crossval_X = mtrx[crv_idxs, :]
                 
             P_per_gnr, R_per_gnr, F1_per_gnr = self.calculate_p_r_f1(crossval_Y, predicted_Y)
                         

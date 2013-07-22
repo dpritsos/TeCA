@@ -32,10 +32,10 @@ method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_gen
 #MGC
 
 #SANTINIS
-corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Kfolds_Vocs_Inds_4Grams"
-genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio", "spirit_1000"]
-method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'w')
+#corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+#kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Kfolds_Vocs_Inds_4Grams"
+#genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio", "spirit_1000"]
+#method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'w')
 
 
 params_range = {
