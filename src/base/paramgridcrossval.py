@@ -6,6 +6,7 @@ import cPickle as pickle
 
 import numpy as np
 import tables as tb
+import numexpr as ne
 
 import scipy.sparse as ssp
 import scipy.spatial.distance as spd
@@ -26,6 +27,39 @@ class ParamGridCrossValBase(object):
         self.gnrs_num = len(genres)
         self.h5_res = h5_res
         self.crps_voc_path = voc_path
+
+
+    def calculate_p_r_f1(self, crossval_Y, predicted_Y):
+
+        #Calculating Scores Precision, Recall and F1 Statistic
+        print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
+        print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
+        
+        cv_tg_idxs = np.array( np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
+        tp_n_fp = np.array( np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
+        
+        P_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+        R_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+        F1_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
+        
+        end = 0
+        for gnr_cnt in range(len(self.genres_lst)):
+            start = end
+            end = end + cv_tg_idxs[gnr_cnt+1]
+            counts_per_grn_cv = np.histogram( predicted_Y[start:end], bins=np.arange(self.gnrs_num+2) )[0]
+            #print counts_per_grn_cv
+            #print tp_n_fp[gnr_cnt+1]
+            P = counts_per_grn_cv.astype(np.float) / tp_n_fp[gnr_cnt+1]
+            P_per_gnr[gnr_cnt+1] = P[gnr_cnt+1]
+            R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]
+            R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  
+            F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
+            
+        P_per_gnr[0] = precision_score(crossval_Y, predicted_Y)   
+        R_per_gnr[0] = recall_score(crossval_Y, predicted_Y) 
+        F1_per_gnr[0] = f1_score(crossval_Y, predicted_Y)  
+
+        return (P_per_gnr, R_per_gnr, F1_per_gnr)
 
 
     def corpus_files_and_tags(self, gnr_file_idx=None, iidx=None):
@@ -75,7 +109,11 @@ class ParamGridCrossValBase(object):
                 #Get the list of Genre argument as given to this Class and build html-file-list and class-genres-tags list
                 for i, g in enumerate(self.genres_lst):
                     #Get all files located to the genre's path 'g'
-                    gnrs_file_lst = self.TF_TT.file_list_frmpaths(self.corpus_path, [ str( g + "/html/" ) ] )
+                    try:
+                        gnrs_file_lst = self.TF_TT.file_list_frmpaths(self.corpus_path, [ str( g + "/html/" ) ] )
+                    except:
+                        msg = "Error reading files from: " +  str( self.corpus_path + g + "/html/" )
+                        raise Exception(msg)
                     
                     #Extends the list of html files with the set of files form genre 'g'
                     html_file_l.extend( gnrs_file_lst )
@@ -99,38 +137,35 @@ class ParamGridCrossValBase(object):
         return (np.array(html_file_l), np.array(cls_gnr_tgs))
 
 
-    def calculate_p_r_f1(self, crossval_Y, predicted_Y):
+    def corpus_matrix(self, k, vocab_size, html_file_l, tid, norm_func):
 
-        #Calculating Scores Precision, Recall and F1 Statistic
-        print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
-        print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
-        
-        cv_tg_idxs = np.array( np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
-        tp_n_fp = np.array( np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
-        
-        P_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-        R_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-        F1_per_gnr = np.zeros(self.gnrs_num+1, dtype=np.float)
-        
-        end = 0
-        for gnr_cnt in range(len(self.genres_lst)):
-            start = end
-            end = end + cv_tg_idxs[gnr_cnt+1]
-            counts_per_grn_cv = np.histogram( predicted_Y[start:end], bins=np.arange(self.gnrs_num+2) )[0]
-            #print counts_per_grn_cv
-            #print tp_n_fp[gnr_cnt+1]
-            P = counts_per_grn_cv.astype(np.float) / tp_n_fp[gnr_cnt+1]
-            P_per_gnr[gnr_cnt+1] = P[gnr_cnt+1]
-            R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]
-            R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  
-            F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
-            
-        P_per_gnr[0] = precision_score(crossval_Y, predicted_Y)   
-        R_per_gnr[0] = recall_score(crossval_Y, predicted_Y) 
-        F1_per_gnr[0] = f1_score(crossval_Y, predicted_Y)  
+        #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
+        corpus_mtrx_fname = self.crps_voc_path+'/kfold_CorpusMatrix_'+str(k)+str(vocab_size)+'.pkl'
 
-        return (P_per_gnr, R_per_gnr, F1_per_gnr)
-    
+        if os.path.exists(corpus_mtrx_fname):
+            print "Loading Sparse TF Matrix for CrossValidation for K-fold=", k, " and Vocabulary size=", vocab_size
+            #Loading Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
+            with open(corpus_mtrx_fname, 'r') as f:
+                corpus_mtrx = pickle.load(f)
+
+        else:
+            print "Creating Sparse TF Matrix (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
+            #Creating TF Vectors Sparse Matrix
+            corpus_mtrx = self.TF_TT.from_files(list( html_file_l ), tid_dictionary=tid, norm_func=norm_func,\
+                                                encoding='utf8', error_handling='replace' )[0] #<--- Be carefull with zero index
+
+            #Saving TF Vecrors Matrix
+            print "Saving Sparse TF Matrix (for CrossValidation)"
+            with open(corpus_mtrx_fname, 'w') as f:
+                pickle.dump(corpus_mtrx, f)
+
+        return (corpus_mtrx, None)
+
+
+    def normalize(self, corpus_mtrx):
+
+        return ssp.csr_matrix( corpus_mtrx.todense() / np.max(corpus_mtrx.todense(), axis=1) )
+
 
     def evaluate(self, *args):
         """ Call prototyping: evaluate(html_file_l, cls_gnr_tgs, None, params_range, 'utf-8') """
@@ -241,25 +276,8 @@ class ParamGridCrossValBase(object):
             tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
             print tid.items()[0:5]
 
-            #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
-            corpus_mtrx_fname = self.crps_voc_path+'/kfold_CorpusMatrix_'+str(k)+str(vocab_size)+'.pkl'
-
-            if os.path.exists(corpus_mtrx_fname):
-                print "Loading Sparse TF Matrix for CrossValidation for K-fold=", k, " and Vocabulary size=", vocab_size
-                #Loading Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
-                with open(corpus_mtrx_fname, 'r') as f:
-                    corpus_mtrx = pickle.load(f)
-
-            else:
-                print "Creating Sparse TF Matrix (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
-                #Creating TF Vectors Sparse Matrix
-                corpus_mtrx = self.TF_TT.from_files(list( html_file_l ), tid_dictionary=tid, norm_func=norm_func,\
-                                                    encoding='utf8', error_handling='replace' )[0] #<--- Be carefull with zero index
-
-                #Saving TF Vecrors Matrix
-                print "Saving Sparse TF Matrix (for CrossValidation)"
-                with open(corpus_mtrx_fname, 'w') as f:
-                    pickle.dump(corpus_mtrx, f)
+            #Load or Crreate the Coprus Matrix/Array for this combination or kfold and vocabulary_size
+            corpus_mtrx, corpus_file = self.corpus_matrix(k, vocab_size, html_file_l, tid, norm_func)
 
             ###Saving Vocabulary and Documents Sizes for this experiment (i.e. this kfold, this text representation, etc.):
             #Save them for an other fold only if the Vocabulary size is different (Most likely same-sized Vocabularies means identical ones)
@@ -269,8 +287,8 @@ class ParamGridCrossValBase(object):
                 vocab_size_group._v_attrs.real_voc_size = [(k, len(resized_tf_d))]
                 
                 #Save the Webpages term counts (Char N-grans or Word N-Grams)
-                docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', corpus_mtrx.sum(axis=1))
-
+                docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx, axis=1))
+                
             else:
                 #For the rest of k-folds save the current Vocabulary and the Corpus Documents sizes if current Vocabulary size is different to the previous ones
                 if len(resized_tf_d) not in vocab_size_group._v_attrs.real_voc_size:
@@ -279,13 +297,15 @@ class ParamGridCrossValBase(object):
                     vocab_size_group._v_attrs.real_voc_size += [(k,len(resized_tf_d))]
 
                     #If Vocabulary is different the the Document term counts will be differnet, then save them again
-                    docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', corpus_mtrx.sum(axis=1))
+                    docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx, axis=1))
             ###END - Saving Block
-
+            
             #Perform default (division by max value) normalisation for corpus matrix 'corpus_mtrx'
             #Should I perform Standarisation/Normalisation by substracting mean value from vector variables?
-            corpus_mtrx = ssp.csr_matrix( corpus_mtrx.todense() / np.max(corpus_mtrx.todense(), axis=1) )
-                
+            print "Normalise"
+            corpus_mtrx = self.normalize(corpus_mtrx)
+            print "Normalisaton Done"
+
             #Load Training Indeces 
             trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'
             print "Loading Training Indices for k-fold=", k
@@ -322,8 +342,64 @@ class ParamGridCrossValBase(object):
             
             for name, value in model_specific_d.items():
                 print self.h5_res.createArray(kfld_group, name, value, "<Comment>")[:]             
-            
+        
+            #Closing corpus file if any. Originaly for closing hd5 files
+            if corpus_file:
+                corpus_file.close()
+        
         #Return Resuls H5 File handler class
         return self.h5_res                                    
 
- 
+
+
+class ParamGridCrossValTables(ParamGridCrossValBase):
+
+    def __init__(self, ML_Model, TF_TT, h5_res, genres, corpus_path, voc_path):
+
+        #Passing the argument to the Super-Class
+        super(ParamGridCrossValTables, self).__init__(ML_Model, TF_TT, h5_res, genres, corpus_path, voc_path)    
+
+
+    def corpus_matrix(self, k, vocab_size, html_file_l, tid, norm_func):
+
+        #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
+        corpus_mtrx_fname = self.crps_voc_path+'/kfold_CorpusMatrix_'+str(k)+str(vocab_size)+'.h5'
+
+        if os.path.exists(corpus_mtrx_fname):
+            print "Loading pyTables TF EArray for CrossValidation for K-fold=", k, " and Vocabulary size=", vocab_size
+            #Loading Coprus pyTables TF EArray for this combination or kfold and vocabulary_size
+            h5f = tb.openFile(corpus_mtrx_fname, 'r+')
+            corpus_mtrx = h5f.getNode('/',  'corpus_earray') #h5f.root.corpus_earray 
+
+        else:
+            print "Creating pyTables TF EArray (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
+            
+            import time
+            start_time = time.time()
+            
+            #Creating pyTables TF EArray
+            corpus_mtrx, h5f = self.TF_TT.from_files(list( html_file_l ), corpus_mtrx_fname, tid_dictionary=tid, norm_func=norm_func,\
+                                                encoding='utf8', error_handling='replace' )[0:2] #<--- Getting only 2 of the 3 returend values
+
+            #Tagging the Corpus EArray a non norlised, yet
+            corpus_mtrx._v_attrs.Normalised = False
+            
+            print "Time: ", time.time() - start_time 
+            
+        return (corpus_mtrx, h5f)
+
+
+    def normalize(self, corpus_mtrx):
+
+        #It supposed to be executed faster and it requires much less memory because it 
+        #prevents the use of indermidate array which it is required in 'c = c / c.max()' operation
+        if not corpus_mtrx._v_attrs.Normalised:
+            
+            max_col_arr = np.max(corpus_mtrx, axis=1)[:, np.newaxis]
+
+            for i, (row, max_val) in enumerate( zip(corpus_mtrx.iterrows(), max_col_arr) ):
+                corpus_mtrx[i] = row / max_val
+        
+            corpus_mtrx._v_attrs.Normalised = True
+
+        return corpus_mtrx

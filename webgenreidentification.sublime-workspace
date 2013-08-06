@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"ev",
+				"evaluate"
+			],
+			[
+				"Ex",
+				"Exception"
+			],
+			[
 				"Exc",
 				"execution"
 			],
@@ -47,7 +55,7 @@
 			"file": "src/RFSE_paramgrid_crossval.py",
 			"settings":
 			{
-				"buffer_size": 2619,
+				"buffer_size": 2846,
 				"line_ending": "Unix"
 			}
 		},
@@ -55,7 +63,7 @@
 			"file": "src/base/paramgridcrossval.py",
 			"settings":
 			{
-				"buffer_size": 16767,
+				"buffer_size": 19948,
 				"line_ending": "Unix",
 				"name": "\"\"\"     \"\"\""
 			}
@@ -64,7 +72,7 @@
 			"file": "src/wrappedmodels/rfse.py",
 			"settings":
 			{
-				"buffer_size": 8740,
+				"buffer_size": 9033,
 				"line_ending": "Unix"
 			}
 		},
@@ -72,7 +80,7 @@
 			"file": "src/ploting/plot_RFSE_Corpus.py",
 			"settings":
 			{
-				"buffer_size": 1968,
+				"buffer_size": 2070,
 				"line_ending": "Unix"
 			}
 		},
@@ -113,6 +121,9 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/Desktop/test.html",
+		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/vectortypes/string2tf.py",
+		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/tables/cngrams.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ParamGridCrossVal_RFSE.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting_deprecated/crossplot_PR_CUR_IV_EnsblAlgo_n_EnsblOCSVM.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/to_be_deprecated/crossval_experiments_Koppels_method.py",
@@ -142,7 +153,6 @@
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_trn_0.idx",
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/html2terms.py",
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/convert/tfdtools.py",
-		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/vectortypes/string2tf.py",
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/sparse/cngrams.py",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_trn_1.idx",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_crv_2.idx",
@@ -211,6 +221,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"shape",
+			"tf_d",
+			"cosine_similarity",
+			"corpus_mtrx",
+			"None",
+			"tid",
+			"tf_d",
 			"vocab_size_group",
 			"plt",
 			";",
@@ -312,7 +329,7 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -320,15 +337,15 @@
 					"file": "src/RFSE_paramgrid_crossval.py",
 					"settings":
 					{
-						"buffer_size": 2619,
+						"buffer_size": 2846,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2064,
-								2064
+								1692,
+								1692
 							]
 						],
 						"settings":
@@ -338,7 +355,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 204.0,
+						"translation.y": 408.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -348,15 +365,15 @@
 					"file": "src/base/paramgridcrossval.py",
 					"settings":
 					{
-						"buffer_size": 16767,
+						"buffer_size": 19948,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								13618,
-								13618
+								19921,
+								19921
 							]
 						],
 						"settings":
@@ -367,7 +384,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4157.0,
+						"translation.y": 6104.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -377,15 +394,15 @@
 					"file": "src/wrappedmodels/rfse.py",
 					"settings":
 					{
-						"buffer_size": 8740,
+						"buffer_size": 9033,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4814,
-								4814
+								7773,
+								7773
 							]
 						],
 						"settings":
@@ -395,7 +412,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2958.0,
+						"translation.y": 3149.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -405,15 +422,15 @@
 					"file": "src/ploting/plot_RFSE_Corpus.py",
 					"settings":
 					{
-						"buffer_size": 1968,
+						"buffer_size": 2070,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1029,
-								1029
+								675,
+								675
 							]
 						],
 						"settings":
@@ -423,7 +440,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 306.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -451,7 +468,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 306.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -492,7 +509,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 354.0
+		"height": 237.0
 	},
 	"replace":
 	{
@@ -527,6 +544,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 296.0,
+	"side_bar_width": 160.0,
 	"status_bar_visible": true
 }

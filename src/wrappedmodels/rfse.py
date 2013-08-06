@@ -82,8 +82,8 @@ class RFSE_Wrapped(object):
             raise Exception('predict(): Invalid Argument, either bagging triggerd with not train-index array or non-bagging with not genre-classes argument')
 
         #Get the part of matrices and arrays required for the model predicition phase
-        crossval_X =  corpus_mtrx[ crv_idxs ] 
-        crossval_Y =  cls_gnr_tgs[ crv_idxs ]
+        crossval_X =  corpus_mtrx[ crv_idxs, : ] 
+        crossval_Y =  cls_gnr_tgs[ crv_idxs, : ]
              
         max_sim_scores_per_iter = np.zeros((params['Iterations'], crossval_X.shape[0]))
         predicted_classes_per_iter = np.zeros((params['Iterations'], crossval_X.shape[0]))
@@ -103,7 +103,7 @@ class RFSE_Wrapped(object):
             #Initialised Predicted Classes and Maximum Similarity Scores Array for this i iteration 
             predicted_classes = np.zeros( crossval_X.shape[0] )
             max_sim_scores = np.zeros( crossval_X.shape[0] )
-            
+        
             #Measure similarity for each Cross-Validation-Set vector to each available Genre Class(i.e. Class-Vector). For This feature_subspace
             for i_vect, vect in enumerate(crossval_X[:, features_subspace]):
                 
@@ -186,8 +186,18 @@ class RFSE_Wrapped(object):
  
 
 def cosine_similarity(vector, centroid):
- 
-    return vector * np.transpose(centroid) / ( np.linalg.norm(vector.todense()) * np.linalg.norm(centroid) )
+
+    #Convert Arrays and Matricies to Matrix Type for preventing unexpeted error, such as returning vector instead of scalar
+    vector = np.matrix(vector)
+    centroid = np.matrix(centroid)
+
+    return vector * np.transpose(centroid) / ( np.linalg.norm(vector) * np.linalg.norm(centroid) )
+
+
+
+def cosine_similarity_sparse(vector, centroid):    
+
+    return cosine_similarity(vector.todense(), centroid)
 
 
 

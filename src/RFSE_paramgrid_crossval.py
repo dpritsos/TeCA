@@ -7,19 +7,20 @@ sys.path.append('../src')
 
 import tables as tb
 
-import html2vect.sparse.wngrams as h2v_wcng
-import html2vect.sparse.cngrams as h2v_cng
+#import html2vect.sparse.wngrams as h2v_wcng
+#import html2vect.sparse.cngrams as h2v_cng
+import html2vect.tables.cngrams as h2v_cng
 
-from base.paramgridcrossval import ParamGridCrossValBase
+from base.paramgridcrossval import ParamGridCrossValBase, ParamGridCrossValTables
 from wrappedmodels.rfse import RFSE_Wrapped, cosine_similarity
 import tables as tb
     
 
 #"Santini's 7-genres Corpus"
-corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Kfolds_Vocs_Inds_4Grams"
-genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
-method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'w')
+#corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
+#kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Kfolds_Vocs_Inds_4Grams"
+#genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ]
+#method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'w')
 
 #"KI-04"
 #corpus_filepath = "/home/dimitrios/Synergy-Crawler/KI-04/"
@@ -32,10 +33,10 @@ method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_gen
 #MGC
 
 #SANTINIS
-#corpus_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/"
-#kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Kfolds_Vocs_Inds_4Grams"
-#genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio", "spirit_1000"]
-#method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'w')
+corpus_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/"
+kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams"
+genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio", "spirit_1000" ]
+method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/C-Santinis_TEST_NOBAGG_2.h5', 'w')
 
 
 params_range = {
@@ -55,10 +56,16 @@ sparse_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, va
 
 ml_model = RFSE_Wrapped(cosine_similarity, -1.0, genres, bagging=False)
 
-pgrid_corssv = ParamGridCrossValBase(\
+
+pgrid_corssv = ParamGridCrossValTables(\
                     ml_model, sparse_cng, method_results, 
                     genres, corpus_filepath, kfolds_vocs_filepath\
                )
+
+#pgrid_corssv = ParamGridCrossValBase(\
+#                    ml_model, sparse_cng, method_results, 
+#                    genres, corpus_filepath, kfolds_vocs_filepath\
+#               )
                
 html_file_l, cls_gnr_tgs = pgrid_corssv.corpus_files_and_tags()
 
