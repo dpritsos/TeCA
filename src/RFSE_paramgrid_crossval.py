@@ -36,7 +36,8 @@ import tables as tb
 corpus_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/"
 kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams"
 genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio", "spirit_1000" ]
-method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/C-Santinis_TEST_NOBAGG_2.h5', 'w')
+test_only_tgs = [12]
+method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Char4Grams_RFSE_kf-10_SigmaT-[0.5]_TestOnly-spirit1000.h5', 'w')
 
 
 params_range = {
@@ -69,7 +70,7 @@ pgrid_corssv = ParamGridCrossValTables(\
                
 html_file_l, cls_gnr_tgs = pgrid_corssv.corpus_files_and_tags()
 
-results_h5 = pgrid_corssv.evaluate(html_file_l, cls_gnr_tgs, None, params_range, 'utf-8')
+results_h5 = pgrid_corssv.evaluate(html_file_l, cls_gnr_tgs, test_only_tgs, None, params_range, 'utf-8')
 
 print results_h5
 

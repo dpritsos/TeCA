@@ -81,8 +81,12 @@ class RFSE_Wrapped(object):
         else:
             raise Exception('predict(): Invalid Argument, either bagging triggerd with not train-index array or non-bagging with not genre-classes argument')
 
-        #Get the part of matrices and arrays required for the model predicition phase
+        #Get the part of matrices or arrays required for the model predicition phase
         crossval_X =  corpus_mtrx[ crv_idxs, : ] 
+        #EXTREMELY IMPORTANT: corpus_mtrx[X] where X=[<idx1>,<idx2>,...,<idxN>] returns ERROR HDF5 when using pytables Earray.
+        #For scipy.sparse there is no such a problem. Therefore it always should be used this expression corpus_mtrx[X, : ] 
+
+        #Get the part of matrices required for the model predicition phase
         crossval_Y =  cls_gnr_tgs[ crv_idxs, : ]
              
         max_sim_scores_per_iter = np.zeros((params['Iterations'], crossval_X.shape[0]))

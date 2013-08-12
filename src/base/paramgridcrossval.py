@@ -166,15 +166,46 @@ class ParamGridCrossValBase(object):
 
         return ssp.csr_matrix( corpus_mtrx.todense() / np.max(corpus_mtrx.todense(), axis=1) )
 
+    
+
+    def get_test_only_idxs(self, cls_gnr_tgs, test_only_tgs):
+
+        if len(test_only_tgs) > 1:
+            valid_tgs_lst = range(test_only_tgs[0], len(test_only_tgs), 1)
+
+            if valid_tgs_lst != test_only_tgs:
+                raise Exception("Invalid test-only-tags sequence: Only a numerical sequence with step +1 increment is valid")
+
+            inv_cls_gnr_tgs = cls_gnr_tgs[::-1]
+            if inv_cls_gnr_tgs[0:len(test_only_tgs)] != test_only_tgs[::-1]:
+                raise Exception("Invalid test-only-tags sequence: Only the most last tags of the cls_gnr_tgs can be used as only-for-test")            
+        
+        new_cls_gnr_tgs = list()
+        test_only_idxs = list()
+
+        for i, tag in enumerate(cls_gnr_tgs):
+
+            if tag in test_only_tgs:
+                test_only_idxs.append(i)
+            else:
+                new_cls_gnr_tgs.append(tag)
+
+        return  (new_cls_gnr_tgs, new_cls_gnr_tgs)
+        
+
 
     def evaluate(self, *args):
         """ Call prototyping: evaluate(html_file_l, cls_gnr_tgs, None, params_range, 'utf-8') """
 
         html_file_l = args[0]
         cls_gnr_tgs = args[1]
-        norm_func = args[2]
-        params_range = args[3]
-        encoding = args[4]
+        test_only_tgs = args[2]
+        norm_func = args[3]
+        params_range = args[4]
+        encoding = args[5]
+
+        if test_only_tgs:
+            cls_gnr_tgs, test_only_idxs = self.get_test_only_idxs(cls_gnr_tgs, test_only_tgs)
 
         #Create CrossVal Folds
         KF = cross_validation.StratifiedKFold(cls_gnr_tgs, len(params_range['kfolds']), indices=True)
@@ -200,7 +231,10 @@ class ParamGridCrossValBase(object):
                 #Save Cross-validation Indeces
                 print "Saving Cross-validation Indices for k-fold=", k
                 with open(crv_filename, 'w') as f:
-                    json.dump( list(crv), f, encoding=encoding)               
+                    if test_only_idxs:
+                        json.dump( list(crv), f, encoding=encoding)               
+                    else:
+                        json.dump( list(crv + test_only_idxs), f, encoding=encoding)               
          
                 #Creating Vocabulary
                 print "Creating Vocabulary for k-fold=",k

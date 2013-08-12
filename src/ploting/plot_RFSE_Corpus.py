@@ -19,7 +19,7 @@ params_range = {
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_TEST_NOBAGG.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'r')
-res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/C-Santinis_TEST_NOBAGG.h5', 'r')
+res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/C-Santinis_TEST_NOBAGG_2.h5', 'r')
 
 
 

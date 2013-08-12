@@ -72,7 +72,7 @@
 			"file": "src/wrappedmodels/rfse.py",
 			"settings":
 			{
-				"buffer_size": 9033,
+				"buffer_size": 9362,
 				"line_ending": "Unix"
 			}
 		},
@@ -80,7 +80,7 @@
 			"file": "src/ploting/plot_RFSE_Corpus.py",
 			"settings":
 			{
-				"buffer_size": 2070,
+				"buffer_size": 2072,
 				"line_ending": "Unix"
 			}
 		},
@@ -121,6 +121,7 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/test.py",
 		"/home/dimitrios/Desktop/test.html",
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/vectortypes/string2tf.py",
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/tables/cngrams.py",
@@ -177,7 +178,6 @@
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/parallel_generatevectors_script.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/deprecated/trainevaloneclssvm.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_resaults_frm_pytables_IV_Bagging.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/test.py",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies/kfold_Voc_0.voc",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/plot_PR_CUR_frm_pytables_IV.py",
 		"/home/dimitrios/Documents/pan13tools/pan13performance.py",
@@ -221,6 +221,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"corpus_mtrx",
 			"shape",
 			"tf_d",
 			"cosine_similarity",
@@ -329,7 +330,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -344,8 +345,8 @@
 						"selection":
 						[
 							[
-								1692,
-								1692
+								1919,
+								1919
 							]
 						],
 						"settings":
@@ -355,7 +356,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 408.0,
+						"translation.y": 357.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -372,8 +373,8 @@
 						"selection":
 						[
 							[
-								19921,
-								19921
+								19204,
+								19204
 							]
 						],
 						"settings":
@@ -384,7 +385,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 6104.0,
+						"translation.y": 6496.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -394,15 +395,15 @@
 					"file": "src/wrappedmodels/rfse.py",
 					"settings":
 					{
-						"buffer_size": 9033,
+						"buffer_size": 9362,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7773,
-								7773
+								3453,
+								3453
 							]
 						],
 						"settings":
@@ -412,7 +413,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3149.0,
+						"translation.y": 1071.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -422,15 +423,15 @@
 					"file": "src/ploting/plot_RFSE_Corpus.py",
 					"settings":
 					{
-						"buffer_size": 2070,
+						"buffer_size": 2072,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								675,
-								675
+								878,
+								878
 							]
 						],
 						"settings":
