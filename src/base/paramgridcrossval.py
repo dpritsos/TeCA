@@ -165,7 +165,6 @@ class ParamGridCrossValBase(object):
     def normalize(self, corpus_mtrx):
 
         return ssp.csr_matrix( corpus_mtrx.todense() / np.max(corpus_mtrx.todense(), axis=1) )
-
     
 
     def get_test_only_idxs(self, cls_gnr_tgs, test_only_tgs):
@@ -190,9 +189,10 @@ class ParamGridCrossValBase(object):
             else:
                 new_cls_gnr_tgs.append(tag)
 
-        return  (new_cls_gnr_tgs, new_cls_gnr_tgs)
-        
+        new_cls_gnr_tgs_arr = np.hstack( (np.array(new_cls_gnr_tgs), np.zeros(len(test_only_idxs), dtype=np.int32)) )
 
+        return  (new_cls_gnr_tgs_arr, test_only_idxs )
+        
 
     def evaluate(self, *args):
         """ Call prototyping: evaluate(html_file_l, cls_gnr_tgs, None, params_range, 'utf-8') """
@@ -232,9 +232,10 @@ class ParamGridCrossValBase(object):
                 print "Saving Cross-validation Indices for k-fold=", k
                 with open(crv_filename, 'w') as f:
                     if test_only_idxs:
-                        json.dump( list(crv), f, encoding=encoding)               
+                        json.dump( list(crv) + test_only_idxs, f, encoding=encoding)   
                     else:
-                        json.dump( list(crv + test_only_idxs), f, encoding=encoding)               
+                        json.dump( list(crv), f, encoding=encoding)               
+                                    
          
                 #Creating Vocabulary
                 print "Creating Vocabulary for k-fold=",k
@@ -408,17 +409,12 @@ class ParamGridCrossValTables(ParamGridCrossValBase):
         else:
             print "Creating pyTables TF EArray (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
             
-            import time
-            start_time = time.time()
-            
             #Creating pyTables TF EArray
             corpus_mtrx, h5f = self.TF_TT.from_files(list( html_file_l ), corpus_mtrx_fname, tid_dictionary=tid, norm_func=norm_func,\
                                                 encoding='utf8', error_handling='replace' )[0:2] #<--- Getting only 2 of the 3 returend values
 
             #Tagging the Corpus EArray a non norlised, yet
             corpus_mtrx._v_attrs.Normalised = False
-            
-            print "Time: ", time.time() - start_time 
             
         return (corpus_mtrx, h5f)
 

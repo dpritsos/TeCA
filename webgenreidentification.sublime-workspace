@@ -55,7 +55,7 @@
 			"file": "src/RFSE_paramgrid_crossval.py",
 			"settings":
 			{
-				"buffer_size": 2846,
+				"buffer_size": 2921,
 				"line_ending": "Unix"
 			}
 		},
@@ -63,7 +63,7 @@
 			"file": "src/base/paramgridcrossval.py",
 			"settings":
 			{
-				"buffer_size": 19948,
+				"buffer_size": 21225,
 				"line_ending": "Unix",
 				"name": "\"\"\"     \"\"\""
 			}
@@ -80,7 +80,7 @@
 			"file": "src/ploting/plot_RFSE_Corpus.py",
 			"settings":
 			{
-				"buffer_size": 2072,
+				"buffer_size": 2111,
 				"line_ending": "Unix"
 			}
 		},
@@ -121,6 +121,7 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams/kfold_crv_0.idx",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/test.py",
 		"/home/dimitrios/Desktop/test.html",
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/vectortypes/string2tf.py",
@@ -330,7 +331,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -338,15 +339,15 @@
 					"file": "src/RFSE_paramgrid_crossval.py",
 					"settings":
 					{
-						"buffer_size": 2846,
+						"buffer_size": 2921,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1919,
-								1919
+								1755,
+								1755
 							]
 						],
 						"settings":
@@ -356,7 +357,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 357.0,
+						"translation.y": 153.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -366,15 +367,15 @@
 					"file": "src/base/paramgridcrossval.py",
 					"settings":
 					{
-						"buffer_size": 19948,
+						"buffer_size": 21225,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								19204,
-								19204
+								8342,
+								8342
 							]
 						],
 						"settings":
@@ -385,7 +386,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 6496.0,
+						"translation.y": 2194.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -402,8 +403,8 @@
 						"selection":
 						[
 							[
-								3453,
-								3453
+								58,
+								58
 							]
 						],
 						"settings":
@@ -413,7 +414,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1071.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -423,15 +424,15 @@
 					"file": "src/ploting/plot_RFSE_Corpus.py",
 					"settings":
 					{
-						"buffer_size": 2072,
+						"buffer_size": 2111,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								878,
-								878
+								920,
+								920
 							]
 						],
 						"settings":
@@ -469,7 +470,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 306.0,
+						"translation.y": 153.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

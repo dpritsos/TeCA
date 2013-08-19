@@ -42,10 +42,10 @@ method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_
 
 params_range = {
     'kfolds' : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    'vocab_size' : [100000], #[10000, 50000, 100000],
-    'features_size' : [1000, 5000, 10000, 70000],
-    'Iterations' : [100],
-    'Sigma' : [0.5],
+    'vocab_size' : [5000, 10000, 50000, 100000],
+    'features_size' : [500, 1000, 5000, 10000, 50000, 90000],
+    'Iterations' : [10, 50, 100],
+    'Sigma' : [0.5, 0.7, 0.9],
     #'Bagging' : [0.66],
 } 
 
@@ -55,8 +55,7 @@ params_range = {
 char_n_gram_size = 4
 sparse_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, valid_html=False)
 
-ml_model = RFSE_Wrapped(cosine_similarity, -1.0, genres, bagging=False)
-
+ml_model = RFSE_Wrapped(cosine_similarity, -1.0, genres[0:-1], bagging=False)
 
 pgrid_corssv = ParamGridCrossValTables(\
                     ml_model, sparse_cng, method_results, 

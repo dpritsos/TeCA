@@ -87,7 +87,7 @@ class RFSE_Wrapped(object):
         #For scipy.sparse there is no such a problem. Therefore it always should be used this expression corpus_mtrx[X, : ] 
 
         #Get the part of matrices required for the model predicition phase
-        crossval_Y =  cls_gnr_tgs[ crv_idxs, : ]
+        #crossval_Y =  cls_gnr_tgs [ crv_idxs, : ]
              
         max_sim_scores_per_iter = np.zeros((params['Iterations'], crossval_X.shape[0]))
         predicted_classes_per_iter = np.zeros((params['Iterations'], crossval_X.shape[0]))
@@ -139,8 +139,8 @@ class RFSE_Wrapped(object):
             max_sim_scores_per_iter[I,:] = max_sim_scores[:]
             predicted_classes_per_iter[I,:] = predicted_classes[:]
                                               
-        predicted_Y = np.zeros((crossval_Y.shape[0]), dtype=np.float)
-        predicted_scores = np.zeros((crossval_Y.shape[0]), dtype=np.float)
+        predicted_Y = np.zeros((crossval_X.shape[0]), dtype=np.float)
+        predicted_scores = np.zeros((crossval_X.shape[0]), dtype=np.float)
         
         for i_prd_cls, prd_cls in enumerate(predicted_classes_per_iter.transpose()):
             genres_occs = np.histogram( prd_cls.astype(np.int), bins=np.arange(self.gnrs_num+2))[0] #One Bin per Genre plus one i.e the first to be always zero
