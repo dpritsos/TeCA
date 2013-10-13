@@ -53,12 +53,12 @@ params_range = {
 #sparse_wng = h2v_wcng.Html2TF(word_n_gram_size, attrib='text', lowercase=True, valid_html=False)
 
 char_n_gram_size = 4
-sparse_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, valid_html=False)
+tables_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, valid_html=False)
 
 ml_model = RFSE_Wrapped(cosine_similarity, -1.0, genres[0:-1], bagging=False)
 
 pgrid_corssv = ParamGridCrossValTables(\
-                    ml_model, sparse_cng, method_results, 
+                    ml_model, tables_cng, method_results, 
                     genres, corpus_filepath, kfolds_vocs_filepath\
                )
 

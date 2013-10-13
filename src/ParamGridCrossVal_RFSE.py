@@ -401,8 +401,8 @@ class ParamGridCrossValBase(object):
             print self.h5_res.createArray(kfld_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
             print self.h5_res.createArray(kfld_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
             print self.h5_res.createArray(kfld_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
-            print                                    
-
+            print                                   
+ 
 
 def cosine_similarity(vector, centroid):
  
