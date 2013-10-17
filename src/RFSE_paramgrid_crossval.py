@@ -13,7 +13,6 @@ import html2vect.tables.cngrams as h2v_cng
 
 from base.paramgridcrossval import ParamGridCrossValBase, ParamGridCrossValTables
 from wrappedmodels.rfse import RFSE_Wrapped, cosine_similarity
-import tables as tb
     
 
 #"Santini's 7-genres Corpus"
@@ -57,15 +56,15 @@ tables_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, va
 
 ml_model = RFSE_Wrapped(cosine_similarity, -1.0, genres[0:-1], bagging=False)
 
-pgrid_corssv = ParamGridCrossValTables(\
-                    ml_model, tables_cng, method_results, 
-                    genres, corpus_filepath, kfolds_vocs_filepath\
-               )
-
-#pgrid_corssv = ParamGridCrossValBase(\
-#                    ml_model, sparse_cng, method_results, 
+#pgrid_corssv = ParamGridCrossValTables(\
+#                    ml_model, tables_cng, method_results, 
 #                    genres, corpus_filepath, kfolds_vocs_filepath\
 #               )
+
+pgrid_corssv = ParamGridCrossValBase(\
+                    ml_model, sparse_cng, method_results, 
+                    genres, corpus_filepath, kfolds_vocs_filepath\
+               )
                
 html_file_l, cls_gnr_tgs = pgrid_corssv.corpus_files_and_tags()
 

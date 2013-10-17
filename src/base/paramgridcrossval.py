@@ -189,9 +189,7 @@ class ParamGridCrossValBase(object):
             else:
                 new_cls_gnr_tgs.append(tag)
 
-        #new_cls_gnr_tgs_arr = np.hstack( (np.array(new_cls_gnr_tgs), np.zeros(len(test_only_idxs), dtype=np.int32)) )
-
-        return  (new_cls_gnr_tgs, test_only_idxs )
+        return ( new_cls_gnr_tgs, test_only_idxs )
         
 
     def evaluate(self, *args):
@@ -204,17 +202,20 @@ class ParamGridCrossValBase(object):
         params_range = args[4]
         encoding = args[5]
 
-        
+        #Separationg the "Test-Only" tags for the rest
         if test_only_tgs:
-            #print len(cls_gnr_tgs)
             cls_gnr_tgs, test_only_idxs = self.get_test_only_idxs(cls_gnr_tgs, test_only_tgs)
-
-        #print len(cls_gnr_tgs), len(test_only_idxs)
-
-        #0/0
 
         #Create CrossVal Folds
         KF = cross_validation.StratifiedKFold(cls_gnr_tgs, len(params_range['kfolds']), indices=True)
+
+        #Appending the test only tags the "Test-Only" tags for the rest - this works only for the last most in genres list() 
+        #Since it is required to build the "crv" and "trn" indecies first and then load them for using then it is required 
+        #to create the Corssvalidations sets form the rest of the tags set and then append them. Therefor for selecting the proper
+        #tags it is required to be appended back to the cls_gnr_tgs but this time with Zero(0) class tag. 
+        #Need to be simplafied!
+        if test_only_tgs:
+            cls_gnr_tgs = np.hstack( (np.array(cls_gnr_tgs), np.zeros(len(test_only_idxs), dtype=np.int32)) )
         
         for k, (trn, crv) in enumerate(KF):
 
@@ -369,6 +370,8 @@ class ParamGridCrossValBase(object):
                                 ) 
 
             #Select Cross Validation Set
+            print cls_gnr_tgs
+            print crv_idxs
             crossval_Y = cls_gnr_tgs[ crv_idxs ]
                 
             P_per_gnr, R_per_gnr, F1_per_gnr = self.calculate_p_r_f1(crossval_Y, predicted_Y)
