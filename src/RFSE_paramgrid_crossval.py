@@ -8,8 +8,8 @@ sys.path.append('../src')
 import tables as tb
 
 #import html2vect.sparse.wngrams as h2v_wcng
-#import html2vect.sparse.cngrams as h2v_cng
-import html2vect.tables.cngrams as h2v_cng
+import html2vect.sparse.cngrams as h2v_cng
+#import html2vect.tables.cngrams as h2v_cng
 
 from base.paramgridcrossval import ParamGridCrossValBase, ParamGridCrossValTables
 from wrappedmodels.rfse import RFSE_Wrapped, cosine_similarity
@@ -52,7 +52,8 @@ params_range = {
 #sparse_wng = h2v_wcng.Html2TF(word_n_gram_size, attrib='text', lowercase=True, valid_html=False)
 
 char_n_gram_size = 4
-tables_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, valid_html=False)
+#tables_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, valid_html=False)
+sparse_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, valid_html=False)
 
 ml_model = RFSE_Wrapped(cosine_similarity, -1.0, genres[0:-1], bagging=False)
 

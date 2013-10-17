@@ -152,7 +152,7 @@ class ParamGridCrossValBase(object):
             print "Creating Sparse TF Matrix (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
             #Creating TF Vectors Sparse Matrix
             corpus_mtrx = self.TF_TT.from_files(list( html_file_l ), tid_dictionary=tid, norm_func=norm_func,\
-                                                encoding='utf8', error_handling='replace' )[0] #<--- Be carefull with zero index
+                                                encoding='utf8', error_handling='replace' )
 
             #Saving TF Vecrors Matrix
             print "Saving Sparse TF Matrix (for CrossValidation)"
