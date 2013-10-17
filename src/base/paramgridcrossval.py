@@ -189,9 +189,9 @@ class ParamGridCrossValBase(object):
             else:
                 new_cls_gnr_tgs.append(tag)
 
-        new_cls_gnr_tgs_arr = np.hstack( (np.array(new_cls_gnr_tgs), np.zeros(len(test_only_idxs), dtype=np.int32)) )
+        #new_cls_gnr_tgs_arr = np.hstack( (np.array(new_cls_gnr_tgs), np.zeros(len(test_only_idxs), dtype=np.int32)) )
 
-        return  (new_cls_gnr_tgs_arr, test_only_idxs )
+        return  (new_cls_gnr_tgs, test_only_idxs )
         
 
     def evaluate(self, *args):
@@ -204,8 +204,14 @@ class ParamGridCrossValBase(object):
         params_range = args[4]
         encoding = args[5]
 
+        
         if test_only_tgs:
+            #print len(cls_gnr_tgs)
             cls_gnr_tgs, test_only_idxs = self.get_test_only_idxs(cls_gnr_tgs, test_only_tgs)
+
+        #print len(cls_gnr_tgs), len(test_only_idxs)
+
+        #0/0
 
         #Create CrossVal Folds
         KF = cross_validation.StratifiedKFold(cls_gnr_tgs, len(params_range['kfolds']), indices=True)
