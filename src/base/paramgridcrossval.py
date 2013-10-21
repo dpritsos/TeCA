@@ -152,8 +152,8 @@ class ParamGridCrossValBase(object):
             print "Creating Sparse TF Matrix (for CrossValidation) for K-fold=", k, " and Vocabulary size=", vocab_size
             #Creating TF Vectors Sparse Matrix
             corpus_mtrx = self.TF_TT.from_files(list( html_file_l ), tid_dictionary=tid, norm_func=norm_func,\
-                                                encoding='utf8', error_handling='replace' )
-
+                                                encoding='utf8', error_handling='replace' )[0] #<--- Be carefull with zero index
+            
             #Saving TF Vecrors Matrix
             print "Saving Sparse TF Matrix (for CrossValidation)"
             with open(corpus_mtrx_fname, 'w') as f:
@@ -329,7 +329,7 @@ class ParamGridCrossValBase(object):
                 vocab_size_group._v_attrs.real_voc_size = [(k, len(resized_tf_d))]
                 
                 #Save the Webpages term counts (Char N-grans or Word N-Grams)
-                docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx, axis=1))
+                docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx.toarray(), axis=1))
                 
             else:
                 #For the rest of k-folds save the current Vocabulary and the Corpus Documents sizes if current Vocabulary size is different to the previous ones
@@ -339,7 +339,7 @@ class ParamGridCrossValBase(object):
                     vocab_size_group._v_attrs.real_voc_size += [(k,len(resized_tf_d))]
 
                     #If Vocabulary is different the the Document term counts will be differnet, then save them again
-                    docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx, axis=1))
+                    docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx.toarray(), axis=1))
             ###END - Saving Block
             
             #Perform default (division by max value) normalisation for corpus matrix 'corpus_mtrx'

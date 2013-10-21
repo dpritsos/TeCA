@@ -52,9 +52,21 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 306.0,
+		"height": 392.0,
 		"selected_items":
 		[
+			[
+				"pa",
+				"Package Control: Remove Package"
+			],
+			[
+				"git",
+				"Git: Diff Tool Current File"
+			],
+			[
+				"gi",
+				"Git: Diff All"
+			],
 			[
 				"Package Control: ",
 				"Package Control: Install Package"
@@ -85,12 +97,16 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/ExtremePro_Workspace/Barcode_Converter_Scripts/tnf_fw13_stock2.fmt",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/RFSE_paramgrid_crossval.py",
+		"/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams/kfold_crv_0.idx",
+		"/home/dimitrios/Synergy-Crawler/SANTINIS/kfold_crv_0.idx",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ParamGridCrossVal_RFSE.py",
 		"/home/dimitrios/.bashrc",
 		"/home/dimitrios/Desktop/Github.tmTheme",
 		"/home/dimitrios/Desktop/test.html",
 		"/home/dimitrios/ExtremePro_Workspace/ArtDesign_Site_ExtremePro.gr/Offers_2013_10_03_Trekking/Offers_2013_10_03_Trekking.html",
 		"/home/dimitrios/ExtremePro_Workspace/Barcode_Converter_Scripts/MIZUNO/odlostock.fmt",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ParamGridCrossVal_RFSE.py",
 		"/home/dimitrios/ExtremePro_Workspace/Barcode_Converter_Scripts/ODLO/odlostock.fmt",
 		"/home/dimitrios/ExtremePro_Workspace/Barcode_Converter_Scripts/xl2xl.py",
 		"/home/dimitrios/Desktop/kamakirc.txt",
@@ -110,7 +126,6 @@
 		"/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams/kfold_crv_3.idx",
 		"/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams/kfold_crv_2.idx",
 		"/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams/kfold_crv_1.idx",
-		"/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams/kfold_crv_0.idx",
 		"/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams/kfold_trn_1.idx",
 		"/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams/Corpus_filename_shorted.lst",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/test.py",
@@ -210,6 +225,17 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"cosine_similarity_sparse",
+			"cosine_similarity",
+			"corpus_mtrx",
+			"print",
+			"corpus_mtrx",
+			"self.TF_TT.from_files",
+			"corpus_matrix",
+			"new_cls_gnr_tgs",
+			"FW13_ADDITIONS",
+			"cls_gnr_tgs",
+			"1490",
 			" &",
 			"h5f",
 			"params_path",
@@ -326,9 +352,7 @@
 			"dx = [0].extend(dx)",
 			"None",
 			"import",
-			"bin",
-			".\n",
-			"contrib"
+			"bin"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -372,7 +396,7 @@
 		"cols":
 		[
 			0.0,
-			0.453268129945,
+			0.789129197496,
 			1.0
 		],
 		"rows":
@@ -384,7 +408,11 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 237.0
+		"height": 195.0
+	},
+	"output.git":
+	{
+		"height": 112.0
 	},
 	"replace":
 	{
@@ -419,6 +447,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 207.0,
+	"side_bar_width": 163.0,
 	"status_bar_visible": true
 }
