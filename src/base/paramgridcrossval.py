@@ -32,8 +32,8 @@ class ParamGridCrossValBase(object):
     def calculate_p_r_f1(self, crossval_Y, predicted_Y):
 
         #Calculating Scores Precision, Recall and F1 Statistic
-        print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
-        print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
+        #print np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))
+        #print np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))
         
         cv_tg_idxs = np.array( np.histogram(crossval_Y, bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
         tp_n_fp = np.array( np.histogram(predicted_Y.astype(np.int), bins=np.arange(self.gnrs_num+2))[0], dtype=np.float)
@@ -96,7 +96,7 @@ class ParamGridCrossValBase(object):
                 sorted(gnrs_file_lst, key=lambda gnrs_file_lst: gnrs_file_lst[0])
                 
                 #just for debugging remove it right after
-                print gnrs_file_lst
+                #print gnrs_file_lst
 
                 #Get the filenames as sorted above
                 html_file_l = [ element[1] for element in gnrs_file_lst ]
@@ -137,7 +137,7 @@ class ParamGridCrossValBase(object):
         return (np.array(html_file_l), np.array(cls_gnr_tgs))
 
 
-    def corpus_matrix(self, k, vocab_size, html_file_l, tid, norm_func):
+    def corpus_matrix(self, k, kfld_group, vocab_size, html_file_l, tid, norm_func):
 
         #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
         corpus_mtrx_fname = self.crps_voc_path+'/kfold_CorpusMatrix_'+str(k)+str(vocab_size)+'.pkl'
@@ -153,18 +153,21 @@ class ParamGridCrossValBase(object):
             #Creating TF Vectors Sparse Matrix
             corpus_mtrx = self.TF_TT.from_files(list( html_file_l ), tid_dictionary=tid, norm_func=norm_func,\
                                                 encoding='utf8', error_handling='replace' )[0] #<--- Be carefull with zero index
-            
+
+            #Save the Webpages term counts (Char N-grans or Word N-Grams)
+            docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx.toarray(), axis=1))
+
+            #Perform default (division by max value) normalisation for corpus matrix 'corpus_mtrx'
+            #Should I perform Standarisation/Normalisation by substracting mean value from vector variables?
+            print "Normalising"
+            corpus_mtrx = ssp.csr_matrix( corpus_mtrx.todense() / np.max(corpus_mtrx.todense(), axis=1) )
+
             #Saving TF Vecrors Matrix
-            print "Saving Sparse TF Matrix (for CrossValidation)"
+            print "Saving Sparse Normalized TF Matrix (for CrossValidation)"
             with open(corpus_mtrx_fname, 'w') as f:
                 pickle.dump(corpus_mtrx, f)
 
         return (corpus_mtrx, None)
-
-
-    def normalize(self, corpus_mtrx):
-
-        return ssp.csr_matrix( corpus_mtrx.todense() / np.max(corpus_mtrx.todense(), axis=1) )
     
 
     def get_test_only_idxs(self, cls_gnr_tgs, test_only_tgs):
@@ -257,11 +260,14 @@ class ParamGridCrossValBase(object):
                     json.dump(tf_d, f, encoding=encoding)
 
         #Starting Parameters Grid Search 
-        for params in grid_search.IterGrid(params_range):
+        for gci, params in enumerate( grid_search.IterGrid(params_range) ):
+
+            #Show how many Gric Search Parameter combinations are remaning
+            print "Param Grid Counts:", gci+1
 
             #Prevent execution of this loop in case feature_size is smaller than Vocabulary size
             if params['features_size'] > params['vocab_size']:
-                print "Skipped Params: ", params
+                print "SKIPPED Params: ", params
                 continue                    
 
             print "Params: ", params
@@ -277,7 +283,7 @@ class ParamGridCrossValBase(object):
             except:
                 vocab_size_group = self.h5_res.createGroup('/', 'vocab_size'+str(vocab_size),\
                                 "Vocabulary actual size group of Results Arrays for this K-fold" )
-
+                                   
             #Creating a Group for this features size in h5 file under this k-fold
             try:
                 feat_num_group = self.h5_res.getNode(vocab_size_group, 'features_size'+str(featrs_size))    
@@ -314,39 +320,16 @@ class ParamGridCrossValBase(object):
             #Get the Vocabuliary keeping all the terms with same freq to the last feature of the reqested size
             resized_tf_d = self.TF_TT.tfdtools.keep_atleast(tf_d, vocab_size) 
 
+            #Saving the real Vocabulary sizes for this experiment (i.e. this text representation, etc.)
+            #keep it as pytables group attribute the actual Vocabulary size
+            vocab_size_group._v_attrs.real_voc_size = [(k, len(resized_tf_d))]
+
             #Create The Terms-Index Vocabulary that is shorted by Frequency descending order
             tid = self.TF_TT.tfdtools.tf2tidx( resized_tf_d )
-            print tid.items()[0:5]
+            #print tid.items()[0:5]
 
-            #Load or Crreate the Coprus Matrix/Array for this combination or kfold and vocabulary_size
-            corpus_mtrx, corpus_file = self.corpus_matrix(k, vocab_size, html_file_l, tid, norm_func)
-
-            ###Saving Vocabulary and Documents Sizes for this experiment (i.e. this kfold, this text representation, etc.):
-            #Save them for an other fold only if the Vocabulary size is different (Most likely same-sized Vocabularies means identical ones)
-            #For the first k-fold just save them all 
-            if k == 0:
-                #keep as pytables group attribute the actual Vocabulary size
-                vocab_size_group._v_attrs.real_voc_size = [(k, len(resized_tf_d))]
-                
-                #Save the Webpages term counts (Char N-grans or Word N-Grams)
-                docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx.toarray(), axis=1))
-                
-            else:
-                #For the rest of k-folds save the current Vocabulary and the Corpus Documents sizes if current Vocabulary size is different to the previous ones
-                if len(resized_tf_d) not in vocab_size_group._v_attrs.real_voc_size:
-                    
-                    #Add the Vocabulary size on the list of real Vocabilary sized for each fold
-                    vocab_size_group._v_attrs.real_voc_size += [(k,len(resized_tf_d))]
-
-                    #If Vocabulary is different the the Document term counts will be differnet, then save them again
-                    docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx.toarray(), axis=1))
-            ###END - Saving Block
-            
-            #Perform default (division by max value) normalisation for corpus matrix 'corpus_mtrx'
-            #Should I perform Standarisation/Normalisation by substracting mean value from vector variables?
-            print "Normalise"
-            corpus_mtrx = self.normalize(corpus_mtrx)
-            print "Normalisaton Done"
+            #Load or Create the Coprus Matrix/Array for this combination or kfold and vocabulary_size
+            corpus_mtrx, corpus_file = self.corpus_matrix(k, kfld_group, vocab_size, html_file_l, tid, norm_func)
 
             #Load Training Indeces 
             trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'
@@ -370,22 +353,24 @@ class ParamGridCrossValBase(object):
                                 ) 
 
             #Select Cross Validation Set
-            print cls_gnr_tgs
-            print crv_idxs
+            #print cls_gnr_tgs
+            #print crv_idxs
             crossval_Y = cls_gnr_tgs[ crv_idxs ]
                 
             P_per_gnr, R_per_gnr, F1_per_gnr = self.calculate_p_r_f1(crossval_Y, predicted_Y)
                         
             #Saving results
-            print self.h5_res.createArray(kfld_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
-            print self.h5_res.createArray(kfld_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
-            print self.h5_res.createArray(kfld_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
-            print self.h5_res.createArray(kfld_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
-            print self.h5_res.createArray(kfld_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
-            print self.h5_res.createArray(kfld_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
+            self.h5_res.createArray(kfld_group, 'expected_Y', crossval_Y, "Expected Classes per Document (CrossValidation Set)")[:]                                         
+            self.h5_res.createArray(kfld_group, 'predicted_Y', predicted_Y, "predicted Classes per Document (CrossValidation Set)")[:]
+            self.h5_res.createArray(kfld_group, 'predicted_scores', predicted_scores, "predicted Scores per Document (CrossValidation Set)")[:]
+            self.h5_res.createArray(kfld_group, "P_per_gnr", P_per_gnr, "Precision per Genre (P[0]==Global P)")[:]
+            self.h5_res.createArray(kfld_group, "R_per_gnr", R_per_gnr, "Recall per Genre (R[0]==Global R)")[:]
+            self.h5_res.createArray(kfld_group, "F1_per_gnr", F1_per_gnr, "F1_statistic per Genre (F1[0]==Global F1)")[:]
+
+            print 
             
             for name, value in model_specific_d.items():
-                print self.h5_res.createArray(kfld_group, name, value, "<Comment>")[:]             
+                self.h5_res.createArray(kfld_group, name, value, "<Comment>")[:]             
         
             #Closing corpus file if any. Originaly for closing hd5 files
             if corpus_file:
@@ -404,7 +389,7 @@ class ParamGridCrossValTables(ParamGridCrossValBase):
         super(ParamGridCrossValTables, self).__init__(ML_Model, TF_TT, h5_res, genres, corpus_path, voc_path)    
 
 
-    def corpus_matrix(self, k, vocab_size, html_file_l, tid, norm_func):
+    def corpus_matrix(self, k, kfld_group, vocab_size, html_file_l, tid, norm_func):
 
         #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
         corpus_mtrx_fname = self.crps_voc_path+'/kfold_CorpusMatrix_'+str(k)+str(vocab_size)+'.h5'
@@ -421,24 +406,19 @@ class ParamGridCrossValTables(ParamGridCrossValBase):
             #Creating pyTables TF EArray
             corpus_mtrx, h5f = self.TF_TT.from_files(list( html_file_l ), corpus_mtrx_fname, tid_dictionary=tid, norm_func=norm_func,\
                                                 encoding='utf8', error_handling='replace' )[0:2] #<--- Getting only 2 of the 3 returend values
-
-            #Tagging the Corpus EArray a non norlised, yet
-            corpus_mtrx._v_attrs.Normalised = False
             
-        return (corpus_mtrx, h5f)
+            #Save the Webpages term counts (Char N-grans or Word N-Grams)
+            docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx, axis=1))
 
-
-    def normalize(self, corpus_mtrx):
-
-        #It supposed to be executed faster and it requires much less memory because it 
-        #prevents the use of indermidate array which it is required in 'c = c / c.max()' operation
-        if not corpus_mtrx._v_attrs.Normalised:
-            
+            #Performing default (division by max value) normalisation for corpus matrix 'corpus_mtrx'
+            #Should I perform Standarisation/Normalisation by substracting mean value from vector variables?            
+            #The following way of normalisatoin supposed to be executed faster and 
+            #it requires much less memory because it prevents the use of 
+            #indermidate array which it is required in 'c = c / c.max()' operation
+            print "Normalising"   
             max_col_arr = np.max(corpus_mtrx, axis=1)[:, np.newaxis]
 
             for i, (row, max_val) in enumerate( zip(corpus_mtrx.iterrows(), max_col_arr) ):
                 corpus_mtrx[i] = row / max_val
-        
-            corpus_mtrx._v_attrs.Normalised = True
 
-        return corpus_mtrx
+        return (corpus_mtrx, h5f)
