@@ -123,8 +123,17 @@ class RFSE_Wrapped(object):
                     #print gnr_cls_bin.shape
                     
                     #Measure Similarity
-                    sim_score = self.similarity_func(vect, gnr_classes[ g ][:, features_subspace])
+                    if gnr_classes[ g ].ndim == 2:
+                        #This case is called when a Sparse Matrix is used which is alway 2D with first dim == 1
+                        sim_score = self.similarity_func(vect, gnr_classes[ g ][:, features_subspace])
                     
+                    elif gnr_classes[ g ].ndim == 1:
+                        #This case is called when a Array or pyTables-Array is used which it this case should be 1D
+                        sim_score = self.similarity_func(vect, gnr_classes[ g ][features_subspace])
+                    
+                    else:
+                        raise Exception("Unexpected Centroid Vector Dimensions: its shape should be (x,) for 1D array or (1,x) for 2D array or matrix")
+
                     #Just for debugging for 
                     #if sim_score < 0.0:
                     #    print "ERROR: Similarity score unexpected value ", sim_score

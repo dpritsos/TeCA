@@ -33,7 +33,7 @@ from wrappedmodels.rfse import RFSE_Wrapped, cosine_similarity, cosine_similarit
 
 #SANTINIS
 corpus_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/"
-kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_4Grams"
+kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Char_4Grams"
 genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio", "spirit_1000" ]
 test_only_tgs = [12]
 method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Char4Grams_RFSE_kf-10_SigmaT-[0.5]_TestOnly-spirit1000.h5', 'w')
