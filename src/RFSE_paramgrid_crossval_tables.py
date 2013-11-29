@@ -50,28 +50,17 @@ params_range = {
 } 
 
 word_n_gram_size = 1
-#sparse_wng = h2v_wcng.Html2TF(word_n_gram_size, attrib='text', lowercase=True, valid_html=False)
 tables_wng = h2v_wcng.Html2TF(word_n_gram_size, attrib='text', lowercase=True, valid_html=False)
 
 #char_n_gram_size = 4
 #tables_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, valid_html=False)
-#sparse_cng = h2v_cng.Html2TF(char_n_gram_size, attrib='text', lowercase=True, valid_html=False)
 
-#For Tables
 ml_model = RFSE_Wrapped(cosine_similarity, -1.0, genres[0:-1], bagging=False)
-
-#For Sparse
-#ml_model = RFSE_Wrapped(cosine_similarity_sparse, -1.0, genres[0:-1], bagging=False)
 
 pgrid_corssv = ParamGridCrossValTables(\
                     ml_model, tables_wng, method_results, 
                     genres, corpus_filepath, kfolds_vocs_filepath\
                )
-
-#pgrid_corssv = ParamGridCrossValBase(\
-#                    ml_model, sparse_cng, method_results, 
-#                    genres, corpus_filepath, kfolds_vocs_filepath\
-#               )
                
 html_file_l, cls_gnr_tgs = pgrid_corssv.corpus_files_and_tags()
 

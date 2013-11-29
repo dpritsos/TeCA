@@ -136,7 +136,7 @@ class CrossVal_OCSVM(object):
                 corpus_mtrx = self.TF_TT.from_files( list( xhtml_file_l ), tid_dictionary=tid, norm_func=norm_func,\
                                                          encoding='utf8', error_handling='replace' )
                 
-                 #SELECT FREATUR SIZE
+                #SELECT FREATUR SIZE
                 for featrs_size in featr_size_lst:
                     
                     #Creating a Group for this features size in h5 file under this k-fold

@@ -369,8 +369,9 @@ class ParamGridCrossValBase(object):
 
             print 
             
-            for name, value in model_specific_d.items():
-                self.h5_res.createArray(kfld_group, name, value, "<Comment>")[:]             
+            if  model_specific_d:
+                for name, value in model_specific_d.items():
+                    self.h5_res.createArray(kfld_group, name, value, "<Comment>")[:]             
         
             #Closing corpus file if any. Originaly for closing hd5 files
             if corpus_file:
