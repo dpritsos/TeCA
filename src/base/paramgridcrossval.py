@@ -54,10 +54,11 @@ class ParamGridCrossValBase(object):
             R = counts_per_grn_cv.astype(np.float) / cv_tg_idxs[gnr_cnt+1]
             R_per_gnr[gnr_cnt+1] = R[gnr_cnt+1]  
             F1_per_gnr[gnr_cnt+1] = 2 * P[gnr_cnt+1] * R[gnr_cnt+1] / (P[gnr_cnt+1] + R[gnr_cnt+1]) 
-            
-        P_per_gnr[0] = precision_score(crossval_Y, predicted_Y)   
-        R_per_gnr[0] = recall_score(crossval_Y, predicted_Y) 
-        F1_per_gnr[0] = f1_score(crossval_Y, predicted_Y)  
+
+        #Check this how it is working with Multiclass case [ 1,.., 2,.., 3,.., x,... ]
+        P_per_gnr[0] = -1 #precision_score(crossval_Y, predicted_Y)   
+        R_per_gnr[0] = -1 #recall_score(crossval_Y, predicted_Y) 
+        F1_per_gnr[0] = -1 #f1_score(crossval_Y, predicted_Y)  
 
         return (P_per_gnr, R_per_gnr, F1_per_gnr)
 
