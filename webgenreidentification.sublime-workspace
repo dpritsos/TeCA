@@ -52,9 +52,17 @@
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 392.0,
+		"height": 306.0,
 		"selected_items":
 		[
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control:",
+				"Package Control: Disable Package"
+			],
 			[
 				"pa",
 				"Package Control: Remove Package"
@@ -66,10 +74,6 @@
 			[
 				"gi",
 				"Git: Diff All"
-			],
-			[
-				"Package Control: ",
-				"Package Control: Install Package"
 			],
 			[
 				"Package Control: i",
@@ -97,6 +101,12 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/.config/sublime-text-2/Packages/LaTeXTools/README.markdown",
+		"/home/dimitrios/.config/sublime-text-2/Packages/LaTeXTools/Default (Linux).sublime-keymap",
+		"/home/dimitrios/Documents/Publications-Confs:MyTrys/Publication_ECIR2013/ECIR2013.tex",
+		"/home/dimitrios/.config/sublime-text-2/Packages/LaTeXTools/LaTeXTools Preferences.sublime-settings",
+		"/home/dimitrios/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
+		"/home/dimitrios/Development_Workspace/webgenreidentification/src/.gitignore",
 		"/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Word_1Grams/Corpus_filename_shorted.lst",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ParamGridCrossVal_RFSE.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/to_be_deprecated/crossval_experiments_OC-SVM.py",
@@ -206,7 +216,6 @@
 		"/home/dimitrios/ExtremePro_Workspace/ArtDesign_Site_ExtremePro.gr/Newsletter_Building_Scripts/build_html_snippets.py",
 		"/home/dimitrios/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
 		"/etc/modprobe.d/hid_apple.conf",
-		"/home/dimitrios/.config/sublime-text-2/Packages/User/Default (Linux).sublime-keymap",
 		"/home/dimitrios/Desktop/test.py",
 		"/usr/local/lib/python2.7/dist-packages/django/bin/__init__.py",
 		"/home/dimitrios/.config/sublime-text-2/Packages/SublimeCodeIntel/Base File.sublime-settings",
@@ -229,6 +238,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			".pdf",
+			"{}",
+			"math",
+			"math mode",
+			"math",
+			"section",
+			"\n\\",
 			"precision_score",
 			"~",
 			"/Users/stamatatos",
@@ -349,14 +365,7 @@
 			"ssp",
 			"tb",
 			"np",
-			"os",
-			"json",
-			"similarity_func",
-			"norm_func",
-			"predicted_classes_per_iter",
-			"max_sim_scores_per_iter",
-			"try",
-			"roc_curve"
+			"os"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -402,7 +411,7 @@
 		"cols":
 		[
 			0.0,
-			0.481883462849,
+			0.961757676685,
 			1.0
 		],
 		"rows":
@@ -452,7 +461,7 @@
 	"show_minimap": true,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": false,
-	"side_bar_width": 166.0,
+	"side_bar_visible": true,
+	"side_bar_width": 330.0,
 	"status_bar_visible": true
 }

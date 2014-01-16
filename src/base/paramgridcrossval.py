@@ -138,7 +138,7 @@ class ParamGridCrossValBase(object):
         return (np.array(html_file_l), np.array(cls_gnr_tgs))
 
 
-    def corpus_matrix(self, k, kfld_group, vocab_size, html_file_l, tid, norm_func):
+    def corpus_matrix(self, k, vocab_size_group, vocab_size, html_file_l, tid, norm_func):
 
         #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
         corpus_mtrx_fname = self.crps_voc_path+'/kfold_CorpusMatrix_'+str(k)+str(vocab_size)+'.pkl'
@@ -156,6 +156,7 @@ class ParamGridCrossValBase(object):
                                                 encoding='utf8', error_handling='replace' )[0] #<--- Be carefull with zero index
 
             #Save the Webpages term counts (Char N-grans or Word N-Grams)
+            kfld_group = self.h5_res.createGroup(vocab_size_group, 'KFold'+str(k))
             docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx.toarray(), axis=1))
 
             #Perform default (division by max value) normalisation for corpus matrix 'corpus_mtrx'
@@ -330,7 +331,7 @@ class ParamGridCrossValBase(object):
             #print tid.items()[0:5]
 
             #Load or Create the Coprus Matrix/Array for this combination or kfold and vocabulary_size
-            corpus_mtrx, corpus_file = self.corpus_matrix(k, kfld_group, vocab_size, html_file_l, tid, norm_func)
+            corpus_mtrx, corpus_file = self.corpus_matrix(k, vocab_size_group, vocab_size, html_file_l, tid, norm_func)
 
             #Load Training Indeces 
             trn_filename = self.crps_voc_path+'/kfold_trn_'+str(k)+'.idx'
@@ -391,7 +392,7 @@ class ParamGridCrossValTables(ParamGridCrossValBase):
         super(ParamGridCrossValTables, self).__init__(ML_Model, TF_TT, h5_res, genres, corpus_path, voc_path)    
 
 
-    def corpus_matrix(self, k, kfld_group, vocab_size, html_file_l, tid, norm_func):
+    def corpus_matrix(self, k, vocab_size_group, vocab_size, html_file_l, tid, norm_func):
 
         #Load or Crreate the Coprus Matrix (Spase) for this combination or kfold and vocabulary_size
         corpus_mtrx_fname = self.crps_voc_path+'/kfold_CorpusMatrix_'+str(k)+str(vocab_size)+'.h5'
@@ -410,6 +411,7 @@ class ParamGridCrossValTables(ParamGridCrossValBase):
                                                 encoding='utf8', error_handling='replace' )[0:2] #<--- Getting only 2 of the 3 returend values
             
             #Save the Webpages term counts (Char N-grans or Word N-Grams)
+            kfld_group = self.h5_res.createGroup(vocab_size_group, 'KFold'+str(k))
             docs_term_counts = self.h5_res.createArray(kfld_group, 'docs_term_counts', np.sum(corpus_mtrx, axis=1))
 
             #Performing default (division by max value) normalisation for corpus matrix 'corpus_mtrx'

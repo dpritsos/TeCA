@@ -34,22 +34,22 @@ from wrappedmodels.rfse import RFSE_Wrapped, cosine_similarity, cosine_similarit
 
 #SANTINIS
 corpus_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/"
-kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Word_1Grams"
+kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Word_3Grams"
 genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio", "spirit_1000" ]
 test_only_tgs = [12]
-method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_RFSE_Part-2.h5', 'w')
+method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words3Grams_RFSE.h5', 'w')
 
 
 params_range = {
     'kfolds' : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-    'vocab_size' : [5000, 10000], #[50000, 100000],  
+    'vocab_size' : [5000, 10000, 50000, 100000],  
     'features_size' : [500, 1000, 5000, 10000, 50000, 90000],
     'Iterations' : [10, 50, 100],
     'Sigma' : [0.5, 0.7, 0.9],
     #'Bagging' : [0.66],
 } 
 
-word_n_gram_size = 1
+word_n_gram_size = 3
 tables_wng = h2v_wcng.Html2TF(word_n_gram_size, attrib='text', lowercase=True, valid_html=False)
 
 #char_n_gram_size = 4

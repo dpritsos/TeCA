@@ -37,7 +37,7 @@ corpus_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/"
 kfolds_vocs_filepath = "/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Word_1Grams"
 genres = [ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio", "spirit_1000" ]
 test_only_tgs = [12]
-method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_OCSVME_Part-1.h5', 'w')
+method_results = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_RFSE_Part-1n2.h5', 'w')
 
 
 params_range = {

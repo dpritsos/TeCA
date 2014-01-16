@@ -9,8 +9,8 @@ from sklearn import grid_search
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 params_range = {
-    '1.vocab_size' : [100000], #[5000, 10000, 50000, 100000],
-    '2.features_size' : [500, 1000, 5000, 10000, 50000, 90000],
+    '1.vocab_size' : [100000], #5000, 10000, 50000, 
+    '2.features_size' : [500, 1000, 5000, 10000, 50000, 90000], #[500, 1000, 5000, 10000, 50000, 90000],
     #'3.Bagging' : [0.66],
     '4.Iterations' : [100], #[10, 50, 100],
     '3.Sigma' : [0.5, 0.7, 0.9]
@@ -19,7 +19,7 @@ params_range = {
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_TEST_NOBAGG.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'r')
-res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Char4Grams_RFSE_kf-10_SigmaT-[0.5]_TestOnly-spirit1000.h5', 'r')
+res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_RFSE_Part-1n2.h5', 'r')
 
 
 color_pallet2 = { 500:['k']*24, 1000:['r']*24, 5000:['g']*24, 10000:['b']*24, 50000:['y']*24, 90000:['m']*24 }
@@ -77,7 +77,7 @@ for i, params in enumerate(grid_search.IterGrid(params_range)):
 
 sub3.boxplot(Zero_Dist_lst)
 
-plt.savefig('/home/dimitrios/Desktop/Expected_ZClass.pdf')
+#plt.savefig('/home/dimitrios/Desktop/Expected_ZClass.pdf')
 
 plt.show()
                                                                          
