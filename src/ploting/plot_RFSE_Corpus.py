@@ -19,7 +19,9 @@ params_range = {
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_TEST_NOBAGG.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'r')
+
 res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_RFSE_Part-1n2.h5', 'r')
+#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Char4Grams_RFSE.h5', 'r')
 
 
 color_pallet2 = { 500:['k']*24, 1000:['r']*24, 5000:['g']*24, 10000:['b']*24, 50000:['y']*24, 90000:['m']*24 }
@@ -43,6 +45,9 @@ Zero_Dist_lst = list()
 plot_cnt = 0
 last_voc_size = '5000'
 
+
+singleplot = True
+
 for i, params in enumerate(grid_search.IterGrid(params_range)):
 
     if params['1.vocab_size'] > params['2.features_size']:
@@ -53,8 +58,6 @@ for i, params in enumerate(grid_search.IterGrid(params_range)):
         X, Y, mark_X, mark_Y = prcurve(res_h5file, kfolds, params_path, genre_tag=None)
 
         Zero_Dist_lst.append( zero_class_dist(res_h5file, kfolds, params_path, genre_tag=None) )
-
-        X_len, Y_len = ZClass_DocSize(res_h5file, kfolds, params_path, genre_tag=None)
 
         #Zero_Dist_lst.append( zclass_dist_per_class(res_h5file, kfolds, params_path, genre_tag=None) )
 
@@ -68,7 +71,11 @@ for i, params in enumerate(grid_search.IterGrid(params_range)):
         if mark_X !=None:
             plt.plot(mark_X, mark_Y, color[i] + symbol[i], markeredgewidth=15)
 
-        sub2.plot(X_len, Y_len,  symbol[i] + color[i], linewidth=1, markeredgewidth=2)
+        if  singleplot:
+            X_len, Y_len = ZClass_DocSize(res_h5file, kfolds, params_path, genre_tag=None)
+            sub2.bar(X_len, Y_len)
+            #sub2.plot(X_len, Y_len,  symbol[i] + color[i], linewidth=1, markeredgewidth=2)
+            singleplot = False
 
         sub1.grid(True)
         sub2.grid(True)

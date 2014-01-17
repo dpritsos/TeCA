@@ -192,41 +192,56 @@ def ZClass_DocSize(res_h5file, kfolds, params_path, genre_tag=None):
         
     else:
 
-        for k in kfolds:
+        for k in [0]: #kfolds:
 
-            pc_per_iter = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_classes_per_iter').read()
-            gnr_pred_cnt = np.where(pc_per_iter == genre_tag, 1, 0) 
+            #pc_per_iter = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_classes_per_iter').read()
+            #gnr_pred_cnt = np.where(pc_per_iter == genre_tag, 1, 0) 
             
-            fold_ps = np.sum(gnr_pred_cnt, axis=0) / np.float(pc_per_iter.shape[0])   
-            PS_lst.append(fold_ps) 
+            #fold_ps = np.sum(gnr_pred_cnt, axis=0) / np.float(pc_per_iter.shape[0])   
+            #PS_lst.append(fold_ps) 
             
             #pred_scores = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_scores' ).read()
             #PS_lst.append( pred_scores )
-            prmpath = "/vocab_size100000/features_size500/Sigma05/Iterations10"
+            prmpath = '/' + params_path.split('/')[1] 
             doc_len = res_h5file.getNode(prmpath+'/KFold'+str(0), name='docs_term_counts' ).read()
-            DCL_lst.append( doc_len )
             
-            exp_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='expected_Y' ).read()
-            EY_lst.append( exp_y )
+            import json
+            import pickle as cpkl
+            with open('/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Char_4Grams/Corpus_filename_shorted.lst', 'r')  as f:
+                flst = json.load(f)
 
-            pre_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_Y' ).read()
+            with open('/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Char_4Grams/kfold_Voc_0.pkl', 'r') as f:
+                voc = cpkl.load(f)
+                print voc.keys()[0:50]
 
-            PY_lst.append(pre_y)
+
+            print doc_len.max(), doc_len.argmax(), flst[ doc_len.argmax() ]
+
+            DCL_lst.append( doc_len[0:-1000] )
+            
+            #exp_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='expected_Y' ).read()
+            #EY_lst.append( exp_y )
+
+            #pre_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_Y' ).read()
+
+            #PY_lst.append(pre_y)
 
     #Make Tables for Ensemble Algo
-    EY = np.hstack(EY_lst)
-    PY = np.hstack(PY_lst)
+    #EY = np.hstack(EY_lst)
+    #PY = np.hstack(PY_lst)
     DCL = np.hstack(DCL_lst)
-    PS = np.hstack(PS_lst)
+    #PS = np.hstack(PS_lst)
+
+    print DCL.shape
 
     #Short Results by Predicted Scores
-    inv_srd_idx = np.argsort(EY)[:]
+    #inv_srd_idx = np.argsort(EY)[:]
     
 
-    PY = PY[ inv_srd_idx ]
-    EY = EY[ inv_srd_idx ]
+    #PY = PY[ inv_srd_idx ]
+    #EY = EY[ inv_srd_idx ]
 
-    print PY
+    #print PY
 
     """
     last = -1
@@ -236,7 +251,9 @@ def ZClass_DocSize(res_h5file, kfolds, params_path, genre_tag=None):
             last = ii
     """
     
-    Y = DCL[ (PY == EY ) & (PY == 0) ]
+    Y = DCL #[ (PY == EY ) & (PY == 0) ]
     X = range( Y.shape[0] )
+
+
 
     return X, Y
