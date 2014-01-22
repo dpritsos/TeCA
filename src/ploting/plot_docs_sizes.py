@@ -85,14 +85,11 @@ def Docs_Sizes(res_h5file, kfolds, params_path, root_path, fidx2gnr=None):
     #Short Results by Cross Validation Idices
     crv_idx_idx = np.argsort(CRV)
     
-    print crv_idx_idx
     #Short Results by Predicted Scores
     #inv_srd_idx = np.argsort(EY)[:]
-
     PY = PY[ crv_idx_idx ]
     EY = EY[ crv_idx_idx ]
     CRV = CRV[ crv_idx_idx ]
-    print CRV
 
     #CVR = CRV[ crv_idxs_idx ]
 
@@ -108,7 +105,7 @@ def Docs_Sizes(res_h5file, kfolds, params_path, root_path, fidx2gnr=None):
     Y = DCL # [ (PY == EY ) & (PY == 0) ]
 
     print len(EY == 0)
-    constrain_inds = CRV[ (EY == 0) ]
+    constrain_inds = CRV[ (PY == 0) & (PY != EY)]
 
     print constrain_inds
     
@@ -123,8 +120,10 @@ def Docs_Sizes(res_h5file, kfolds, params_path, root_path, fidx2gnr=None):
         Z_sets = list()
         Z_sets.append(last_gnr)
 
-        for idx, gname in enumerate(fidx2gnr):
+        for crv_i in CRV:
             
+            gname = fidx2gnr[crv_i]
+
             if gname != last_gnr: 
                 last_gnr = gname 
                 Z_sets.append(last_gnr)
@@ -133,8 +132,8 @@ def Docs_Sizes(res_h5file, kfolds, params_path, root_path, fidx2gnr=None):
                 print len(y_set)
                 y_set = []
            
-            if idx in constrain_inds:
-                y_set.append( Y[idx] )
+            if crv_i in constrain_inds:
+                y_set.append( Y[crv_i] )
 
             else:
                 pass #y_set.append( -10 )
@@ -164,7 +163,7 @@ if __name__ == '__main__':
         '2.features_size' : [10000], #500, 1000, 5000, 10000, 50000, 90000], #[500, 1000, 5000, 10000, 50000, 90000],
         #'3.Bagging' : [0.66],
         '4.Iterations' : [100], #[10, 50, 100],
-        '3.Sigma' : [0.5] #, 0.7, 0.9]
+        '3.Sigma' : [0.5] #0.5, 0.7, 0.9]
     } 
 
     root_path_Word1G = '/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Word_1Grams/'
@@ -227,7 +226,7 @@ if __name__ == '__main__':
             
             #sub1.legend(loc=3, bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)    
            
-    ax.xaxis.set_ticks(np.arange(0,120010,5000))
+    ax.xaxis.set_ticks(np.arange(0,200010,10000))
     plt.setp(plt.xticks()[1], rotation=45, size='small')
     #plt.setp(plt.zticks()[1], rotation=45, size='small')
     plt.setp(plt.yticks()[1], size='small')

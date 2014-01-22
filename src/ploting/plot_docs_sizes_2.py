@@ -113,22 +113,23 @@ def Docs_Sizes(res_h5file, kfolds, params_path, root_path, fidx2gnr=None):
         Z_sets = list()
         Z_sets.append(last_gnr)
 
-        for idx, gname in enumerate(fidx2gnr):
+       for crv_i in CRV:
             
+            gname = fidx2gnr[crv_i]
+
             if gname != last_gnr: 
                 last_gnr = gname 
                 Z_sets.append(last_gnr)
                 Y_sets.append(y_set)    
                 X_sets.append( range(len(y_set)) )
-                print sum(y_set)
+                print len(y_set)
                 y_set = []
            
-            if idx in constrain_inds:
-                y_set.append( Y[idx] )
+            if crv_i in constrain_inds:
+                y_set.append( Y[crv_i] )
 
             else:
                 pass #y_set.append( -10 )
-
         Y_sets.append(y_set)   
         print len(y_set) 
         X_sets.append( range(len(y_set)) )
