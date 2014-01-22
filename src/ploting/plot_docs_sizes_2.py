@@ -85,32 +85,22 @@ def Docs_Sizes(res_h5file, kfolds, params_path, root_path, fidx2gnr=None):
     #Short Results by Cross Validation Idices
     crv_idx_idx = np.argsort(CRV)
     
-    print crv_idx_idx
     #Short Results by Predicted Scores
     #inv_srd_idx = np.argsort(EY)[:]
 
     PY = PY[ crv_idx_idx ]
     EY = EY[ crv_idx_idx ]
     CRV = CRV[ crv_idx_idx ]
-    print CRV
 
-    #CVR = CRV[ crv_idxs_idx ]
+    u_CRV, uCRV_i = np.unique(CRV, return_index=True)
 
-    #print PY
-
-    """
-    last = -1
-    for ii in PY[inv_srd_idx]:
-        if ii != last:
-            print ii
-            last = ii
-    """
+    PY = PY[ uCRV_i ]
+    EY = EY[ uCRV_i ]
+    CRV = CRV[ uCRV_i ]
     
-    Y = DCL # [ (PY == EY ) & (PY == 0) ]
+    Y = DCL[ (PY != EY ) & (PY == 0) ]
 
-    constrain_inds = CRV #[ (PY != EY) & (PY == 0)  ]
-
-    print constrain_inds
+    constrain_inds = CRV #[ (PY == EY) & (PY == 0) ]
     
     if fidx2gnr:
 
@@ -148,8 +138,9 @@ def Docs_Sizes(res_h5file, kfolds, params_path, root_path, fidx2gnr=None):
         Z = Z_sets
 
     else:
-        X = range( Y.shape[0] )
-        Z = [0]
+        X = [range( Y.shape[0] )]
+        Y = [Y]
+        Z = [None]
 
     return X, Y, Z
 
@@ -186,7 +177,7 @@ if __name__ == '__main__':
 
     #plt.figure(num=None, figsize=(22, 12), dpi=80, facecolor='w', edgecolor='k')
     fig = plt.figure()
-    ax = fig.add_subplot(111,projection='3d')
+    ax = fig.add_subplot(111)
 
     for i, params in enumerate(grid_search.IterGrid(params_range)):
 
@@ -199,22 +190,30 @@ if __name__ == '__main__':
             color = color_pallet2[ params['2.features_size'] ]
 
             fidx2gnr = Idx_2_Genre(root_path_Char4G, 'Corpus_filename_shorted.lst')
-            X_sets, Y_sets, Z_sets = Docs_Sizes(res_h5file, kfolds, params_path, root_path_Char4G, fidx2gnr)
-            
+            X_sets, Y_sets, Z_sets = Docs_Sizes(res_h5file, kfolds, params_path, root_path_Char4G)
+
+            if Z_sets[0]:
+                ax.projection('3d')
+                
             for zi, (x, y, z) in enumerate(zip(X_sets, Y_sets, Z_sets)):
-                #hist, bins = np.histogram(Y_len, bins=500)
-                #print hist, bins
-                hist, bins = np.histogram(y, 100)
-                #print hist, bins
+                
+                hist, bins = np.histogram(y, 200)
+                print hist, bins
                 tmp = np.zeros(len(bins+1))
                 tmp[0:-1] = hist[::]
                 hist = tmp
 
-                ax.bar(bins[0:100], hist[0:100], zi, zdir='y', alpha=0.8, align='center', width=bins[1]-bins[0])
+                if Z_sets[0]:
+                    ax.bar(bins, hist, zi, zdir='y', alpha=0.8, align='center', width=bins[1]-bins[0])
+        
+                else:
+                    ax.bar(bins, hist, alpha=0.8, align='center', width=bins[1]-bins[0])
             
             #ax.set_ylim3d(0,11) 
             #ax.set_xlim3d(0,60000) 
-            plt.yticks(range(12), Z_sets, size="small")
+            if Z_sets[0]:
+                plt.yticks(range(12), Z_sets, size="small")
+
             #plt.title('False Negative("Don''t Know" excluded) Document-Size-Distributions per Genre (Char4Grams)')
             plt.title('"Don''t Know" Document-Size-Distributions per Genre (Char4Grams)')
             #ax.w_yaxis.set_ticklabels(Z_sets, size="small") 
@@ -222,15 +221,20 @@ if __name__ == '__main__':
             
             #sub1.legend(loc=3, bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)    
            
-    ax.xaxis.set_ticks(np.arange(0,300010,20000))
+    ax.xaxis.set_ticks(np.arange(0, 300010, 10000))
+    ax.yaxis.set_ticks(np.arange(0, 100, 5))
     plt.setp(plt.xticks()[1], rotation=45, size='small')
-    plt.setp(plt.zticks()[1], rotation=45, size='small')
-    plt.setp(plt.yticks()[1], size='small')
+    if Z_sets[0]:
+        plt.setp(plt.zticks()[1], rotation=45, size='small')
 
     #plt.savefig('/home/dimitrios/Desktop/Expected_ZClass.pdf')
     ax.set_xlabel('# Terms')
-    ax.set_zlabel('# Documents')
-    ax.set_ylabel('Genres')
+    
+    if Z_sets[0]:
+        ax.set_zlabel('# Documents')
+        ax.set_ylabel('Genres')
+    else:
+        ax.set_ylabel('# Documents')
 
     plt.show()
                                                                              

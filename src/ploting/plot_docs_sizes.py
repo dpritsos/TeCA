@@ -105,10 +105,10 @@ def Docs_Sizes(res_h5file, kfolds, params_path, root_path, fidx2gnr=None):
             print ii
             last = ii
     """
-    
     Y = DCL # [ (PY == EY ) & (PY == 0) ]
 
-    constrain_inds = CRV #[ (PY != EY) & (PY == 0)  ]
+    print len(EY == 0)
+    constrain_inds = CRV[ (EY == 0) ]
 
     print constrain_inds
     
@@ -130,7 +130,7 @@ def Docs_Sizes(res_h5file, kfolds, params_path, root_path, fidx2gnr=None):
                 Z_sets.append(last_gnr)
                 Y_sets.append(y_set)    
                 X_sets.append( range(len(y_set)) )
-                print sum(y_set)
+                print len(y_set)
                 y_set = []
            
             if idx in constrain_inds:
@@ -216,15 +216,20 @@ if __name__ == '__main__':
             #ax.set_xlim3d(0,60000) 
             plt.yticks(range(12), Z_sets, size="small")
             #plt.title('False Negative("Don''t Know" excluded) Document-Size-Distributions per Genre (Char4Grams)')
-            plt.title('"Don''t Know" Document-Size-Distributions per Genre (Char4Grams)')
+            
+            #plt.title('Full Corpus Document-Size-Distributions per Genre (Char4Grams)')
+            
+            #plt.title('"Don''t Know"-(Should Have Been) Document-Size-Distributions per Genre (Char4Grams)')
+            plt.title('Missclassified (Excluding "Don''t Know") Document-Size-Distributions per Genre (Char4Grams)')
+
             #ax.w_yaxis.set_ticklabels(Z_sets, size="small") 
             
             
             #sub1.legend(loc=3, bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)    
            
-    ax.xaxis.set_ticks(np.arange(0,300010,20000))
+    ax.xaxis.set_ticks(np.arange(0,120010,5000))
     plt.setp(plt.xticks()[1], rotation=45, size='small')
-    plt.setp(plt.zticks()[1], rotation=45, size='small')
+    #plt.setp(plt.zticks()[1], rotation=45, size='small')
     plt.setp(plt.yticks()[1], size='small')
 
     #plt.savefig('/home/dimitrios/Desktop/Expected_ZClass.pdf')
