@@ -14,7 +14,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gspec
  
-from analysis.docmetrix import get_idx2gnr, Docs_Sizes, get_docsizes
+from analytics.docmetrix import get_idx2gnr, Docs_Sizes, get_docsizes
 
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
