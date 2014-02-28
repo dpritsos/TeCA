@@ -1,6 +1,6 @@
 """ 
-    This module includs a set of functions required for interpolating and averaging
-    PR curves as they are returned from 'sklearn.metrics' machine learning library.
+    This module included ROC, PRC, AUC, Interpolation, etc., functions.
+    Details can be found in each funciton separatly. 
 
     Aurthor: Dimitrios Pritos
 
@@ -13,7 +13,7 @@ def roc_curve(trh_arr, scr_arr, arr_type=np.float32):
     """Receiver Operating Characteristic (ROC) curves.
 
     Returns the Receiver Operating Characteristic curve given the truth table, 
-    i.e. the binary real labels of the samples and the scores/probabilities returned. 
+    i.e. the binary real labels of the samples and the scores/probabilities returned 
     by the classifier, either as final result or in an indeterminate stage of the 
     classification/prediction.
 
@@ -39,7 +39,7 @@ def roc_curve(trh_arr, scr_arr, arr_type=np.float32):
     Output:
 
         tp_rate: True positive rate values array.
-        tp_rate: False positive rate values array.
+        tf_rate: False positive rate values array.
         unique_scores: Unique Scores from scr_arr argument. These values are the thresholds 
             where new points in ROC curve where added.
 
@@ -76,15 +76,15 @@ def roc_curve(trh_arr, scr_arr, arr_type=np.float32):
     #Building the ROC curve
     for exp_y, scr in zip(trh_arr, scr_arr):
 
-        if scr != last_scr:
-            tp_rate.append( tp / pos_sum )
-            fp_rate.append( fp / neg_sum )
-            last_scr = scr
-
         if exp_y > 0:   #if expected y is 1  
             tp += 1
         else:           #if expected y is 0  
             fp += 1
+
+        if scr != last_scr:
+            tp_rate.append( tp / pos_sum )
+            fp_rate.append( fp / neg_sum )
+            last_scr = scr
         
     #Append last point if not already
     tp_rate.append( tp / pos_sum )
@@ -96,6 +96,100 @@ def roc_curve(trh_arr, scr_arr, arr_type=np.float32):
 
     #Returning the ROC curve
     return tp_rate, fp_rate, np.unique(scr_arr)
+
+
+def pr_curve(trh_arr, scr_arr, arr_type=np.float32):
+    """Precision-Recall (PR) curves.
+
+    Returns the Precision-Recall curve given the truth table, i.e. the binary real 
+    labels of the samples and the scores/probabilities returned by the classifier, 
+    either as final result or in an indeterminate stage of the classification/prediction.
+
+    This algorithm has been developed for exploiting the monotonicity of the curve, 
+    i.e. any instance that is classified positive with respect to a given threshold 
+    will be classified positive for all lower thresholds as well. Therefore, we can 
+    simply sort the test instances decreasing by f scores and move down the list, 
+    processing one instance at a time and updating TP as we go. In this way
+    an PR graph can be created from a linear scan. Followin the same line of thought
+    as the algorithm is described for ROC curves which has been cited in "ROC Graphs: 
+    Notes and Practical Considerations for Researchers" by Tom Fawcett.
+    
+    Input argumens:
+        
+        trh_arr: The binay truth array, i.e. the real classies of the samples 
+            has been given to the Classifier.
+            Valid values:  +1 for positive samples.
+                            0 or -1 for negative samples.
+            arr_type: (optional) user-defined arrays type. default numpy.flaot32
+
+        scr_arr: The Classifier's returning scores/probabilities array for samples 
+            being positive.
+
+    Output:
+
+        precision: Precision values array.
+        recall: Recall values array (equivalent to the True positive rate) .
+        tp_rate: False positive rate values array.
+        unique_scores: Unique Scores from scr_arr argument. These values are the thresholds 
+            where new points in PR curve where added.
+
+    """
+
+    #Weak checking for invalid values in real classes (values) array.
+    if not (np.sum(trh_arr == 0) + np.sum(trh_arr == 1)) == trh_arr.size and\
+        not (np.sum(trh_arr == -1) + np.sum(trh_arr == 1)) == trh_arr.size:
+        raise Exception("Samples truth table array contains invalid values:\
+                    Only {1,0} or {1,-1} (float or integer) sets of values are valid.")
+
+    #In place convertion of numerical type in case the input is in integer. 
+    trh_arr = trh_arr.astype(arr_type, copy=False)
+    scr_arr = scr_arr.astype(arr_type, copy=False)
+
+    #Convert truth binary array from {1, -1} to {1, 0}.
+    trh_arr[ np.where(trh_arr == -1) ] = 0
+
+    #Counting the total number of positive.
+    pos_sum = trh_arr.sum()
+
+    #Initialising True Positive and False Positive counters.
+    tp = 0
+   
+    #Initialising True Positive and False Positive rates.
+    precision = list()
+    recall = list()
+    
+    #Appeding fist fixed point (x, y) = (0, 1).
+    #This point might be a duplicate in best case or misleading in worst case.
+    precision.append( 1.0 )
+    recall.append( 0.0 )
+    
+    #Initialising last score and document counter.
+    last_scr = -1
+    doc_cnt = 0.0
+    
+    #Building the PR curve
+    for exp_y, scr in zip(trh_arr, scr_arr):
+
+        doc_cnt += 1.0
+
+        if exp_y > 0:   #if expected y is 1  
+            tp += 1
+
+        #if scr != last_scr:
+        precision.append( tp / doc_cnt )
+        recall.append( tp / pos_sum )
+        last_scr = scr
+        
+    #Append last point if not already
+    precision.append( tp / doc_cnt )
+    recall.append( tp / pos_sum )
+
+    #Converting Precision and Recall lists to numpy.arrays
+    precision = np.array(precision, dtype=arr_type)
+    recall = np.array(recall, dtype=arr_type)
+
+    #Returning the ROC curve
+    return precision, recall, np.unique(scr_arr)
 
 
 def auc(x, y, arr_type=np.float32):
@@ -155,6 +249,8 @@ def auc(x, y, arr_type=np.float32):
     #This is equal to matrix operation h*b.T or array operation sum(h*b).
     return np.sum( heigt_means*dx )
 
+
+""" Under Refactoring - START"""
 
 def recl_lv_P_avg(P, R):
 
@@ -286,6 +382,9 @@ def nrst_smooth_pr(P, R):
         idxs[i] = (np.abs(R - r)).argmin()
     
     return smoothed_P[idxs], R[idxs]
+
+
+""" Under Refactoring - END"""
 
 
 class purepy(object):

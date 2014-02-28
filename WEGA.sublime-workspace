@@ -72,6 +72,10 @@
 		"selected_items":
 		[
 			[
+				"",
+				"Package Control: Install Package"
+			],
+			[
 				"Package Control: ",
 				"Package Control: Install Package"
 			],
@@ -94,10 +98,6 @@
 			[
 				"Package Control: i",
 				"Package Control: Install Package"
-			],
-			[
-				"",
-				"Build: Cancel"
 			]
 		],
 		"width": 602.0
@@ -117,6 +117,8 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/Development_Workspace/WEGA/src/analytics/pr_curves_to_11_standard_recall_levels.pyc",
+		"/usr/local/lib/python2.7/dist-packages/sklearn/metrics/metrics.py",
 		"/home/dimitrios/Documents/passwords.txt",
 		"/home/dimitrios/Development_Workspace/WEGA/src/analytics/roc_curves",
 		"/home/dimitrios/Documents/pan13tools/pan13performance.py",
@@ -230,7 +232,6 @@
 		"/home/dimitrios/Documents/pan13tools/Answers.txt",
 		"/home/dimitrios/ExtremePro_Workspace/ArtDesign_Site_ExtremePro.gr/EOLO-SPORTS_Aetoi-KATHARODEYTERA/Email_HTML/EMAIL_to_Retail_Customers.html",
 		"/home/dimitrios/Desktop/untitled.py",
-		"/usr/local/lib/python2.7/dist-packages/sklearn/metrics/metrics.py",
 		"/home/dimitrios/Desktop/Profff/pan13tools.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/Author_Attribution_lowbow.py",
 		"/home/dimitrios/Desktop/Profff/ROC_Algo.txt",
@@ -260,6 +261,16 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"srl",
+			"fp_rate",
+			"tp_rate",
+			"precision_recall_curve",
+			"check_arrays",
+			"scr_arr",
+			"trh_arr",
+			"reorder",
+			"auc",
+			"auc_score",
 			"roc_curve",
 			"auc",
 			"roc_curve",
@@ -377,17 +388,7 @@
 			"side",
 			"^",
 			"items()",
-			"items()\n",
-			"():\n",
-			"():",
-			"items()",
-			"name",
-			"crv_idxs, corpus_mtrx, cls_gnr_tgs, vocab_index_dct, params,",
-			"bagging_param",
-			"sigma_threshold",
-			"iters",
-			"featrs_size",
-			"bagging_param"
+			"items()\n"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -433,7 +434,7 @@
 		"cols":
 		[
 			0.0,
-			0.968592964824,
+			0.905541561713,
 			1.0
 		],
 		"rows":
@@ -445,7 +446,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 235.0
+		"height": 232.0
 	},
 	"output.git":
 	{
@@ -484,6 +485,6 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 332.0,
+	"side_bar_width": 286.0,
 	"status_bar_visible": true
 }

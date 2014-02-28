@@ -1,9 +1,13 @@
 "Precision Recall Curves"
 
 
+import sys
+sys.path.append('../../src')
+
 import numpy as np
 import sklearn.metrics as skm
-import pr_curves as srl
+from analytics.metrix import pr_curve
+#import pr_curves as srl
 
 
 def prcurve(res_h5file, kfolds, params_path, genre_tag=None, mark_thres=None):
@@ -48,7 +52,14 @@ def prcurve(res_h5file, kfolds, params_path, genre_tag=None, mark_thres=None):
     EY = EY[ inv_srd_idx ]
 
     #Calculate P-R Curves for Ensemble Algorithm
-    P, R, T= skm.precision_recall_curve(EY, PS)
+    P, R, T = skm.precision_recall_curve(EY, PS)
+
+    PP, RR, TT = pr_curve(EY, PS)
+
+    print PP, len(P), len(PP), "\n"
+    print RR, len(R), len(RR), "\n"
+    print TT, len(T), len(TT), "\n"
+
     
     T = T[::-1]
     R = R[::-1]
