@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gspec
 from analytics.curve_pr_rfse import  prcurve
 from analytics.docmetrix import zero_class_dist, zclass_dist_per_class, ZClass_DocSize
+from analytics.metrix import auc
 from sklearn import grid_search
 
 
@@ -40,11 +41,9 @@ line_type = [ "--", "--", "--", "--", "-" , "-", "-", "-", "--", "--", "--", "--
 
 plt.figure(num=None, figsize=(22, 12), dpi=80, facecolor='w', edgecolor='k')
 
-gs = gspec.GridSpec(5, 3)
+gs = gspec.GridSpec(5, 1)
 
 sub1 = plt.subplot(gs[:-1, 0])
-sub2 = plt.subplot(gs[:-1, 1])
-sub3 = plt.subplot(gs[:-1, 2])
 #sub3 = plt.ylim(ymin=0, ymax=12000)
 
 
@@ -55,6 +54,7 @@ last_voc_size = '5000'
 
 
 singleplot = True
+
 
 for i, params in enumerate(grid_search.IterGrid(params_range)):
 
@@ -74,28 +74,10 @@ for i, params in enumerate(grid_search.IterGrid(params_range)):
 
         plot_cnt += 1
 
-        sub1.plot(X, Y, symbol[i] + line_type[i] + color[i], linewidth=1, markeredgewidth=2, label="("+str(plot_cnt)+") RFSE"+params_path  )
-        
-        print Y
-        
-        """
-        A, B = srl.interpol_soothed_pr_curve(Y[::-1], X)
+        a = auc(X, Y)
 
-        sub2.plot(B, A, symbol[i] + line_type[i] + color[i], linewidth=1, markeredgewidth=2, label="("+str(plot_cnt)+") RFSE"+params_path  )
-
-        A, B = srl._interpol_soothed_pr_curve(Y[::-1], X)
-
-        sub3.plot(B, A, symbol[i] + line_type[i] + color[i], linewidth=1, markeredgewidth=2, label="("+str(plot_cnt)+") RFSE"+params_path  )
-        
-        if mark_X !=None:
-            plt.plot(mark_X, mark_Y, color[i] + symbol[i], markeredgewidth=15)
-
-        #if  singleplot:
-        #    X_len, Y_len = ZClass_DocSize(res_h5file, kfolds, params_path, genre_tag=None)
-        #    sub2.bar(X_len, Y_len)
-        #    #sub2.plot(X_len, Y_len,  symbol[i] + color[i], linewidth=1, markeredgewidth=2)
-        #    singleplot = False
-        """
+        sub1.plot(plot_cnt, a, symbol[i] + line_type[i] + color[i], linewidth=1, markeredgewidth=2, label="("+str(plot_cnt)+") RFSE"+params_path  )
+      
         sub1.grid(True)
         #sub2.grid(True)
         sub1.legend(loc=3, bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)    

@@ -9,7 +9,7 @@
 import numpy as np
 
 
-def roc_curve(trh_arr, scr_arr, arr_type=np.float32):
+def roc_curve(trh_arr, scr_arr, full_curve=False, arr_type=np.float32):
     """Receiver Operating Characteristic (ROC) curves.
 
     Returns the Receiver Operating Characteristic curve given the truth table, 
@@ -36,6 +36,11 @@ def roc_curve(trh_arr, scr_arr, arr_type=np.float32):
         scr_arr: The Classifier's returning scores/probabilities array for samples 
             being positive.
 
+        full_curve: Expected values are {0,1} or {True, False}:
+            If its values is 1 or True it will return a point for every input score in scr_arr.
+            If its values is 0 or False it will return a point for only the unique input scores,
+            i.e. numpy.unique(scr_arr) returning values.
+
     Output:
 
         tp_rate: True positive rate values array.
@@ -50,6 +55,10 @@ def roc_curve(trh_arr, scr_arr, arr_type=np.float32):
         not (np.sum(trh_arr == -1) + np.sum(trh_arr == 1)) == trh_arr.size:
         raise Exception("Samples truth table array contains invalid values:\
                     Only {1,0} or {1,-1} (float or integer) sets of values are valid.")
+
+    #Checking the expected values (True/False) for 'full_curve' argument
+    if not isinstance(full_curve, bool) and not full_curve in [0,1]:
+        raise Exception("full_curve agument expected values are: Only {0,1} or {True,False}.") 
 
     #In place convertion of numerical type in case the input is in integer. 
     trh_arr = trh_arr.astype(arr_type, copy=False)
@@ -81,7 +90,7 @@ def roc_curve(trh_arr, scr_arr, arr_type=np.float32):
         else:           #if expected y is 0  
             fp += 1
 
-        if scr != last_scr:
+        if scr != last_scr or full_curve:
             tp_rate.append( tp / pos_sum )
             fp_rate.append( fp / neg_sum )
             last_scr = scr
@@ -98,7 +107,7 @@ def roc_curve(trh_arr, scr_arr, arr_type=np.float32):
     return tp_rate, fp_rate, np.unique(scr_arr)
 
 
-def pr_curve(trh_arr, scr_arr, arr_type=np.float32):
+def pr_curve(trh_arr, scr_arr, full_curve=False, arr_type=np.float32):
     """Precision-Recall (PR) curves.
 
     Returns the Precision-Recall curve given the truth table, i.e. the binary real 
@@ -125,6 +134,11 @@ def pr_curve(trh_arr, scr_arr, arr_type=np.float32):
         scr_arr: The Classifier's returning scores/probabilities array for samples 
             being positive.
 
+        full_curve: Expected values are {0,1} or {True, False}:
+            If its values is 1 or True it will return a point for every input score in scr_arr.
+            If its values is 0 or False it will return a point for only the unique input scores,
+            i.e. numpy.unique(scr_arr) returning values.
+
     Output:
 
         precision: Precision values array.
@@ -135,11 +149,15 @@ def pr_curve(trh_arr, scr_arr, arr_type=np.float32):
 
     """
 
-    #Weak checking for invalid values in real classes (values) array.
+    #Checking for invalid values in real classes (values) array.
     if not (np.sum(trh_arr == 0) + np.sum(trh_arr == 1)) == trh_arr.size and\
         not (np.sum(trh_arr == -1) + np.sum(trh_arr == 1)) == trh_arr.size:
         raise Exception("Samples truth table array contains invalid values:\
                     Only {1,0} or {1,-1} (float or integer) sets of values are valid.")
+
+    #Checking the expected values (True/False) for 'full_curve' argument
+    if not isinstance(full_curve, bool) and not full_curve in [0,1]:
+        raise Exception("full_curve agument expected values are: Only {0,1} or {True,False}.") 
 
     #In place convertion of numerical type in case the input is in integer. 
     trh_arr = trh_arr.astype(arr_type, copy=False)
@@ -175,10 +193,10 @@ def pr_curve(trh_arr, scr_arr, arr_type=np.float32):
         if exp_y > 0:   #if expected y is 1  
             tp += 1
 
-        #if scr != last_scr:
-        precision.append( tp / doc_cnt )
-        recall.append( tp / pos_sum )
-        last_scr = scr
+        if scr != last_scr or full_curve:
+            precision.append( tp / doc_cnt )
+            recall.append( tp / pos_sum )
+            last_scr = scr
         
     #Append last point if not already
     precision.append( tp / doc_cnt )
@@ -247,7 +265,7 @@ def auc(x, y, arr_type=np.float32):
 
     #Returning the AUC, i.e. the sum of all trapezoids formed under the curve.
     #This is equal to matrix operation h*b.T or array operation sum(h*b).
-    return np.sum( heigt_means*dx )
+    return np.sum( height_means*dx )
 
 
 """ Under Refactoring - START"""
