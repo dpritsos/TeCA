@@ -66,7 +66,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
             gnr_pred_cnt = np.where(pc_per_iter == genre_tag, 1, 0) 
             
             fold_ps = np.sum(gnr_pred_cnt, axis=0) / np.float(pc_per_iter.shape[0])   
-            PS_lst.append(fold_ps) 
+            PS_lst.append(fold_ps)
             
             #Collecting the excected tag values by conveting them first in binary form.
             exp_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='expected_Y' ).read()
@@ -77,6 +77,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
         #Collecting Scores for and Expected Values for every fold given in kfold list.    
         for k in kfolds:
             
+            #Loading expected and predicted values.
             pred_scores = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_scores').read()
             PS_lst.append( pred_scores )
 

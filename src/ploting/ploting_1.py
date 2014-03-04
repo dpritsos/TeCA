@@ -6,9 +6,8 @@ sys.path.append('../../src')
 import tables as tb
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gspec
-from analytics.curve_pr_rfse import  prcurve
-from analytics.docmetrix import zero_class_dist, zclass_dist_per_class, ZClass_DocSize
-from analytics.metrix import auc
+import data_retrieval.rfsedata as data
+import analytics.metrix as mx
 from sklearn import grid_search
 
 

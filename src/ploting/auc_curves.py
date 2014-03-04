@@ -4,24 +4,24 @@ import sys
 sys.path.append('../../src')
 
 import tables as tb
+import collections as coll
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gspec
-from analytics.curve_pr_rfse import  prcurve
-from analytics.docmetrix import zero_class_dist, zclass_dist_per_class, ZClass_DocSize
-from analytics.metrix import auc
+import data_retrieval.rfsedata as data
+import base.param_combs as param_comb
+import analytics.metrix as mx
 from sklearn import grid_search
-
 
 
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-params_range = {
-    '1.vocab_size' : [5000, 10000, 50000, 
-    '2.features_size' : [500, 1000, 5000, 10000, 50000, 90000], 
-    #'3.Bagging' : [0.66],
-    '4.Iterations' : [100], #[10, 50, 100],
-    '3.Sigma' : [0.5, 0.7, 0.9]
-} 
+params_od = coll.OrderedDict( [
+    ('vocab_size', [5000, 10000, 50000, 100000]),\
+    ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),\
+    #'3.Bagging', [0.66],\
+    ('Sigma', [0.5, 0.7, 0.9]),\
+    ('Iterations', [100]), #[10, 50, 100]),\
+] )
 
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_TEST_NOBAGG.h5', 'r')
@@ -46,35 +46,42 @@ gs = gspec.GridSpec(5, 1)
 sub1 = plt.subplot(gs[:-1, 0])
 #sub3 = plt.ylim(ymin=0, ymax=12000)
 
-
 Zero_Dist_lst = list()
 
 plot_cnt = 0
 last_voc_size = '5000'
 
-
 singleplot = True
 
 
-for i, params in enumerate(grid_search.IterGrid(params_range)):
 
-    if params['1.vocab_size'] > params['2.features_size']:
+for i, params in enumerate(param_comb.ParamGridIter(params_od)):
 
-        params_path = "/".join( [ key.split('.')[1] + str(value).replace('.','') for key, value in sorted( params.items() ) ] )
+    print params
+
+    if params['vocab_size'] > params['features_size']:
+
+        params_path = "/".join( [ key+str(value).replace('.','') for key, value in params.items() ] )
         params_path = '/' + params_path
         
-        X, Y, mark_X, mark_Y = prcurve(res_h5file, kfolds, params_path, genre_tag=None)
+        print params_path
 
-        Zero_Dist_lst.append( zero_class_dist(res_h5file, kfolds, params_path, genre_tag=None) )
+        ps, ey = data.get_predictions(res_h5file, kfolds, params_path, genre_tag=None)
 
-        #Zero_Dist_lst.append( zclass_dist_per_class(res_h5file, kfolds, params_path, genre_tag=None) )
+        p, r, t = mx.pr_curve(ey, ps, full_curve=False)
 
+        auc_value = mx.auc(p, r)
+
+        
+"""
         #color = color_pallet[ params['1.vocab_size'] ]
         color = color_pallet2[ params['2.features_size'] ]
 
         plot_cnt += 1
 
         a = auc(X, Y)
+
+
 
         sub1.plot(plot_cnt, a, symbol[i] + line_type[i] + color[i], linewidth=1, markeredgewidth=2, label="("+str(plot_cnt)+") RFSE"+params_path  )
       
@@ -88,5 +95,6 @@ for i, params in enumerate(grid_search.IterGrid(params_range)):
 #plt.savefig('/home/dimitrios/Desktop/Expected_ZClass.pdf')
 
 plt.show()
+"""
                                                                          
 res_h5file.close()   
