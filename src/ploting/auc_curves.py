@@ -12,6 +12,8 @@ import base.param_combs as param_comb
 import analytics.metrix as mx
 from sklearn import grid_search
 
+from sklearn import grid_search
+
 
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -64,7 +66,7 @@ for i, params in enumerate(param_comb.ParamGridIter(params_od)):
         params_path = "/".join( [ key+str(value).replace('.','') for key, value in params.items() ] )
         params_path = '/' + params_path
         
-        print params_path
+    	print params_path
 
         ps, ey = data.get_predictions(res_h5file, kfolds, params_path, genre_tag=None)
 
