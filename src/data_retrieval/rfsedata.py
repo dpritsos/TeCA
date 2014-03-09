@@ -63,6 +63,8 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
 
             #Calulating Prediction Scores for the given Gerne i.e. assuming that the rest genres being Negative examples
             pc_per_iter = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_classes_per_iter').read()
+            #pc_per_iter = pc_per_iter[0:-2500]
+            #genre_tag = genre_tag[0:-2500]
             gnr_pred_cnt = np.where(pc_per_iter == genre_tag, 1, 0) 
             
             fold_ps = np.sum(gnr_pred_cnt, axis=0) / np.float(pc_per_iter.shape[0])   
@@ -70,6 +72,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
             
             #Collecting the excected tag values by conveting them first in binary form.
             exp_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='expected_Y' ).read()
+            #exp_y = exp_y[0:-2500]
             EY_lst.append( np.where(exp_y == genre_tag, 1, 0) ) 
 
     elif genre_tag == None:
@@ -79,11 +82,14 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
             
             #Loading expected and predicted values.
             pred_scores = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_scores').read()
+            pred_scores = pred_scores#[0:-1000]
             PS_lst.append( pred_scores )
 
             exp_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='expected_Y').read()
+            exp_y = exp_y#[0:-1000]
 
             pre_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_Y').read()
+            pre_y = pre_y#[0:-1000]
 
             #Collecting and the Truth Table of expected and predicted values.
             EY_lst.append( np.where(exp_y == pre_y, 1, 0) )

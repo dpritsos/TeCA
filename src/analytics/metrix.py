@@ -250,15 +250,17 @@ def auc(x, y, arr_type=np.float32):
     x = x.astype(arr_type, copy=False)
     y = y.astype(arr_type, copy=False)
 
-    #Checking curve's points correct sequence. Channing it if it is required.
-    if np.argmax(x) == 0: #Sequence is in descending order so it is inverted.
+    #Checking curve's points correct sequence.
+    if np.argmax(x) == 0: #Sequence assumed to be in descending order so it is inverted.
         y = y[::-1]
         x = x[::-1]
-    elif np.argmin(x) != 0: #Sequence is not in random order the the curve is incorrect.
+
+    #Checking the Sequence. If x it is in random order the input is not a proper curve.
+    if not np.array_equal(np.sort(x), x) and not np.array_equal(np.sort(x), x[::-1]): 
         raise Exception("X-coordinate sequence is in random oder: Impossible to calculate the AUC correctly.")
     
     #Calculating the delta-x's, i.e. bases of trapezoids.
-    dx = np.diff(x)
+    dx = np.abs( np.diff(x) )
     
     #Calculating the average hight amongst all sequential pairs of y axis heights.
     height_means = ( y[1:] + y[:-1] ) / 2.0 

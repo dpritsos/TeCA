@@ -2,8 +2,10 @@
 
 import sys
 sys.path.append('../../src')
+sys.path.append('../../../DoGSWrapper/src')
 
 import tables as tb
+import numpy as np
 import collections as coll
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gspec
@@ -22,16 +24,16 @@ params_od = coll.OrderedDict( [
     ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),\
     #'3.Bagging', [0.66],\
     ('Sigma', [0.5, 0.7, 0.9]),\
-    ('Iterations', [100]), #[10, 50, 100]),\
+    ('Iterations', [100]) #, 50, 100])
 ] )
 
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_TEST_NOBAGG.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'r')
 
-#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_RFSE.h5', 'r')
+res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_RFSE.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words3Grams_RFSE.h5', 'r')
-res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Char4Grams_RFSE.h5', 'r')
+#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Char4Grams_RFSE.h5', 'r')
 
 
 
@@ -41,41 +43,69 @@ color_pallet = { 5000:['k']*24, 10000:['r']*24, 50000:['g']*24, 100000:['b']*24 
 symbol = [ "^", "*", "x", "+", "*", "^", "x", "+", "^", "*", "x", "+", "*", "^", "x", "+", "^", "*", "x", "+", "*", "^", "x", "+" ]
 line_type = [ "--", "--", "--", "--", "-" , "-", "-", "-", "--", "--", "--", "--", "-" , "-", "-", "-", "--", "--", "--", "--", "-" , "-", "-", "-" ]
 
-plt.figure(num=None, figsize=(22, 12), dpi=80, facecolor='w', edgecolor='k')
-
-gs = gspec.GridSpec(5, 1)
-
-sub1 = plt.subplot(gs[:-1, 0])
-#sub3 = plt.ylim(ymin=0, ymax=12000)
-
-Zero_Dist_lst = list()
-
-plot_cnt = 0
-last_voc_size = '5000'
-
-singleplot = True
 
 
+res_lst = list()
 
-for i, params in enumerate(param_comb.ParamGridIter(params_od)):
+#Loading data in a convenient form.
+for params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), param_comb.ParamGridIter(params_od, 'path')):
 
-    print params
-
-    if params['vocab_size'] > params['features_size']:
-
-        params_path = "/".join( [ key+str(value).replace('.','') for key, value in params.items() ] )
-        params_path = '/' + params_path
-        
-    	print params_path
+    if params_lst[0] > params_lst[1]:
 
         ps, ey = data.get_predictions(res_h5file, kfolds, params_path, genre_tag=None)
 
         p, r, t = mx.pr_curve(ey, ps, full_curve=False)
 
-        auc_value = mx.auc(p, r)
+        try:
+            auc_value = mx.auc(r, p)
 
+            params_lst.extend([auc_value])
+
+            res_lst.append(params_lst)
         
-"""
+        except:
+            
+            print params_path
+            
+
+#Stack the data collected in a 2D array. Last column contain the AUC for every parameters values possible combination.
+res = np.vstack(res_lst)
+
+
+plt.figure(num=None, figsize=(22, 12), dpi=80, facecolor='w', edgecolor='k')
+#sub3 = plt.ylim(ymin=0, ymax=12000)
+
+
+#Variance Implementation.
+for voc_size in params_od['features_size']: #params_od['vocab_size']:
+  
+    x = list()
+    y = list()
+    yerr = list()
+
+    for feat_size in params_od['vocab_size']: #params_od['features_size']:
+
+        auc_per_sigma = res[ np.where((res[:,0] == feat_size) & (res[:,1] == voc_size)) ]
+
+        if auc_per_sigma.shape[0]:
+            print auc_per_sigma[:,-1]
+            x.append(feat_size)    
+            y.append( np.mean(auc_per_sigma[:,-1]) )
+            yerr.append( np.var(auc_per_sigma[:,-1]) )
+
+    plt.errorbar(x, y, yerr, label=voc_size)
+
+plt.xticks(params_od['vocab_size'])
+plt.grid()
+plt.legend(loc=0) #bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)
+
+plt.show()
+
+
+
+
+"""        
+
         #color = color_pallet[ params['1.vocab_size'] ]
         color = color_pallet2[ params['2.features_size'] ]
 
