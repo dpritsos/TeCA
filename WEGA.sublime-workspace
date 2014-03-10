@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"p",
+				"append  (function)"
+			],
+			[
+				"re",
+				"recurtion"
+			],
+			[
 				"key",
 				"keyval_pairs"
 			],
@@ -83,31 +91,7 @@
 			"file": "src/ploting/auc_curves.py",
 			"settings":
 			{
-				"buffer_size": 3307,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/base/param_combs.py",
-			"settings":
-			{
-				"buffer_size": 1011,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/base/paramgridcrossval.py",
-			"settings":
-			{
-				"buffer_size": 21447,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/analytics/metrix.py",
-			"settings":
-			{
-				"buffer_size": 16198,
+				"buffer_size": 4176,
 				"line_ending": "Unix"
 			}
 		},
@@ -115,7 +99,31 @@
 			"file": "src/data_retrieval/rfsedata.py",
 			"settings":
 			{
-				"buffer_size": 4597,
+				"buffer_size": 4845,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/analytics/metrix.py",
+			"settings":
+			{
+				"buffer_size": 16275,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/ploting/plot_docs_sizes.py",
+			"settings":
+			{
+				"buffer_size": 4760,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/ploting_deprecated/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
+			"settings":
+			{
+				"buffer_size": 5644,
 				"line_ending": "Unix"
 			}
 		}
@@ -177,6 +185,15 @@
 	},
 	"file_history":
 	[
+		"/home/dimitrios/Development_Workspace/WEGA/src/analytics/roc_curves_pan13.py",
+		"/home/dimitrios/Development_Workspace/WEGA/src/base/param_combs.py",
+		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/untitled.diff",
+		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/test.py",
+		"/home/dimitrios/Development_Workspace/WEGA/src/base/paramgridcrossval.py",
+		"/home/dimitrios/Development_Workspace/WEGA/README.txt",
+		"/home/dimitrios/Development_Workspace/WEGA/src/OCSVME_paramgrid_crossval_tables.py",
+		"/home/dimitrios/.fonts/Read Me.txt",
+		"/etc/fonts/fonts.conf",
 		"/media/dimitrios/dbbaa90d-fc43-4e53-84ca-e5aa1bce18d9/ExtremePro_Workspace/AdKeywordsGenerator_Scripts/KeywordBuilder.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/data_retrieval/__init__.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/ploting_1.py",
@@ -188,7 +205,6 @@
 		"/home/dimitrios/Documents/passwords.txt",
 		"/home/dimitrios/Development_Workspace/WEGA/src/analytics/roc_curves",
 		"/home/dimitrios/Documents/pan13tools/pan13performance.py",
-		"/home/dimitrios/Development_Workspace/WEGA/src/OCSVME_paramgrid_crossval_tables.py",
 		"/home/dimitrios/Synergy-Crawler/SANTINIS/blog/html/blog_britblog_00000123.htm",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/ploting/find_docs_size.py",
 		"/home/dimitrios/Development_Workspace/webgenreidentification/src/RFSE_paramgrid_crossval_tables.py",
@@ -296,15 +312,7 @@
 		"/home/dimitrios/Documents/pan13tools/pan13rnd.py",
 		"/home/dimitrios/ExtremePro_Workspace/ArtDesign_Site_ExtremePro.gr/Notify_Promo_Grangers_Oct_2012/Promo_Grangers_Nov_2012.html",
 		"/home/dimitrios/Documents/pan13tools/Answers.txt",
-		"/home/dimitrios/ExtremePro_Workspace/ArtDesign_Site_ExtremePro.gr/EOLO-SPORTS_Aetoi-KATHARODEYTERA/Email_HTML/EMAIL_to_Retail_Customers.html",
-		"/home/dimitrios/Desktop/untitled.py",
-		"/home/dimitrios/Desktop/Profff/pan13tools.py",
-		"/home/dimitrios/Development_Workspace/webgenreidentification/src/Author_Attribution_lowbow.py",
-		"/home/dimitrios/Desktop/Profff/ROC_Algo.txt",
-		"/home/dimitrios/Desktop/pan13tools.py",
-		"/home/dimitrios/ExtremePro_Workspace/ArtDesign_Site_ExtremePro.gr/Newsletter_Building_Scripts/build_html_snippets.py",
-		"/home/dimitrios/.config/sublime-text-2/Packages/Default/Default (Linux).sublime-keymap",
-		"/etc/modprobe.d/hid_apple.conf"
+		"/home/dimitrios/ExtremePro_Workspace/ArtDesign_Site_ExtremePro.gr/EOLO-SPORTS_Aetoi-KATHARODEYTERA/Email_HTML/EMAIL_to_Retail_Customers.html"
 	],
 	"find":
 	{
@@ -322,6 +330,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"1000",
+			"precision_score",
+			".",
 			"	\n",
 			"],",
 			", ",
@@ -446,10 +457,7 @@
 			"Res",
 			"TT",
 			"fold_ps",
-			"PY_lst",
-			"g_tag",
-			"path_str",
-			"i_fs"
+			"PY_lst"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -479,15 +487,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3307,
+						"buffer_size": 4176,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2583,
-								2583
+								2152,
+								2152
 							]
 						],
 						"settings":
@@ -601,7 +609,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 714.0,
+						"translation.y": 459.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -609,19 +617,19 @@
 				},
 				{
 					"buffer": 1,
-					"file": "src/base/param_combs.py",
+					"file": "src/data_retrieval/rfsedata.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1011,
+						"buffer_size": 4845,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								968,
-								968
+								3565,
+								3565
 							]
 						],
 						"settings":
@@ -730,60 +738,32 @@
 							},
 							"codeintel_tooltips": "popup",
 							"sublime_auto_complete": true,
-							"syntax": "Packages/Python/Python.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 102.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/base/paramgridcrossval.py",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 21447,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 408.0,
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 2,
 					"file": "src/analytics/metrix.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 16198,
+						"buffer_size": 16275,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8451,
-								8451
+								7308,
+								7308
 							]
 						],
 						"settings":
@@ -897,7 +877,141 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3621.0,
+						"translation.y": 2365.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/ploting/plot_docs_sizes.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4760,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3597,
+								3597
+							]
+						],
+						"settings":
+						{
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 837.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -905,136 +1019,32 @@
 				},
 				{
 					"buffer": 4,
-					"file": "src/data_retrieval/rfsedata.py",
+					"file": "src/ploting_deprecated/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4597,
+						"buffer_size": 5644,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3175,
-								3175
+								544,
+								544
 							]
 						],
 						"settings":
 						{
-							"codeintel": true,
-							"codeintel_config":
-							{
-								"JavaScript":
-								{
-									"codeintel_max_recursive_dir_depth": 2,
-									"codeintel_scan_files_in_project": false,
-									"javascriptExtraPaths":
-									[
-									]
-								},
-								"PHP":
-								{
-									"codeintel_max_recursive_dir_depth": 5,
-									"codeintel_scan_files_in_project": false,
-									"phpExtraPaths":
-									[
-									]
-								},
-								"Python":
-								{
-									"env":
-									{
-									}
-								}
-							},
-							"codeintel_enabled_languages":
-							[
-								"JavaScript",
-								"Mason",
-								"XBL",
-								"XUL",
-								"RHTML",
-								"SCSS",
-								"Python",
-								"HTML",
-								"Ruby",
-								"Python3",
-								"XML",
-								"Sass",
-								"XSLT",
-								"Django",
-								"HTML5",
-								"Perl",
-								"CSS",
-								"Twig",
-								"Less",
-								"Smarty",
-								"Node.js",
-								"Tcl",
-								"TemplateToolkit",
-								"PHP"
-							],
-							"codeintel_live": true,
-							"codeintel_live_enabled_languages":
-							[
-								"JavaScript",
-								"Mason",
-								"XBL",
-								"XUL",
-								"RHTML",
-								"SCSS",
-								"Python",
-								"HTML",
-								"Ruby",
-								"Python3",
-								"XML",
-								"Sass",
-								"XSLT",
-								"Django",
-								"HTML5",
-								"Perl",
-								"CSS",
-								"Twig",
-								"Less",
-								"Smarty",
-								"Node.js",
-								"Tcl",
-								"TemplateToolkit",
-								"PHP"
-							],
-							"codeintel_max_recursive_dir_depth": 10,
-							"codeintel_scan_exclude_dir":
-							{
-								"JavaScript":
-								[
-									"/build/",
-									"/min/"
-								]
-							},
-							"codeintel_scan_files_in_project": true,
-							"codeintel_selected_catalogs":
-							[
-								"PyWin32",
-								"jQuery",
-								"Rails"
-							],
-							"codeintel_snippets": true,
-							"codeintel_syntax_map":
-							{
-								"Python Django": "Python"
-							},
-							"codeintel_tooltips": "popup",
-							"sublime_auto_complete": true,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 765.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -1073,7 +1083,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 232.0
+		"height": 267.0
 	},
 	"output.find_results":
 	{

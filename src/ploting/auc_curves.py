@@ -23,17 +23,17 @@ params_od = coll.OrderedDict( [
     ('vocab_size', [5000, 10000, 50000, 100000]),\
     ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),\
     #'3.Bagging', [0.66],\
-    ('Sigma', [0.5, 0.7, 0.9]),\
-    ('Iterations', [100]) #, 50, 100])
+    ('Sigma', [0.5, 0.7, 0.9]), #[0.5, 0.7, 0.9])\
+    ('Iterations', [10, 50, 100])
 ] )
 
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/C-KI04_TT-Char4Grams-Koppels-Bagging_method_kfolds-10_GridSearch_TEST.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TT-Words-Koppels_method_kfolds-10_SigmaThreshold-None_TEST_NOBAGG.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/C-Santinis_TEST_NOBAGG.h5', 'r')
 
-res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_RFSE.h5', 'r')
+#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_RFSE.h5', 'r')
 #res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words3Grams_RFSE.h5', 'r')
-#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Char4Grams_RFSE.h5', 'r')
+res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Char4Grams_RFSE.h5', 'r')
 
 
 
@@ -76,24 +76,25 @@ plt.figure(num=None, figsize=(22, 12), dpi=80, facecolor='w', edgecolor='k')
 #sub3 = plt.ylim(ymin=0, ymax=12000)
 
 
+
 #Variance Implementation.
-for voc_size in params_od['features_size']: #params_od['vocab_size']:
+for feat_size in params_od['features_size']: 
   
     x = list()
     y = list()
     yerr = list()
 
-    for feat_size in params_od['vocab_size']: #params_od['features_size']:
+    for voc_size in params_od['vocab_size']: 
 
-        auc_per_sigma = res[ np.where((res[:,0] == feat_size) & (res[:,1] == voc_size)) ]
+        auc_per_sigma = res[ np.where((res[:,0] == voc_size) & (res[:,1] == feat_size)) ]
 
         if auc_per_sigma.shape[0]:
             print auc_per_sigma[:,-1]
-            x.append(feat_size)    
+            x.append(voc_size)    
             y.append( np.mean(auc_per_sigma[:,-1]) )
             yerr.append( np.var(auc_per_sigma[:,-1]) )
 
-    plt.errorbar(x, y, yerr, label=voc_size)
+    plt.errorbar(x, y, yerr, label=feat_size)
 
 plt.xticks(params_od['vocab_size'])
 plt.grid()
