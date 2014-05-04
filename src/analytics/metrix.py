@@ -270,6 +270,68 @@ def auc(x, y, arr_type=np.float32):
     return np.sum( height_means*dx )
 
 
+def smooth_linear(y, x=None, arr_type=np.float32):
+    """Practical linear smoothing function. 
+
+    Takes as argument a saw-like shaped curve and returns the curve connecting the local maxima of the 
+    curve. There is no need for X axis values to be given in case only the Y axis values are required 
+    for all x values.
+
+    In case the x values are provided then only the y thresholds (local maxima) with their respective
+    x values will be retunred.   
+
+    NOTE: ***The Y sequence sould be inverted from the lowest to the highest values ***
+          *** I works properly for curves that increasing or decreasing for all x values 
+              (Think about it by studying the code bellow)***
+
+     Input arguments:
+
+        y: is the numpy.array sequence of all y coodinates of the curve's points.
+        x: is the numpy.array sequence of all x coodinates of the curve's points.
+        arr_type: (optional) user-defined arrays type. default numpy.flaot32
+
+    Output:
+
+        smooth_y: is the numpy.array sequence of all local maxima of y axis.
+        smooth_x: is the numpy.array sequence of the respective x of smooth_y sequence. 
+                  *(only when x values sequence is provided as input argument.)
+
+    """
+
+    #The list of local maxima. Either for each x value or only for the unique local maxima.
+    smooth_y = list()
+    
+    #Finding the unique local maxima. 
+    #The y values sequence assumed to be given from lower to higher value
+    max_y = 0
+    for yval in y:
+       
+        #The same local maxima is appended to the list until a greater value is occuring.
+        if yval > max_y:
+            max_y = yval
+
+        smooth_y.append( max_y )
+
+    #Converting the list to an numpy array using the proper data type given as argument.
+    smooth_y = np.array(y, dtype=arr_type)
+
+    #Finding the thresholds and their respective x values in case x sequence is given as argument.
+    if isinstance(x, np.ndarray) or isinstance(x, list):
+        
+        #Getting the unique maximum values.
+        y_thresholds, u_inds = np.unique( smooth_y, return_index=True )
+        
+        #Getting the respective x for each threashold.
+        smooth_x = np.array(x, dtype=arr_type)[u_inds]
+
+        #Retunring the values. 
+        return y_thresholds, smooth_x
+
+    #Returning the smoothed y values sequence where the values between the local maxima 
+    #has been replaced with the local maxima values, whenever a new one has been occuring
+    return smooth_y
+
+
 """ Under Refactoring - START"""
 
 def recl_lv_P_avg(P, R):
@@ -287,38 +349,34 @@ def recl_lv_P_avg(P, R):
     #CRITICAL: The P sould be inverted from the lowest to 
     #the highest values*. 
     # *( it suppose the higest values to be normally fist in order )
-    smthd_P = interpol_linear(P)
+
+    smthd_P = smooth_linear(P[::-1])
 
     smthd_P = smthd_P[::-1]
     
     SP = np.zeros_like(R_Levels, dtype=np.float)
 
+    down_r_level_idxs = 0
     for i, r in enumerate(R_Levels):
         
-        up2_r_level_idxs = np.where(R <= r)
-        print r
-        print up2_r_level_idxs
+        up_r_level_idxs = np.max( np.where(R <= r) )
         
-        print smthd_P[up2_r_level_idxs]
-        print np.sum( smthd_P[up2_r_level_idxs] )
-        print float( len(up2_r_level_idxs) )
+        print up_r_level_idxs
 
-        SP[i] = np.mean( smthd_P[up2_r_level_idxs] )
-            
-        #print lft_idx, rgt_idx, idxs[i+1] 
-    #idxs[0] = 0
-    #idxs[10] = smthd_P
-    
-    
-    #SP[10] = 0
-    
-    #print R_Levels
-    #print SP
-             
+        #************************** ITS GETTING BETTER NEEDS MORE WORK TO CLEAN-UP THE MESS **********************
+        
+        #print smthd_P[up2_r_level_idxs]
+        #print np.sum( smthd_P[up2_r_level_idxs] )
+        #print float( len(up2_r_level_idxs) )
+
+        SP[i] = np.mean( smthd_P[ down_r_level_idxs : up_r_level_idxs ] )
+
+        down_r_level_idxs = up_r_level_idxs
+                 
     return SP, R_Levels
 
 
-def close_to_11_rl(P, R):
+def close_to_11_rl(P, R): 
     
     #Creating the array of 11 Recall Levels (0 to 10)
     R_Levels = np.arange(0.0, 1.1, 0.1)
@@ -327,7 +385,7 @@ def close_to_11_rl(P, R):
     #CRITICAL: The P sould be inverted from the lowest to 
     #the highest values*. 
     # *( it suppose the higest values to be normally fist in order )
-    smthd_P = p_smooth(P)
+    smthd_P = smooth_linear(P[::-1])
 
     smthd_P = smthd_P[::-1]
     
@@ -356,29 +414,15 @@ def close_to_11_rl(P, R):
     return SP, R_Levels
 
 
-def interpol_linear(P):
-    
-    ipol_P = np.zeros_like(P, dtype=np.float64)
-    
-    max_p = 0
-    for i, p in enumerate(P):
-       
-        if p > max_p:
-            max_p = p
-       
-        ipol_P[i] = max_p     
-    
-    return ipol_P
-
-
 def std_avg_pr_curve(P, R):
+    ### IT SEEMS CRAP
     
     R_Levels = np.arange(0.0, 1.1, 0.1) 
     
     ipol_P = np.zeros_like(P, dtype=np.float64)
     
     max_p = 0
-    for i, p in enumerate(P):
+    for i, p in enumerate(P[::-1]):
         if p > max_p:
             max_p = p
         ipol_P[i] = max_p     
@@ -388,14 +432,16 @@ def std_avg_pr_curve(P, R):
     for i, r in enumerate(R_Levels):
         P_AVG[i] = np.average(ipol_P[np.where(R <= r)])
     
-    return R_Levels, P_AVG
+    return P_AVG, R_Levels 
 
 
 def nrst_smooth_pr(P, R):
     
     R_Levels = np.arange(0.0, 1.1, 0.1)
     
-    smoothed_P = smooth_pr_curve(P)
+    smoothed_P = smooth_linear(P[::-1])
+
+    smoothed_P = smoothed_P[::-1]
     
     idxs = np.zeros_like(R_Levels, dtype=np.int)
     for i, r in enumerate(R_Levels):
