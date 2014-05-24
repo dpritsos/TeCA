@@ -53,6 +53,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
     #Initialising.
     PS_lst = list() #Ensemble Predicted Scores
     EY_lst = list() #Ensemble Truth Table
+    PR_Y_lst = list() #Ensemble Predicted Y's
     
 
     #Choosing whether or not to create a Truth table depeding on the genre_tag value.
@@ -62,7 +63,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
         for k in kfolds:
 
             #Calulating Prediction Scores for the given Gerne i.e. assuming that the rest genres being Negative examples
-            pc_per_iter = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_classes_per_iter').read()
+            pc_per_iter = res_h5file.get_node(params_path+'/KFold'+str(k), name='predicted_classes_per_iter').read()
             #pc_per_iter = pc_per_iter[0:-2500]
             #genre_tag = genre_tag[0:-2500]
             gnr_pred_cnt = np.where(pc_per_iter == genre_tag, 1, 0) 
@@ -71,7 +72,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
             PS_lst.append(fold_ps)
             
             #Collecting the excected tag values by conveting them first in binary form.
-            exp_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='expected_Y' ).read()
+            exp_y = res_h5file.get_node(params_path+'/KFold'+str(k), name='expected_Y' ).read()
             #exp_y = exp_y[0:-2500]
             EY_lst.append( np.where(exp_y == genre_tag, 1, 0) ) 
 
@@ -81,15 +82,17 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
         for k in kfolds:
             
             #Loading expected and predicted values.
-            pred_scores = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_scores').read()
+            pred_scores = res_h5file.get_node(params_path+'/KFold'+str(k), name='predicted_scores').read()
             pred_scores = pred_scores#[0:-1000]
             PS_lst.append( pred_scores )
 
-            exp_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='expected_Y').read()
+            exp_y = res_h5file.get_node(params_path+'/KFold'+str(k), name='expected_Y').read()
             exp_y = exp_y#[0:-1000]
 
-            pre_y = res_h5file.getNode(params_path+'/KFold'+str(k), name='predicted_Y').read()
+            pre_y = res_h5file.get_node(params_path+'/KFold'+str(k), name='predicted_Y').read()
             pre_y = pre_y#[0:-1000]
+
+            PR_Y_lst.append(pre_y)
 
             #Collecting and the Truth Table of expected and predicted values.
             EY_lst.append( np.where(exp_y == pre_y, 1, 0) )
@@ -101,14 +104,18 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
     #Stack the lists to Single arrays for PS and EY respectively
     PS = np.hstack(PS_lst)
     EY = np.hstack(EY_lst)
+    PR_Y = np.hstack(PR_Y_lst)
+
+    #print PR_Y[ PR_Y == 0 ]
     
     #Short Results by Predicted Scores
     inv_srd_idx = np.argsort(PS)[::-1]
     PS = PS[ inv_srd_idx ]
     EY = EY[ inv_srd_idx ]
+    PR_Y = PR_Y[inv_srd_idx]
 
     #Retunring Predicted Scores and Expected Values
-    return (PS, EY)
+    return (PS, EY, PR_Y)
 
 
 

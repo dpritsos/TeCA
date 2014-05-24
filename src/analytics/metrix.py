@@ -303,7 +303,7 @@ def smooth_linear(y, x=None, arr_type=np.float32):
     
     #Finding the unique local maxima. 
     #The y values sequence assumed to be given from lower to higher value
-    max_y = 0
+    max_y = -1
     for yval in y:
        
         #The same local maxima is appended to the list until a greater value is occuring.
@@ -313,7 +313,7 @@ def smooth_linear(y, x=None, arr_type=np.float32):
         smooth_y.append( max_y )
 
     #Converting the list to an numpy array using the proper data type given as argument.
-    smooth_y = np.array(y, dtype=arr_type)
+    smooth_y = np.array(smooth_y, dtype=arr_type)
 
     #Finding the thresholds and their respective x values in case x sequence is given as argument.
     if isinstance(x, np.ndarray) or isinstance(x, list):
@@ -332,125 +332,155 @@ def smooth_linear(y, x=None, arr_type=np.float32):
     return smooth_y
 
 
-""" Under Refactoring - START"""
+def reclev_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
 
-def recl_lv_P_avg(P, R):
+    """Recall Level Averaging function.
 
-    """Recall Level Precision Averages
-    This function is smoothing out Precision-Recall Curve
-    via interpolation. That is, always 
+    It takes the Precision Recall (RP) Curve and returns an averaged PR curve at particular points
+    as given by the user. The same applies for any curve for which one would like to average it at 
+    any particular X positions.
+
+    Input arguments:
+
+        P: is the numpy.array sequence of all y coodinates of the curve's points.
+        R: is the numpy.array sequence of all x coodinates of the curve's points.
+        rcl_tuple: A three elements tuple for x poition to be averaged where fist is the
+            starting position, the second is the ending position and the thired is the
+            increament step.
+
+    Output:
+
+        avg_P: is the numpy.array Precision values sequence of the Averaged PR curve.
+        R_Levels: is the numpy.array of the Recall levels created based rcl_tuple argument
+            or default, i.e. the 11 Recall Levels.
 
     """
 
-    #Creating the array of 11 Recall Levels (0 to 10)
-    R_Levels = np.arange(0.0, 1.1, 0.1)
-    
-    #Smoothing out the Precision (Y axis) of the P-R Curve
-    #CRITICAL: The P sould be inverted from the lowest to 
-    #the highest values*. 
-    # *( it suppose the higest values to be normally fist in order )
+    #Creating the array of recall leves for which the curve will be averaged. Default: 11 recall levels (0 to 10).
+    if len(rcl_tuple) != 3:
+        raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
+    R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])        
+     
+    #The Array for stroring the Precition values respectively to the recall levels. 
+    avg_P = np.zeros_like(R_Levels, dtype=np.float)
 
-    smthd_P = smooth_linear(P[::-1])
+    #Init the smallest index from where the part of the line, which will be used to be averaged, starts. 
+    last_rl_idx = 0
 
-    smthd_P = smthd_P[::-1]
-    
-    SP = np.zeros_like(R_Levels, dtype=np.float)
+    #The initial value for this variable should equal to be 1 because in PR curves the (0,1) point is fixed.
+    last_avg_P = P[0]
 
-    down_r_level_idxs = 0
-    for i, r in enumerate(R_Levels):
+    #Averaging the part of the PR Curve at each level of the given recall levels (defaut 11 levels). 
+    for i, r in enumerate(R_Levels[0:-1]):
         
-        up_r_level_idxs = np.max( np.where(R <= r) )
-        
-        print up_r_level_idxs
+        #Getting the closest index to the recall level of the current loop.
+        #In particular the largest index is selected in case we have more than one position with the same small distance. 
+        current_rl_idx = np.max( np.where( np.abs(R-r) == np.min(np.abs(R-r)) ) ) 
 
-        #************************** ITS GETTING BETTER NEEDS MORE WORK TO CLEAN-UP THE MESS **********************
-        
-        #print smthd_P[up2_r_level_idxs]
-        #print np.sum( smthd_P[up2_r_level_idxs] )
-        #print float( len(up2_r_level_idxs) )
+        #Alternatively it could be used the first occurred index respective to the minimum distance. However, the above
+        #approach returns an averaged curve close to the real one (with full points).
+        #current_rl_idx = (np.abs(R - r)).argmin()
+       
+        #Averaging each part of the line from the last recall level to the current one.
+        avg_P[i] = np.mean( P[ last_rl_idx : current_rl_idx ] )
 
-        SP[i] = np.mean( smthd_P[ down_r_level_idxs : up_r_level_idxs ] )
+        #Preventing the case that averaging returns NaN when 'last' and 'current' indices coincide.
+        if np.isnan(avg_P[i]):
+            avg_P[i] = last_avg_P
+        else:
+            last_avg_P = avg_P[i]
 
-        down_r_level_idxs = up_r_level_idxs
+        #Making the current highest index of the current loop to be the smallest one. 
+        last_rl_idx = current_rl_idx
+
+    #Averaging the last part of the line. Letting the last point to be calculated outside of the above loop it is assured that
+    #all point of the last part of the curve are taken in to account.
+    avg_P[-1] = np.mean( P[ last_rl_idx:: ] )
                  
-    return SP, R_Levels
+    return avg_P, R_Levels
 
 
-def close_to_11_rl(P, R): 
-    
-    #Creating the array of 11 Recall Levels (0 to 10)
-    R_Levels = np.arange(0.0, 1.1, 0.1)
-    
-    #Smoothing out the Precision (Y axis) of the P-R Curve
-    #CRITICAL: The P sould be inverted from the lowest to 
-    #the highest values*. 
-    # *( it suppose the higest values to be normally fist in order )
-    smthd_P = smooth_linear(P[::-1])
+def reclev_nearest(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
 
-    smthd_P = smthd_P[::-1]
-    
-    idxs = np.zeros_like(R_Levels, dtype=np.int)
-    
-    for i, r in enumerate(R_Levels[1::]):
-        lft_idx = np.max(np.where(R < r))
-        rgt_idx = np.max(np.where(R >= r))
-        
-        #print smthd_P[lft_idx], ">", smthd_P[rgt_idx]
-        if smthd_P[lft_idx] >= smthd_P[rgt_idx]:
-            idxs[i+1] = lft_idx
-        elif smthd_P[lft_idx] < smthd_P[rgt_idx]:
-            idxs[i+1] = rgt_idx
-            
-        #print lft_idx, rgt_idx, idxs[i+1] 
-    #idxs[0] = 0
-    #idxs[10] = smthd_P
-    
-    SP = smthd_P[idxs]
-    #SP[10] = 0
-    
-    #print R_Levels
-    #print SP
-             
-    return SP, R_Levels
+    """Nearest to the Recall Levels function.
 
+    It takes the Precision Recall (RP) Curve and returns the Y values of the PR curve of the nearest
+    (x,y) points to the recall levels (i.e. X values) as given by the user. The same applies for any 
+    curve for which one would like to average it at any particular X positions.
 
-def std_avg_pr_curve(P, R):
-    ### IT SEEMS CRAP
-    
-    R_Levels = np.arange(0.0, 1.1, 0.1) 
-    
-    ipol_P = np.zeros_like(P, dtype=np.float64)
-    
-    max_p = 0
-    for i, p in enumerate(P[::-1]):
-        if p > max_p:
-            max_p = p
-        ipol_P[i] = max_p     
-    
-    P_AVG = np.zeros(11, dtype=np.float64)
-    
-    for i, r in enumerate(R_Levels):
-        P_AVG[i] = np.average(ipol_P[np.where(R <= r)])
-    
-    return P_AVG, R_Levels 
+    Input arguments:
 
+        P: is the numpy.array sequence of all y coodinates of the curve's points.
+        R: is the numpy.array sequence of all x coodinates of the curve's points.
+        rcl_tuple: A three elements tuple for x poition to be averaged where fist is the
+            starting position, the second is the ending position and the thired is the
+            increament step.
 
-def nrst_smooth_pr(P, R):
-    
-    R_Levels = np.arange(0.0, 1.1, 0.1)
-    
-    smoothed_P = smooth_linear(P[::-1])
+    Output:
 
-    smoothed_P = smoothed_P[::-1]
+        avg_P: is the numpy.array Precision values of the nearest to the R levels.
+        R_Levels: is the numpy.array of the Recall levels created based rcl_tuple argument
+            or default, i.e. the 11 Recall Levels.
+
+    """
+    
+    #Creating the array of recall leves for which the curve will be averaged. Default: 11 recall levels (0 to 10).
+    if len(rcl_tuple) != 3:
+        raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
+    R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])        
     
     idxs = np.zeros_like(R_Levels, dtype=np.int)
     for i, r in enumerate(R_Levels):
         idxs[i] = (np.abs(R - r)).argmin()
     
-    return smoothed_P[idxs], R[idxs]
+    return P[idxs], R[idxs]
 
 
-""" Under Refactoring - END"""
+def reclev_max_around(P, R, rcl_tuple=(0.0, 1.1, 0.1)): 
+
+     """Maximum Y values around to the Recall Levels function.
+
+    It takes the Precision Recall (RP) Curve and returns the maximum Y values of the PR curve of the
+    (x,y) points around to the recall levels (i.e. X values) as given by the user. The same applies 
+    for any curve for which one would like to average it at any particular X positions.
+
+    Input arguments:
+
+        P: is the numpy.array sequence of all y coodinates of the curve's points.
+        R: is the numpy.array sequence of all x coodinates of the curve's points.
+        rcl_tuple: A three elements tuple for x poition to be averaged where fist is the
+            starting position, the second is the ending position and the thired is the
+            increament step.
+
+    Output:
+
+        avg_P: is the numpy.array Maximum Precision values around the R levels.
+        R_Levels: is the numpy.array of the Recall levels created based rcl_tuple argument
+            or default, i.e. the 11 Recall Levels.
+
+    """
+    
+    #Creating the array of recall leves for which the curve will be averaged. Default: 11 recall levels (0 to 10).
+    if len(rcl_tuple) != 3:
+        raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
+    R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])        
+    
+    idxs = np.zeros_like(R_Levels, dtype=np.int)
+    
+    for i, r in enumerate(R_Levels[1::]):
+        lft_idx = np.max(np.where(R < r))
+        rgt_idx = np.min(np.where(R >= r))
+        
+        #print P[lft_idx], ">", P[rgt_idx]
+        if P[lft_idx] >= P[rgt_idx]:
+            idxs[i+1] = lft_idx
+        elif P[lft_idx] < P[rgt_idx]:
+            idxs[i+1] = rgt_idx
+     
+    selected_P = P[idxs]
+    
+             
+    return selected_P, R_Levels
 
 
 class purepy(object):

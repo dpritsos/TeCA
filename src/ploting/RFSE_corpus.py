@@ -7,12 +7,13 @@ sys.path.append('../../../DoGSWrapper/src')
 import tables as tb
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gspec
-from analytics.metrix import  pr_curve, recl_lv_P_avg, roc_curve, std_avg_pr_curve, close_to_11_rl, nrst_smooth_pr
+from analytics.metrix import  pr_curve, roc_curve, reclev_averaging, reclev_nearest_max_y, reclev_nearest, smooth_linear
 from data_retrieval.rfsedata import get_predictions
 from sklearn import grid_search
 from sklearn.metrics import roc_curve as roc
 import base.param_combs as param_comb
 import collections as coll
+import numpy as np
 
 
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -25,21 +26,20 @@ params_od = coll.OrderedDict( [
     ('Iterations', [100]) #[10, 50, 100]
 ] )
 
+#res_h5file = tb.open_file('/home/dimitrios/SSynergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres.h5', 'r')
 
-#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words_RFSE.h5', 'r')
-#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/SANTINIS_Words3Grams_RFSE.h5', 'r')
-#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Word_1Grams_New_Sqrd.h5', 'r')
-#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres.h5', 'r')
-#res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_Char4Grams_Sqrd.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS_SQRD.h5', 'r')
 
-res_h5file = tb.openFile('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04.h5', 'r')
-
+res_h5file = tb.open_file('/home/dimitrios/SSynergy-Crawler/KI-04/RFSE_1Words_KI04_SQRD.h5', 'r')
 
 symbol = [ "^", "*", "x", "+", "*", "^", "x", "+", "^", "*", "x", "+", "*", "^", "x", "+", "^", "*", "x", "+", "*", "^", "x", "+" ]
 line_type = [ "--", "--", "--", "--", "-" , "-", "-", "-", "--", "--", "--", "--", "-" , "-", "-", "-", "--", "--", "--", "--", "-" , "-", "-", "-" ]
 color = ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k']
 
-plt.figure(num=None, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
+fg1 = plt.figure(num=1, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
+ax1 = fg1.add_subplot(111)
+fg2 = plt.figure(num=2, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
+ax2 = fg2.add_subplot(111)
 
 i = 0
 
@@ -47,22 +47,50 @@ for params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), 
 
     if params_lst[0] > params_lst[1]:
 
-        PS, EY = get_predictions(res_h5file, kfolds, params_path, genre_tag=None)
+        PS, EY, PR_Y = get_predictions(res_h5file, kfolds, params_path, genre_tag=None)
 
         Y, X, T = pr_curve(EY, PS, full_curve=True) #roc(EY, PS) #roc_curve(EY, PS, full_curve=False) #
 
-        Y, X = recl_lv_P_avg(Y, X)   #std_avg_pr_curve, close_to_11_rl, recl_lv_P_avg, nrst_smooth_pr
+        #Smoothing out the Precision (Y axis) of the P-R Curve.
+        #CRITICAL: The P sould be inverted from the lowest to 
+        #the highest values*. 
+        # *( it suppose the higest values to be normally fist in order )
+        #Y = smooth_linear(Y[::-1])
         
+        #Inverting the Y (i.e. Precition) axis values after has been smoothed out.
+        #Y = Y[::-1]
+
+        # OR
+        
+        #Y, X = smooth_linear(Y[::-1], X[::-1])
+        #Y, X = Y[::-1], X[::-1]
+
+        Y, X = reclev_averaging(Y, X)   #reclev_nearest_max_y, reclev_averaging, reclev_nearest
+
+        #Y, X = reclev_nearest(Y, X)
+
+        #Y, X = reclev_nearest_max_y(Y, X)
+
         i += 1
 
         #plt.locator_params(nbins=4)
 
-        plt.plot(X, Y, color[i] + line_type[i] + symbol[i], linewidth=1, markeredgewidth=1, label="("+str(i)+") Feat "+str(params_lst[1])  )
-        plt.title("SANTINIS")
-        plt.yticks([.10, .15, .20, .25, .30, .35, .40, .45, .50, .55, .60, .65, .70, .75, .80, .85, .90, .95, 1.00])
-        plt.grid(True)
-        plt.legend(loc=4, fancybox=True, shadow=True)    
-        #plt.legend(loc=3, bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)    
+        ax1.plot(X, Y, color[i] + line_type[i] + symbol[i], linewidth=1, markeredgewidth=1, label="("+str(i)+") Feat "+str(params_lst[1])  )
+        #ax1.title("SANTINIS")
+        #ax1.yticks([ .50, .55, .60, .65, .70, .75, .80, .85, .90, .95, 1.00]) #.10, .15, .20, .25, .30, .35, .40, .45,
+        ax1.grid(True)
+        ax1.legend(loc=4, fancybox=True, shadow=True)    
+        #ax1.legend(loc=3, bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)
+
+        hist, bins = np.histogram(PR_Y, 7)
+
+        #print len(PR_Y[PR_Y == 0]), hist, bins
+        
+        #tmp = np.zeros(len(bins+1))
+        #tmp[0:-1] = hist[::]
+        #hist = tmp
+
+        ax2.bar(bins[0:7], hist) #i, zdir='y', alpha=0.8, align='center', width=bins[1]-bins[0])    
        
 plt.show()
                                                                          
