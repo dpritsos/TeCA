@@ -423,22 +423,26 @@ def reclev_nearest(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
             or default, i.e. the 11 Recall Levels.
 
     """
-    
+
     #Creating the array of recall leves for which the curve will be averaged. Default: 11 recall levels (0 to 10).
     if len(rcl_tuple) != 3:
         raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
     R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])        
     
+    #Init with zeros the array for saving the nearest recall levels indexes.
     idxs = np.zeros_like(R_Levels, dtype=np.int)
-    for i, r in enumerate(R_Levels):
-        idxs[i] = (np.abs(R - r)).argmin()
     
-    return P[idxs], R[idxs]
+    for i, r in enumerate(R_Levels):
+        #Getting the closest index to the recall level of the current loop.
+        idxs[i] = (np.abs(R - r)).argmin()
+
+    #Using the above indexes for selecting the Y (i.e. precision) values from the PR curve to be returned.
+    return P[idxs], R_Levels
 
 
 def reclev_max_around(P, R, rcl_tuple=(0.0, 1.1, 0.1)): 
 
-     """Maximum Y values around to the Recall Levels function.
+    """Maximum Y values around to the Recall Levels function.
 
     It takes the Precision Recall (RP) Curve and returns the maximum Y values of the PR curve of the
     (x,y) points around to the recall levels (i.e. X values) as given by the user. The same applies 
@@ -465,22 +469,23 @@ def reclev_max_around(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
         raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
     R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])        
     
+    #Init with zeros the array for saving the indexes around the given recall levels with the highest precision value.
     idxs = np.zeros_like(R_Levels, dtype=np.int)
     
     for i, r in enumerate(R_Levels[1::]):
+
+        #Getting the two nearest values around the current recall level.
         lft_idx = np.max(np.where(R < r))
         rgt_idx = np.min(np.where(R >= r))
         
-        #print P[lft_idx], ">", P[rgt_idx]
+        #Getting the index around the current (in this loop) recall level with the highest precision value.
         if P[lft_idx] >= P[rgt_idx]:
             idxs[i+1] = lft_idx
         elif P[lft_idx] < P[rgt_idx]:
             idxs[i+1] = rgt_idx
-     
-    selected_P = P[idxs]
     
-             
-    return selected_P, R_Levels
+    #Using the above indexes for selecting the Y (i.e. precision) values from the PR curve to be returned.         
+    return P[idxs], R_Levels
 
 
 class purepy(object):

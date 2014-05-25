@@ -7,14 +7,14 @@ sys.path.append('../../../DoGSWrapper/src')
 import tables as tb
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gspec
-from analytics.metrix import  pr_curve, roc_curve, reclev_averaging, reclev_nearest_max_y, reclev_nearest, smooth_linear
+from analytics.metrix import  pr_curve, roc_curve, reclev_averaging, reclev_max_around, reclev_nearest, smooth_linear
 from data_retrieval.rfsedata import get_predictions
 from sklearn import grid_search
 from sklearn.metrics import roc_curve as roc
 import base.param_combs as param_comb
 import collections as coll
 import numpy as np
-
+from sklearn.metrics import precision_recall_curve
 
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -49,8 +49,9 @@ for params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), 
 
         PS, EY, PR_Y = get_predictions(res_h5file, kfolds, params_path, genre_tag=None)
 
-        Y, X, T = pr_curve(EY, PS, full_curve=True) #roc(EY, PS) #roc_curve(EY, PS, full_curve=False) #
-
+        Y, X, T = pr_curve(EY, PS, full_curve=False) #roc(EY, PS) #roc_curve(EY, PS, full_curve=False) #
+        #Y, X, T = precision_recall_curve(EY, PS) #<== They are not 100% percent the same.
+        
         #Smoothing out the Precision (Y axis) of the P-R Curve.
         #CRITICAL: The P sould be inverted from the lowest to 
         #the highest values*. 
@@ -65,11 +66,11 @@ for params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), 
         #Y, X = smooth_linear(Y[::-1], X[::-1])
         #Y, X = Y[::-1], X[::-1]
 
-        Y, X = reclev_averaging(Y, X)   #reclev_nearest_max_y, reclev_averaging, reclev_nearest
+        Y, X = reclev_averaging(Y, X)
 
         #Y, X = reclev_nearest(Y, X)
 
-        #Y, X = reclev_nearest_max_y(Y, X)
+        #Y, X = reclev_max_around(Y, X)
 
         i += 1
 
