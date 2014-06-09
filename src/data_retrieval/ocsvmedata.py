@@ -1,5 +1,5 @@
 """ 
-    This module includes RFSE data retrieval functions.
+    This module includes OC-SVME data retrieval functions.
     Details can be found in each funciton separatly. 
 
     Aurthor: Dimitrios Pritos
@@ -14,7 +14,7 @@ import numpy as np
 
 def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
 
-    """Retrieval functions for the date returned from the RFSE method. 
+    """Retrieval functions for the date returned from the OC-SVME method. 
 
     Returns the Predicted Scores and the Expected Values for the sample set has been given to the 
     RSFE for evaluation. If genre_tag argument is a number other that None then it returns the perdition
@@ -23,7 +23,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
 
     The default case genre_tag (i.e. == None) is base on the concept that a Precision Recall Carve is the fraction 
     of true positives (TP) in relation to all positive predictions (i.e. known as precision). Therefore, one can use
-    The Truth Table is created in Default case for evaluating the RFSE for the whole Sample. In particular using
+    The Truth Table is created in Default case for evaluating the OC-SVME for the whole Sample. In particular using
     PRC for evaluation, it will be shown that rate of the Successful Perdition (i.e. predicted as positive while 
     they where expected as positive) compare to all the positive (TP + FP) predictions. However, using this for ROC
     curves things are a bit more complicated therefore I recommend not to use this argument (genre_tag=None) 
@@ -44,7 +44,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
 
     Output:
 
-        PS: The predicted Scores of the RFSE for each sample in the corpus given for evaluation to the RFSE method. 
+        PS: The predicted Scores of the OC-SVME for each sample in the corpus given for evaluation to the OC-SVME method. 
         EY: The expected values in binary format {0,1}. However in that case of genre_tag=None it will return the 
             Truth Table of Expected and Predicted values.
 
@@ -62,6 +62,10 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
         #Collecting Scores for and Expected Values for every fold given in kfold list.
         for k in kfolds:
 
+            raise Exception("It is not implemented yet!")
+
+            """
+
             #Calulating Prediction Scores for the given Gerne i.e. assuming that the rest genres being Negative examples
             pc_per_iter = res_h5file.get_node(params_path+'/KFold'+str(k), name='predicted_classes_per_iter').read()
             #pc_per_iter = pc_per_iter[0:-2500]
@@ -75,6 +79,8 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
             exp_y = res_h5file.get_node(params_path+'/KFold'+str(k), name='expected_Y' ).read()
             #exp_y = exp_y[0:-2500]
             EY_lst.append( np.where(exp_y == genre_tag, 1, 0) ) 
+
+            """
 
     elif genre_tag == None:
 
