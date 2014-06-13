@@ -488,6 +488,118 @@ def reclev_max_around(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
     return P[idxs], R_Levels
 
 
+def contingency_table(expd_y, pred_y, unknow_class=False, arr_type=np.float32):
+
+    """Contingency talbe building the function.
+
+    It takes the expected Y and the predicted Y values of a Classifier and it is returning the contingency_table.
+    The number of classes are detected by the different tags (i.e. integers) located in the expeted Y list/array 
+    argument. In in case tags others than the ones in the expected Y list are found into the predictions list then
+    a Zero Class (i.e. Don't Know) will considered fist in order of rows and columns respectively.
+
+    Input arguments:
+
+        expd_y: is the numpy.array or python list contains the expected prediction, i.e. the real classes.
+        pred_y: is the numpy.array or python list contains the instance prediction of the classifier.
+        unknow_class: (optional) defines whether 0 index in contigency table will be condidered as unknow class
+            irrespectivly of its occurnace into the expected tags list and any class tag not given to the expected
+            tag list will be concidered as unkown class (0 index), too. 
+        arr_type: (optional) user-defined arrays type. default numpy.flaot32
+
+    Output:
+
+        conf_matrix: is the Confusion Matrix / Contingency Table returned by this function.
+
+    """
+
+    expd_y = np.array(expd_y, dtype=arr_type)
+    pred_y = np.array(pred_y, dtype=arr_type)
+    
+    if expd_y.shape[0] != pred_y.shape[0]:
+        raise Exception("Input arguments length inconsistency: expd_y and pred_y must have the same length.")
+
+    if not unknow_class and not ( set(pred_y) & set(expd_y) == set(pred_y) ):
+            raise Exception("Predicted Y(s) tags list contains values not valid in expected Y(s) list tags.")
+        
+    uncl = 0
+    if unknow_class:
+
+        unknow_class_tags_idxs = np.where( (pred_y == expd_y) == False )
+        
+        pred_y[ unknow_class_tags_idxs ] == 0
+
+        if np.min(expd_y):
+            uncl = 1
+
+    expd_cls_tags = np.unique(expd_y)
+
+    new_expd_cls = list()
+    for i, exp_tg in enumerate(expd_cls_tags):
+
+        expd_y[expd_y == exp_tg] = i + uncl
+        pred_y[pred_y == exp_tg] = i + uncl
+        new_expd_cls.append( i + uncl ) 
+
+    expd_cls_tags = new_expd_cls
+        
+    conf_dim = np.max(expd_cls_tags) + 1
+
+    conf_matrix = np.zeros((conf_dim, conf_dim), dtype=arr_type)
+
+    for i, j in zip(pred_y, expd_y):
+
+        if i not in expd_cls_tags:
+
+            conf_matrix[0, j] += 1
+ 
+        else:
+          
+            conf_matrix[i, j] += 1
+
+    return conf_matrix
+
+
+def precision_recall_scores(conting_tbl, arr_type=np.float32):
+
+    """Precision and Recall scores. (it requries a contigency table as an input)
+
+    It takes a contigency table (i.e. a confusion matrix) as an input and returns the precision and recall scores
+    for each class in 2D array. In the precision recall table row indexs are respective to the classes assigned to 
+    the contigency tables.
+
+    Input arguments:
+
+        contig_tbl: is the contigency table (i.e. confusion matrix).
+        arr_type: (optional) user-defined arrays type. default numpy.flaot32
+
+    Output:
+
+        prec_recl_scores: a table of precision and recal scores for each class of the contigency table.
+
+    """
+
+    conting_tbl = np.array(conting_tbl, dtype=arr_type)
+    
+    if conting_tbl.shape[0] != conting_tbl.shape[1]:
+        raise Exception("Contingency table must be a 2D square matrix.")
+
+    pred_sums = np.sum(conting_tbl, axis=1) 
+    expd_sums = np.sum(conting_tbl, axis=0)
+
+    cls_tp = np.diagonal(conting_tbl) 
+
+    prec_recl_scores = np.vstack( (cls_tp/pred_sums, cls_tp/expd_sums) ).T
+
+    return prec_recl_scores
+
+
+if __name__ == '__main__':
+
+    ct = contingency_table([1,1,2,2,3,3,4,4,5,5,6,6,7,7,0,0,0,0,0,0,0,0,0], [1,0,2,0,3,1,4,3,5,0,6,6,7,7,0,0,3,0,0,7,0,0,0], unknow_class=True)
+
+    print precision_recall_scores(ct)
+
+
 class purepy(object):
 
     @staticmethod
