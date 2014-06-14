@@ -16,11 +16,42 @@ from sklearn import grid_search
 
 from sklearn import grid_search
 
+"""
+from matplotlib import rc, rcParams
+rc('font', **{'family':'serif', 'serif':['Helvetica'],
+              'monospace':['Computer Modern Typewriter']})
+params = {'backend': 'eps',
+      'text.latex.preamble': [r"\usepackage{upgreek}",
+                              r"\usepackage{siunitx}",
+                              r"\usepackage{amsmath}",
+                              r"\usepackage{amstext}",],
+      'axes.labelsize': 18,
+      #'axes.linewidth': 1,
+      #'text.fontsize':17,
+      'legend.fontsize': 16,
+      'xtick.labelsize': 16,
+      #'xtick.major.width' : 0.75,
+      'ytick.labelsize': 16,
+      'figure.figsize': [8.8,6.8],
+      #'figure.dpi': 120,
+      'text.usetex': True,
+      'axes.unicode_minus': True,
+      'ps.usedistiller' : 'xpdf'
+      }          
+rcParams.update(params)
+rcParams.update({'figure.autolayout':True})
+"""
+
+#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+## for Palatino and other serif fonts use:
+#rc('font',**{'family':'serif','serif':['Palatino']})
+#rc('text', usetex=True)
+
   
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 params_od = coll.OrderedDict( [
-    ('vocab_size', [100000]), #[5000, 10000, 50000, 100000]),\
+    ('vocab_size', [5000, 10000, 50000, 100000]),\
     ('features_size', [1000, 5000, 10000, 50000, 90000]), #1000, 5000, 10000, 50000, 90000]\
     #'3.Bagging', [0.66],\
     #('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),\
@@ -73,13 +104,13 @@ for params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), 
 #Stack the data collected in a 2D array. Last column contain the AUC for every parameters values possible combination.
 res = np.vstack(res_lst)
 
-plt.figure(num=None, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
+plt.figure(num=None, figsize=(12, 8), dpi=100, facecolor='w', edgecolor='k')
 #sub3 = plt.ylim(ymin=0, ymax=12000)
 
 i = 0;
 
 #Variance Implementation.
-for param_1 in params_od['Iterations']: 
+for param_1 in params_od['vocab_size']: 
     
     i += 1
     x = list()
@@ -88,7 +119,9 @@ for param_1 in params_od['Iterations']:
 
     for param_2 in params_od['features_size']: 
 
-        auc_per_sigma = res[ np.where((res[:,1] == param_2) & (res[:,3] == param_1)) ]
+        if param_2 > 10000: continue;
+
+        auc_per_sigma = res[ np.where((res[:,1] == param_2) & (res[:,0] == param_1)) ]
 
         if auc_per_sigma.shape[0]:
             #print auc_per_sigma[:,-1]
@@ -103,10 +136,15 @@ for param_1 in params_od['Iterations']:
          xlolims=False, xuplims=False, errorevery=1,
          capthick=None)"""
 
-plt.xticks(params_od['features_size'])
+#plt.xticks(params_od['features_size'])
+plt.xticks([0, 1000, 5000, 10000, 12000])
+
+plt.yticks([0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0])
+
+
 plt.grid()
 plt.legend(loc=0) #bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)
-
+plt.tight_layout()
 plt.show()
 
                                                                         
