@@ -59,14 +59,14 @@ params_od = coll.OrderedDict( [
     ('Iterations', [10, 50, 100]) #[10, 50, 100]
 ] )
 
-res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/RFSE_4Chars_7Genres.h5', 'r')
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/OCSVM_4Chars_7Genres.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_1Words_7Genres.h5', 'r')
 
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/RFSE_4Chars_SANTINIS.h5', 'r')
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/OCSVM_4Chars_SANTINIS.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_3Words_SANTINIS.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS.h5', 'r')
 
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/RFSE_1Words_KI04.h5', 'r')
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/OCSVM_1Words_KI04.h5', 'r')
+res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_3Words_KI04.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_3Words_KI04.h5', 'r')
 
 
 symbol = [ 'o', 'v', '^', '+', 'x', 's', '*', '<', '>', 'H', '1', '2', '3', '4', 'D', 'h', '8', 'd', 'p', '.', ',' ]
@@ -110,18 +110,18 @@ plt.figure(num=None, figsize=(12, 8), dpi=100, facecolor='w', edgecolor='k')
 i = 0;
 
 #Variance Implementation.
-for param_1 in params_od['vocab_size']: 
+for param_1 in params_od['Sigma']: 
     
     i += 1
     x = list()
     y = list()
     yerr = list()
 
-    for param_2 in params_od['features_size']: 
+    for param_2 in params_od['Iterations']: 
 
-        if param_2 > 10000: continue;
+        #if param_2 > 10000: continue;
 
-        auc_per_sigma = res[ np.where((res[:,1] == param_2) & (res[:,0] == param_1)) ]
+        auc_per_sigma = res[ np.where((res[:,3] == param_2) & (res[:,2] == param_1)) ]
 
         if auc_per_sigma.shape[0]:
             #print auc_per_sigma[:,-1]
@@ -137,13 +137,15 @@ for param_1 in params_od['vocab_size']:
          capthick=None)"""
 
 #plt.xticks(params_od['features_size'])
-plt.xticks([0, 1000, 5000, 10000, 12000])
+#plt.xticks([0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000])
 
-plt.yticks([0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1.0])
+#*plt.xticks(np.arange(0,100000,5000))
+
+#plt.yticks(np.arange(0.0,1.05,0.05))
 
 
 plt.grid()
-plt.legend(loc=0) #bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)
+plt.legend(loc=4) #bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)
 plt.tight_layout()
 plt.show()
 

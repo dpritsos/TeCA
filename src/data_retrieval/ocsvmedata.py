@@ -101,7 +101,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
             PR_Y_lst.append(pre_y)
 
             #Collecting and the Truth Table of expected and predicted values.
-            EY_lst.append( np.where(exp_y == pre_y, 1, 0) )
+            EY_lst.append( exp_y ) # np.where(exp_y == pre_y, 1, 0) )
 
     else:
         raise Exception("Invalid genre_tag argument's value: Valid arguments are either and integer (as genre tag) of 'None'")
