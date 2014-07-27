@@ -28,14 +28,14 @@ params_od = coll.OrderedDict( [
     ('Iterations', [100]) #[10, 50, 100]
 ] )
 
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/RFSE_4Chars_7Genres.h5', 'r')
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/OCSVM_4Chars_7Genres.h5', 'r')
+res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres_minmax.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_4Chars_7Genres.h5', 'r')
 
-res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/RFSE_4Chars_SANTINIS.h5', 'r')
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/OCSVM_4Chars_SANTINIS.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_4Chars_SANTINIS.h5', 'r')
 
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/RFSE_1Words_KI04.h5', 'r')
-#res_h5file = tb.open_file('/Users/Stathis/Synergy-Crawler/OCSVM_1Words_KI04.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_1Words_KI04.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_1Words_KI04.h5', 'r')
 
 symbol = [ 'o', 'v', '^', '+', 'x', 's', '*', '<', '>', 'H', '1', '2', '3', '4', 'D', 'h', '8', 'd', 'p', '.', ',' ]
 
@@ -106,7 +106,7 @@ for params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), 
         i += 1 
         bar_width += 0.1 
 
-plt.xticks(bins[0:12] + bar_width, ('Dont Know', "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio"))
+#plt.xticks(bins[0:12] + bar_width, ('Dont Know', "blog", "eshop", "faq", "frontpage", "listing", "php", "spage", "diy_mini", "editorial", "feat_articles", "short_bio"))
 
 plt.show()
                                                                          

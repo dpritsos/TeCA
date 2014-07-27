@@ -16,14 +16,14 @@ kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 params_od = coll.OrderedDict( [
     ('vocab_size', [100000]), #[5000, 10000, 50000, 100000]),\
-    ('features_size', [10000]), #[1000, 5000, 10000, 50000, 90000]\
+    ('features_size', [5000]), #[1000, 5000, 10000, 50000, 90000]\
     #(Bagging', [0.66]),\
     #('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),\
     ('Sigma', [0.5]), #[0.5, 0.7, 0.9]),\
     ('Iterations', [100]) #[10, 50, 100]
 ] )
 
-res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres.h5', 'r')
+res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres_minmax.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_4Chars_7Genres.h5', 'r')
 
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS.h5', 'r')
@@ -77,6 +77,7 @@ conf_percent = np.divide(conf_mtrx, np.bincount(expected_y)) * 100
 print  conf_percent
 
 pr_scores = mx.precision_recall_scores(conf_mtrx)
+print pr_scores
 
 np.savetxt("/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/conf_mtrx_RFSE_4Chars_7Genres.csv", conf_mtrx)
 np.savetxt("/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/conf_percent_RFSE_4Chars_7Genres.csv", conf_percent)
