@@ -67,16 +67,29 @@ params_full_array = np.vstack(params_full_lst)
 predicted_y = np.hstack( pred_y )
 expected_y = np.hstack( exp_y )
 
-conf_mtrx =  mx.contingency_table(expected_y, predicted_y, unknow_class=True, arr_type=np.float32) 
+conf_mtrx =  mx.contingency_table(expected_y, predicted_y, unknow_class=True, arr_type=np.int32)
+conf_percent = np.divide(conf_mtrx, np.bincount(expected_y)) * 100 
+pr_scores = mx.precision_recall_scores(conf_mtrx)
+col_sums = conf_mtrx.sum(axis=0)
+
+#conf_mtrx = np.array(conf_mtrx, dtype="S9")
+#col_sums = np.array(col_sums, dtype="S9")
+
+genres = np.array([ "blog", "eshop", "faq", "frontpage", "listing", "php", "spage" ])
+
+#import numpy.lib.recfunctions as nprf
+#conf_mtrx = nprf.stack_arrays((genres, conf_mtrx, col_sums), usemask=False)
+
+conf_mtrx = np.vstack((conf_mtrx, col_sums))
 
 np.set_printoptions(precision=3, threshold=10000, suppress=True, linewidth=100)
 
 print conf_mtrx
 
-conf_percent = np.divide(conf_mtrx, np.bincount(expected_y)) * 100
-print  conf_percent
 
-pr_scores = mx.precision_recall_scores(conf_mtrx)
+print conf_percent
+
+
 print pr_scores
 
 np.savetxt("/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/conf_mtrx_RFSE_4Chars_7Genres.csv", conf_mtrx)
