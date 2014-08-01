@@ -92,6 +92,8 @@ print conf_percent
 
 print pr_scores
 
+
+
 np.savetxt("/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/conf_mtrx_RFSE_4Chars_7Genres.csv", conf_mtrx)
 np.savetxt("/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/conf_percent_RFSE_4Chars_7Genres.csv", conf_percent)
 np.savetxt("/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/pr_scores_RFSE_4Chars_7Genres.csv", pr_scores)
