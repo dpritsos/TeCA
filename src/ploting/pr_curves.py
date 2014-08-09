@@ -28,13 +28,13 @@ params_od = coll.OrderedDict( [
     ('Iterations', [100]) #[10, 50, 100]
 ] )
 
-res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres_minmax.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres_jaccard.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_4Chars_7Genres.h5', 'r')
 
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_4Chars_SANTINIS.h5', 'r')
 
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_1Words_KI04.h5', 'r')
+res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_3Words_KI04_jaccard.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_1Words_KI04.h5', 'r')
 
 symbol = [ 'o', 'v', '^', '+', 'x', 's', '*', '<', '>', 'H', '1', '2', '3', '4', 'D', 'h', '8', 'd', 'p', '.', ',' ]

@@ -103,7 +103,7 @@
 			"file": "src/ploting/pr_curves.py",
 			"settings":
 			{
-				"buffer_size": 4775,
+				"buffer_size": 4784,
 				"line_ending": "Unix"
 			}
 		},
@@ -116,10 +116,7 @@
 			}
 		},
 		{
-			"contents": "#!/usr/bin/env python\n\nimport sys\nsys.path.append('../../src')\nsys.path.append('../../../DoGSWrapper/src')\n\nimport tables as tb\nimport numpy as np\nimport collections as coll\nfrom data_retrieval.ocsvmedata import get_predictions as get_rfse\nimport base.param_combs as param_comb\nimport analytics.metrix as mx\n\n  \nkfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]\n\nparams_od = coll.OrderedDict( [\n    ('vocab_size', [100000]), #[5000, 10000, 50000, 100000]),\\\n    ('features_size', [5000]), #[1000, 5000, 10000, 50000, 90000]\\\n    #(Bagging', [0.66]),\\\n    #('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),\\\n    ('Sigma', [0.5]), #[0.5, 0.7, 0.9]),\\\n    ('Iterations', [100]) #[10, 50, 100]\n] )\n\nres_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres_minmax.h5', 'r')\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_4Chars_7Genres.h5', 'r')\n\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS.h5', 'r')\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS.h5', 'r')\n\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04.h5', 'r')\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_3Words_KI04.h5', 'r')\n\n\n\npred_y_lst = list()\n\nexp_y_lst = list()\n\nparams_full_lst = list()\n\n#Loading data in a convenient form.\nfor params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), param_comb.ParamGridIter(params_od, 'path')):\n\n    if params_lst[0] > params_lst[1]:\n\n        rfse_data = get_rfse(res_h5file, kfolds, params_path, genre_tag=None) \n\n        #3rd element contain predicted y values list\n        pred_y_lst.append(rfse_data[2])\n\n        #2rd element contain predicted y values list\n        exp_y_lst.append(rfse_data[1])\n\n        params_full_lst.append(params_lst)\n\n                 \n#Stack the data collected in a 2D array.\npred_y = np.vstack(pred_y_lst)\nexp_y = np.vstack(exp_y_lst)\nparams_full_array = np.vstack(params_full_lst)\n\n\n#predicted_y = np.hstack( pred_y[ np.where(((params_full_array[:,2] == 0.5) )) ] )\n#expected_y = np.hstack( exp_y[ np.where(((params_full_array[:,2] == 0.5) )) ] )\npredicted_y = np.hstack( pred_y )\nexpected_y = np.hstack( exp_y )\n\nconf_mtrx =  mx.contingency_table(expected_y, predicted_y, unknow_class=True, arr_type=np.int32)\nconf_percent = np.divide(conf_mtrx, np.bincount(expected_y)) * 100 \npr_scores = mx.precision_recall_scores(conf_mtrx)\ncol_sums = conf_mtrx.sum(axis=0)\n\n#conf_mtrx = np.array(conf_mtrx, dtype=\"S9\")\n#col_sums = np.array(col_sums, dtype=\"S9\")\n\ngenres = np.array([ \"blog\", \"eshop\", \"faq\", \"frontpage\", \"listing\", \"php\", \"spage\" ])\n\n#import numpy.lib.recfunctions as nprf\n#conf_mtrx = nprf.stack_arrays((genres, conf_mtrx, col_sums), usemask=False)\n\nconf_mtrx = np.vstack((conf_mtrx, col_sums))\n\nnp.set_printoptions(precision=3, threshold=10000, suppress=True, linewidth=100)\n\nprint conf_mtrx\n\n\nprint conf_percent\n\n\nprint pr_scores\n\n\n\nnp.savetxt(\"/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/conf_mtrx_RFSE_4Chars_7Genres.csv\", conf_mtrx)\nnp.savetxt(\"/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/conf_percent_RFSE_4Chars_7Genres.csv\", conf_percent)\nnp.savetxt(\"/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/pr_scores_RFSE_4Chars_7Genres.csv\", pr_scores)\n\n\n                                                                        \nres_h5file.close()   ",
 			"file": "src/ploting/contigency_table.py",
-			"file_size": 3584,
-			"file_write_time": 130511210711436342,
 			"settings":
 			{
 				"buffer_size": 3586,
@@ -493,7 +490,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -502,15 +499,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4775,
+						"buffer_size": 4784,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								587,
-								587
+								1584,
+								1584
 							]
 						],
 						"settings":
@@ -627,7 +624,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -643,8 +640,8 @@
 						"selection":
 						[
 							[
-								2379,
-								2379
+								2396,
+								2396
 							]
 						],
 						"settings":
@@ -761,7 +758,7 @@
 						"translation.y": 696.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -777,8 +774,8 @@
 						"selection":
 						[
 							[
-								2715,
-								2715
+								2719,
+								2719
 							]
 						],
 						"settings":
@@ -888,14 +885,14 @@
 							"codeintel_tooltips": "popup",
 							"sublime_auto_complete": true,
 							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 2,
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 765.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{

@@ -62,10 +62,10 @@ params_od = coll.OrderedDict( [
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres_minmax.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_1Words_7Genres.h5', 'r')
 
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_3Words_SANTINIS.h5', 'r')
+res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS_minmax.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS.h5', 'r')
 
-res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_3Words_KI04.h5', 'r')
 
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/auc_curves_vocabVSfeat_KI04_4Chars.eps'
