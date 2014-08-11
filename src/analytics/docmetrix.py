@@ -2,6 +2,7 @@
 import json
 import pickle as pkl
 import numpy as np
+import cPickle as pickle
 
 from sklearn import grid_search
 
@@ -339,3 +340,30 @@ def ZClass_DocSize(res_h5file, kfolds, params_path, genre_tag=None):
 
 
     return X, Y
+
+
+def VocabFD(voc_pkl_fname):
+
+    with open(voc_pkl_fname, 'r') as f:
+        
+        voc = pickle.load(f)
+
+    terms = np.array( voc.keys() )
+    freq = np.array( voc.values() )
+
+    freq = np.sort(freq, )
+
+    return (np.arange(len(freq)), freq, terms)
+
+
+
+if __name__ == '__main__':
+
+    x, y, labels = VocabFD('/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Char_4Grams/kfold_Voc_0.pkl')
+
+    import matplotlib.pyplot as plt
+
+    plt.bar(x, y)
+    plt.show()
+
+
