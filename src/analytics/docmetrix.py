@@ -3,6 +3,10 @@ import json
 import pickle as pkl
 import numpy as np
 import cPickle as pickle
+import scipy.spatial.distance as spdist
+import tables as tb
+import numpy.random as rnd 
+
 
 from sklearn import grid_search
 
@@ -356,10 +360,35 @@ def VocabFD(voc_pkl_fname):
     return (np.arange(len(freq)), freq, terms)
 
 
+def VectorSizes(hdf5_Array):
+
+    h5f = tb.open_file(hdf5_Array, 'r')
+    corpus_mtrx = h5f.getNode('/',  'corpus_earray')
+    corpus_mtrx = corpus_mtrx.read()
+
+    origin = np.zeros_like(corpus_mtrx[0])
+
+    
+
+    rnd_inds = rnd.random_integers(len(corpus_mtrx[:]), size=(1.,100))[0]
+
+    print rnd_inds
+
+    dsts = np.sort( np.array([ spdist.euclidean(origin, vect) for vect in corpus_mtrx[rnd_inds,:] ]) )
+    
+    h5f.close()
+
+    return np.arange(len(dsts)), dsts
+    
+    
+
+
 
 if __name__ == '__main__':
 
-    x, y, labels = VocabFD('/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Char_4Grams/kfold_Voc_0.pkl')
+    x, y = VectorSizes('/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Char_4Grams/kfold_CorpusMatrix_1100000.h5')
+
+    #x, y, labels = VocabFD('/home/dimitrios/Synergy-Crawler/SANTINIS/Kfolds_Vocs_Inds_Char_4Grams/kfold_Voc_0.pkl')
 
     import matplotlib.pyplot as plt
 
