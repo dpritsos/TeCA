@@ -144,7 +144,7 @@
 			"file": "src/analytics/docmetrix.py",
 			"settings":
 			{
-				"buffer_size": 9817,
+				"buffer_size": 10515,
 				"line_ending": "Unix"
 			}
 		},
@@ -1067,15 +1067,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 9817,
+						"buffer_size": 10515,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9549,
-								9549
+								9965,
+								9965
 							]
 						],
 						"settings":
@@ -1189,7 +1189,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4905.0,
+						"translation.y": 5208.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
