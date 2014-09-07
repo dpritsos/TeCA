@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"In",
+				"Iterations"
+			],
+			[
 				"sh",
 				"Short"
 			],
@@ -111,7 +115,7 @@
 			"file": "src/ploting/pr_curves.py",
 			"settings":
 			{
-				"buffer_size": 4784,
+				"buffer_size": 4778,
 				"line_ending": "Unix"
 			}
 		},
@@ -119,7 +123,7 @@
 			"file": "src/ploting/auc_curves.py",
 			"settings":
 			{
-				"buffer_size": 5334,
+				"buffer_size": 5347,
 				"line_ending": "Windows"
 			}
 		},
@@ -128,6 +132,14 @@
 			"settings":
 			{
 				"buffer_size": 3590,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\n\n[[  0   4  17  22   0  31  26  13]\n [  0 196   4   1   0   8  41   1]\n [  0   0 173   0   0   2   0   2]\n [  0   0   0 135   0   1   0   0]\n [  0   0   0   0 200   7   0   1]\n [  0   0   6  42   0 147  16   7]\n [  0   0   0   0   0   2 117   0]\n [  0   0   0   0   0   2   0 176]\n [  0 200 200 200 200 200 200 200]]\n\n [  0   8 122  93  13 142 163 108]\n [  0 192   0   0   0   1   7   0]\n [  0   0  78   0   0   0   0   0]\n [  0   0   0 106   0   0   0   0]\n [  0   0   0   0 187   2   0   0]\n [  0   0   0   1   0  55   2   0]\n [  0   0   0   0   0   0  28   0]\n [  0   0   0   0   0   0   0  92]\n [  0 200 200 200 200 200 200 200]]\n\n [[  0   7  52  68   0  78  90  46]\n [  0 193   1   0   0   6  22   0]\n [  0   0 146   0   0   0   0   1]\n [  0   0   0 113   0   0   0   0]\n [  0   0   0   0 200   5   0   0]\n [  0   0   1  19   0 111   5   3]\n [  0   0   0   0   0   0  83   0]\n [  0   0   0   0   0   0   0 150]\n [  0 200 200 200 200 200 200 200]]\n\n\n\n [  0   1  32   0   0  38  33   8]\n [  0 199   9   1   0  13  49   1]\n [  0   0 139   0   0   0   0   1]\n [  0   0   0 198   0   8   0   0]\n [  0   0  18   0 200  37   6  14]\n [  0   0   1   1   0  96   3   2]\n [  0   0   0   0   0   1 109   0]\n [  0   0   1   0   0   7   0 174]\n [  0 200 200 200 200 200 200 200]]\n\n [  0   5 139  12   0 131 156  78]\n [  0 195   0   0   0   7  15   0]\n [  0   0  56   0   0   0   0   0]\n [  0   0   0 188   0   1   0   0]\n [  0   0   5   0 200  16   1   5]\n [  0   0   0   0   0  45   0   0]\n [  0   0   0   0   0   0  28   0]\n [  0   0   0   0   0   0   0 117]\n [  0 200 200 200 200 200 200 200]]\n\n [[  0   2  91   3   0  94  95  34]\n [  0 198   2   0   0  10  35   0]\n [  0   0  98   0   0   0   0   0]\n [  0   0   0 197   0   2   0   0]\n [  0   0   8   0 200  21   5   9]\n [  0   0   1   0   0  70   1   0]\n [  0   0   0   0   0   0  64   0]\n [  0   0   0   0   0   3   0 157]\n [  0 200 200 200 200 200 200 200]]\n\n\n [[ 4190     3    24    37     0    38    41    20     0     1     0     0]\n [ 1181   197     2     0     0     9    35     1     0     0     0     0]\n [  221     0   170     0     0     1     0     2     0     0     0     0]\n [    1     0     0   126     0     0     0     0     0     0     0     0]\n [   87     0     0     0   200     8     0     1     0     0     0     0]\n [ 4021     0     4    37     0   142    11     6     0     0     0     0]\n [  189     0     0     0     0     1   113     0     0     0     0     0]\n [   77     0     0     0     0     1     0   170     0     0     0     0]\n [    0     0     0     0     0     0     0     0    20     0     0     0]\n [   28     0     0     0     0     0     0     0     0    19     0     0]\n [    0     0     0     0     0     0     0     0     0     0    20     0]\n [    5     0     0     0     0     0     0     0     0     0     0    20]\n [10000   200   200   200   200   200   200   200    20    20    20    20]]\n\n [[ 5589     1    58     1     0    71    64    12     0     0     0     0]\n [ 1129   198     1     1     0     9    41     1     0     0     0     0]\n [   65     0   126     0     0     0     0     1     0     0     0     0]\n [   59     0     0   198     0     3     0     0     0     0     0     0]\n [ 1124     0    12     0   200    29     4    12     0     0     0     0]\n [ 1149     0     1     0     0    74     2     0     0     0     0     0]\n [  114     0     0     0     0     1    85     0     0     0     0     0]\n [  157     0     0     0     0     7     2   174     0     0     0     0]\n [   36     1     1     0     0     4     2     0    20     0     0     0]\n [  425     0     0     0     0     1     0     0     0    20     0     0]\n [   10     0     1     0     0     0     0     0     0     0    20     0]\n [  143     0     0     0     0     1     0     0     0     0     0    20]\n [10000   200   200   200   200   200   200   200    20    20    20    20]]\n\n\n[[ 9295    15   140    96    22   156   173   114     0     5     0     0]\n [  260   185     0     0     0     0     4     0     0     0     0     0]\n [    0     0    60     0     0     0     0     0     0     0     0     0]\n [    0     0     0   104     0     0     0     0     0     0     0     0]\n [    3     0     0     0   178     2     0     0     0     0     0     0]\n [  437     0     0     0     0    42     1     0     0     0     0     0]\n [    3     0     0     0     0     0    22     0     0     0     0     0]\n [    2     0     0     0     0     0     0    86     0     0     0     0]\n [    0     0     0     0     0     0     0     0    20     0     0     0]\n [    0     0     0     0     0     0     0     0     0    15     0     0]\n [    0     0     0     0     0     0     0     0     0     0    20     0]\n [    0     0     0     0     0     0     0     0     0     0     0    20]\n [10000   200   200   200   200   200   200   200    20    20    20    20]]\n\n [[ 9208     6   160    16     0   148   169    98     0     1     0     0]\n [  437   194     0     0     0     5    12     0     0     0     0     0]\n [    2     0    37     0     0     0     0     0     0     0     0     0]\n [    0     0     0   184     0     1     0     0     0     0     0     0]\n [  160     0     3     0   200    13     0     3     0     0     0     0]\n [  161     0     0     0     0    33     0     0     0     0     0     0]\n [    0     0     0     0     0     0    19     0     0     0     0     0]\n [   20     0     0     0     0     0     0    99     0     0     0     0]\n [    0     0     0     0     0     0     0     0    20     0     0     0]\n [   10     0     0     0     0     0     0     0     0    19     0     0]\n [    0     0     0     0     0     0     0     0     0     0    20     0]\n [    2     0     0     0     0     0     0     0     0     0     0    20]\n [10000   200   200   200   200   200   200   200    20    20    20    20]]",
+			"settings":
+			{
+				"buffer_size": 5819,
 				"line_ending": "Unix"
 			}
 		},
@@ -375,6 +387,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"50",
+			"auc_curves_vocabVSfeat_7Genres_1Words_MinMax",
 			"\"",
 			", ",
 			" & (params_full_array[:,3] == 100)",
@@ -500,9 +514,7 @@
 			"corpus_matrix",
 			"ODLO_THERMALWEAR",
 			"inv_srd_idx",
-			"ODLO_STOCK",
-			"]",
-			"],"
+			"ODLO_STOCK"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -523,7 +535,7 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -532,15 +544,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4784,
+						"buffer_size": 4778,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1584,
-								1584
+								1388,
+								1388
 							]
 						],
 						"settings":
@@ -648,16 +660,17 @@
 								"Python Django": "Python"
 							},
 							"codeintel_tooltips": "popup",
+							"side_bar_folders_auto_load_folder": 1,
 							"sublime_auto_complete": true,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": -0.0,
+						"translation.y": 135.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -666,15 +679,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5334,
+						"buffer_size": 5347,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2208,
-								2208
+								2675,
+								2675
 							]
 						],
 						"settings":
@@ -782,16 +795,17 @@
 								"Python Django": "Python"
 							},
 							"codeintel_tooltips": "popup",
+							"side_bar_folders_auto_load_folder": 1,
 							"sublime_auto_complete": true,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 696.0,
+						"translation.y": 606.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -807,8 +821,8 @@
 						"selection":
 						[
 							[
-								794,
-								794
+								801,
+								801
 							]
 						],
 						"settings":
@@ -916,13 +930,14 @@
 								"Python Django": "Python"
 							},
 							"codeintel_tooltips": "popup",
+							"side_bar_folders_auto_load_folder": 1,
 							"sublime_auto_complete": true,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 90.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -930,6 +945,138 @@
 				},
 				{
 					"buffer": 3,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5819,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								955,
+								955
+							]
+						],
+						"settings":
+						{
+							"auto_name": "",
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
 					"file": "RES_TEMP.txt",
 					"semi_transient": false,
 					"settings":
@@ -1052,17 +1199,19 @@
 							},
 							"codeintel_tooltips": "popup",
 							"sublime_auto_complete": true,
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "src/analytics/docmetrix.py",
 					"semi_transient": false,
 					"settings":
@@ -1193,11 +1342,11 @@
 						"translation.y": 4893.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 6,
 					"file": "src/ploting/Bargram3D_demo.py",
 					"semi_transient": false,
 					"settings":
@@ -1221,11 +1370,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 7,
 					"file": "src/data_retrieval/ocsvmedata.py",
 					"semi_transient": false,
 					"settings":
@@ -1355,11 +1504,11 @@
 						"translation.y": 804.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 8,
 					"file": "src/analytics/metrix.py",
 					"semi_transient": false,
 					"settings":
@@ -1489,7 +1638,7 @@
 						"translation.y": 8476.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 7,
 					"type": "text"
 				}
 			]
@@ -1528,7 +1677,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 269.0
+		"height": 175.0
 	},
 	"output.find_results":
 	{

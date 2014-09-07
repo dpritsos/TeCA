@@ -65,10 +65,10 @@ params_od = coll.OrderedDict( [
 res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS_minmax.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS.h5', 'r')
 
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04_minmax.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_3Words_KI04.h5', 'r')
 
-fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/auc_curves_vocabVSfeat_KI04_4Chars.eps'
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/auc_curves_SigmaVSIters_SANTINIS_4Chars_MinMax.eps'
 
 
 symbol = [ 'o', 'v', '^', '+', 'x', 's', '*', '<', '>', 'H', '1', '2', '3', '4', 'D', 'h', '8', 'd', 'p', '.', ',' ]
@@ -112,18 +112,18 @@ plt.figure(num=None, figsize=(12, 8), dpi=100, facecolor='w', edgecolor='k')
 i = 0;
 
 #Variance Implementation.
-for param_1 in params_od['vocab_size']: 
+for param_1 in params_od['Sigma']: 
     
     i += 1
     x = list()
     y = list()
     yerr = list()
 
-    for param_2 in params_od['features_size']: 
+    for param_2 in params_od['Iterations']: 
 
         if param_2 > 10000: continue;
 
-        auc_per_sigma = res[ np.where((res[:,1] == param_2) & (res[:,0] == param_1)) ]
+        auc_per_sigma = res[ np.where((res[:,3] == param_2) & (res[:,2] == param_1)) ]
 
         if auc_per_sigma.shape[0]:
             #print auc_per_sigma[:,-1]
@@ -139,12 +139,12 @@ for param_1 in params_od['vocab_size']:
          capthick=None)"""
 
 #plt.xticks(params_od['features_size'])
-plt.xticks([0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000])
+#plt.xticks([0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000])
 
 #plt.xticks(np.arange(0,100000,5000))
 #plt.xticks(np.arange(0,120,10))
 
-plt.yticks(np.arange(0.4,1.05,0.05))
+plt.yticks(np.arange(0.30,1.05,0.05))
 
 
 plt.grid()

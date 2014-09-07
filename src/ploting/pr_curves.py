@@ -24,17 +24,17 @@ params_od = coll.OrderedDict( [
     ('features_size', [1000, 5000, 10000, 50000, 90000]), #1000, 5000, 10000, 50000, 90000]\
     #'3.Bagging', [0.66],\
     #('nu', [0.1]) #, 0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
-    ('Sigma', [0.5]), #[0.5, 0.7, 0.9])\
+    ('Sigma', [0.9]), #[0.5, 0.7, 0.9])\
     ('Iterations', [100]) #[10, 50, 100]
 ] )
 
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres_jaccard.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres_d.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_4Chars_7Genres.h5', 'r')
 
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS.h5', 'r')
+res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_4Chars_SANTINIS.h5', 'r')
 
-res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_3Words_KI04_jaccard.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_3Words_KI04_jaccard.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_1Words_KI04.h5', 'r')
 
 symbol = [ 'o', 'v', '^', '+', 'x', 's', '*', '<', '>', 'H', '1', '2', '3', '4', 'D', 'h', '8', 'd', 'p', '.', ',' ]
