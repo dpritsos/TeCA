@@ -121,7 +121,7 @@ for param_1 in params_od['Sigma']:
 
     for param_2 in params_od['Iterations']: 
 
-        if param_2 > 10000: continue;
+        #if param_2 > 10000: continue;
 
         auc_per_sigma = res[ np.where((res[:,3] == param_2) & (res[:,2] == param_1)) ]
 
