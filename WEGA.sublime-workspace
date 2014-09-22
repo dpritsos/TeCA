@@ -132,10 +132,13 @@
 			}
 		},
 		{
+			"contents": "#!/usr/bin/env python\n\nimport sys\nsys.path.append('../../src')\nsys.path.append('../../../DoGSWrapper/src')\n\nimport tables as tb\nimport numpy as np\nimport collections as coll\nfrom data_retrieval.rfsedata import get_predictions as get_rfse\nimport base.param_combs as param_comb\nimport analytics.metrix as mx\n\n\n#Parameters used for the experiments required for selecting specific or group of results\nkfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]\n\nparams_od = coll.OrderedDict( [\n    ('vocab_size', [5000, 10000, 50000, 100000]),\\\n    ('features_size', [1000, 5000, 10000, 50000, 90000]), #1000, 5000, 10000, 50000, 90000]\\\n    #'3.Bagging', [0.66],\\\n    #('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),\\\n    ('Sigma', [0.5, 0.7, 0.9]),\\\n    ('Iterations', [10, 50, 100]) #[10, 50, 100]\n] )\n\n\n#Defining the file name of the experimental results to be used\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres_minmax.h5', 'r')\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_3Words_7Genres.h5', 'r')\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS_minmax.h5', 'r')\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_4Chars_SANTINIS.h5', 'r')\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04_minmax.h5', 'r')\n#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_4Chars_KI04.h5', 'r')\n\n#Defining the directory and file name for table to be saved\naucz_mean_var_fname = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/ECIR2015/tables_data/AUC_tables/AUC_4Chars_KI04_MinMax_Voc&Feat.csv'\n\n\n#Beginning AUC-Params table bu3lding\nres_lst = list()\n\n#Loading data in a convenient form.\nfor params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), param_comb.ParamGridIter(params_od, 'path')):\n\n    if params_lst[0] > params_lst[1]:\n\n        pred_scores, expd_y, pred_y = get_rfse(res_h5file, kfolds, params_path, genre_tag=None)\n\n        prec, recl, t = mx.pr_curve(expd_y, pred_scores, full_curve=True)\n\n        try:\n            auc_value = mx.auc(recl, prec)\n\n            params_lst.extend([auc_value])\n\n            res_lst.append(params_lst)\n        \n        except:\n            \n            print params_path\n            \n\n#Stack the data collected in a 2D array. Last column contain the AUC for every parameters values possible combination.\nres = np.vstack(res_lst)\n\n#Variance Implementation.\np1_lst = params_od['features_size']\np2_lst = params_od['vocab_size']\n\n#Table containing the results AUC means plus variance\naucz_mean_var_table = np.zeros( (len(p1_lst), len(p2_lst)*2) )\n\nfor i, p1 in enumerate(p1_lst):\n\n    skp1 = 0\n \n    for cc, p2 in enumerate(p2_lst):\n\n        j = skp1 + cc\n\n        auc_per_params = res[ np.where((res[:,1] == p1) & (res[:,0] == p2)) ]\n      \n        if auc_per_params.shape[0]:\n            aucz_mean_var_table[i, j] = np.mean(auc_per_params[:,-1])\n            aucz_mean_var_table[i, j+1] = np.var(auc_per_params[:,-1])\n\n        skp1 += 1\n\n#Saving the AUC means (with variance table)     \nnp.savetxt(aucz_mean_var_fname, aucz_mean_var_table)\n\n#Closing HDF5 file\nres_h5file.close()\n\n\n ",
 			"file": "src/ploting/auc_tables.py",
+			"file_size": 3346,
+			"file_write_time": 130558477060337391,
 			"settings":
 			{
-				"buffer_size": 3198,
+				"buffer_size": 3251,
 				"line_ending": "Windows"
 			}
 		},
@@ -811,7 +814,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1632.0,
+						"translation.y": 1275.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -823,15 +826,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3198,
+						"buffer_size": 3251,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2747,
-								2747
+								920,
+								920
 							]
 						],
 						"settings":
@@ -947,7 +950,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 102.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,

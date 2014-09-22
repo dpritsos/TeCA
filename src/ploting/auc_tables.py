@@ -26,18 +26,18 @@ params_od = coll.OrderedDict( [
 
 
 #Defining the file name of the experimental results to be used
-res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres.h5', 'r')
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_1Words_7Genres.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres_minmax.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_3Words_7Genres.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS_minmax.h5', 'r')
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS.h5', 'r')
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04_minmax.h5', 'r')
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_3Words_KI04.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_4Chars_SANTINIS.h5', 'r')
+res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04_minmax.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_4Chars_KI04.h5', 'r')
 
 #Defining the directory and file name for table to be saved
-aucz_mean_var_fname = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/ECIR2015/tables_data/AUC_tables/AUC_3Words_7Genres_Cos_Sigma&Iter.csv'
+aucz_mean_var_fname = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/ECIR2015/tables_data/AUC_tables/AUC_4Chars_KI04_MinMax_Voc&Feat.csv'
 
 
-#Beginning AUC-Params table building
+#Beginning AUC-Params table bu3lding
 res_lst = list()
 
 #Loading data in a convenient form.
@@ -65,8 +65,8 @@ for params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), 
 res = np.vstack(res_lst)
 
 #Variance Implementation.
-p1_lst = params_od['Sigma']
-p2_lst = params_od['Iterations']
+p1_lst = params_od['features_size']
+p2_lst = params_od['vocab_size']
 
 #Table containing the results AUC means plus variance
 aucz_mean_var_table = np.zeros( (len(p1_lst), len(p2_lst)*2) )
@@ -79,7 +79,7 @@ for i, p1 in enumerate(p1_lst):
 
         j = skp1 + cc
 
-        auc_per_params = res[ np.where((res[:,3] == p2) & (res[:,2] == p1)) ]
+        auc_per_params = res[ np.where((res[:,1] == p1) & (res[:,0] == p2)) ]
       
         if auc_per_params.shape[0]:
             aucz_mean_var_table[i, j] = np.mean(auc_per_params[:,-1])
@@ -89,6 +89,9 @@ for i, p1 in enumerate(p1_lst):
 
 #Saving the AUC means (with variance table)     
 np.savetxt(aucz_mean_var_fname, aucz_mean_var_table)
+
+#Closing HDF5 file
+res_h5file.close()
 
 
  
