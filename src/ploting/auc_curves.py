@@ -8,13 +8,12 @@ import tables as tb
 import numpy as np
 import collections as coll
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gspec
 from data_retrieval.rfsedata import get_predictions as get_rfse
 import base.param_combs as param_comb
 import analytics.metrix as mx
-from sklearn import grid_search
-
-from sklearn import grid_search
+#from sklearn import grid_search
+#import matplotlib.gridspec as gspec
+#from sklearn import grid_search
 
 """
 from matplotlib import rc, rcParams
@@ -37,7 +36,7 @@ params = {'backend': 'eps',
       'text.usetex': True,
       'axes.unicode_minus': True,
       'ps.usedistiller' : 'xpdf'
-      }          
+      }
 rcParams.update(params)
 rcParams.update({'figure.autolayout':True})
 """
@@ -47,7 +46,7 @@ rcParams.update({'figure.autolayout':True})
 #rc('font',**{'family':'serif','serif':['Palatino']})
 #rc('text', usetex=True)
 
-  
+
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 params_od = coll.OrderedDict( [
@@ -61,10 +60,8 @@ params_od = coll.OrderedDict( [
 
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres_minmax.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_1Words_7Genres.h5', 'r')
-
 res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS_minmax.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS.h5', 'r')
-
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04_minmax.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_3Words_KI04.h5', 'r')
 

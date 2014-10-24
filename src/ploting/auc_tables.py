@@ -19,9 +19,9 @@ params_od = coll.OrderedDict( [
     ('vocab_size', [5000, 10000, 50000, 100000]),\
     ('features_size', [1000, 5000, 10000, 50000, 90000]), #1000, 5000, 10000, 50000, 90000]\
     #'3.Bagging', [0.66],\
-    #('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),\
-    ('Sigma', [0.5, 0.7, 0.9]),\
-    ('Iterations', [10, 50, 100]) #[10, 50, 100]
+    ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),\
+    #('Sigma', [0.5, 0.7, 0.9]),\
+    #('Iterations', [10, 50, 100]) #[10, 50, 100]
 ] )
 
 
@@ -29,15 +29,15 @@ params_od = coll.OrderedDict( [
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres_minmax.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_3Words_7Genres.h5', 'r')
 #res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_4Chars_SANTINIS_minmax.h5', 'r')
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_4Chars_SANTINIS.h5', 'r')
-res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04_minmax.h5', 'r')
-#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_4Chars_KI04.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS.h5', 'r')
+#res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/RFSE_4Chars_KI04_minmax.h5', 'r')
+res_h5file = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_3Words_KI04.h5', 'r')
 
 #Defining the directory and file name for table to be saved
-aucz_mean_var_fname = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/ECIR2015/tables_data/AUC_tables/AUC_4Chars_KI04_MinMax_Voc&Feat.csv'
+aucz_mean_var_fname = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/ECIR2015/tables_data/AUC_tables/AUC_3Words_KI04_OCSVM_Nu&Feat.csv'
 
 
-#Beginning AUC-Params table bu3lding
+#Beginning AUC-Params table building
 res_lst = list()
 
 #Loading data in a convenient form.
@@ -65,8 +65,8 @@ for params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), 
 res = np.vstack(res_lst)
 
 #Variance Implementation.
-p1_lst = params_od['features_size']
-p2_lst = params_od['vocab_size']
+p1_lst = params_od['nu']
+p2_lst = params_od['features_size']
 
 #Table containing the results AUC means plus variance
 aucz_mean_var_table = np.zeros( (len(p1_lst), len(p2_lst)*2) )
@@ -79,7 +79,7 @@ for i, p1 in enumerate(p1_lst):
 
         j = skp1 + cc
 
-        auc_per_params = res[ np.where((res[:,1] == p1) & (res[:,0] == p2)) ]
+        auc_per_params = res[ np.where((res[:,2] == p1) & (res[:,1] == p2)) ]
       
         if auc_per_params.shape[0]:
             aucz_mean_var_table[i, j] = np.mean(auc_per_params[:,-1])

@@ -80,7 +80,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None):
 
         #Collecting Scores for and Expected Values for every fold given in kfold list.    
         for k in kfolds:
-            
+
             #Loading expected and predicted values.
             pred_scores = res_h5file.get_node(params_path+'/KFold'+str(k), name='predicted_scores').read()
             pred_scores = pred_scores#[0:-1000]
