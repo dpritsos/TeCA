@@ -10,10 +10,8 @@ import matplotlib.pyplot as plt
 from analytics.metrix import pr_curve, reclev_averaging
     #roc_curve, reclev_max_around,
     #reclev_nearest, smooth_linear
-
+#from data_retrieval.rfsedata import get_predictions
 from data_retrieval.rfsemixdata import get_predictions
-from data_retrieval.rfsedata import get_predictions as get_rfse
-
 import base.param_combs as param_comb
 import collections as coll
 import numpy as np
@@ -71,11 +69,14 @@ for params_lst, params_path in \
 
     if params_lst[0] > params_lst[1]:
 
-        pred_scores, expd_y, pred_y = get_predictions(
-            h5d_fl1, h5d_fl2, kfolds, params_path, params_lst[2], gnr_num=12, genre_tag=None
-        )
+        #pred_scores, expd_y, pred_y = get_predictions(
+        #    h5d_fl1, kfolds, params_path, genre_tag=None, binary=False
+        #)
 
-        #pred_scores, expd_y, pred_y = get_rfse(h5d_fl1, kfolds, params_path, genre_tag=None)
+        pred_scores, expd_y, pred_y = get_predictions(
+            h5d_fl1, h5d_fl2, kfolds, params_path, params_lst[2], gnr_num=12,
+            genre_tag=None, binary=True
+        )
 
         #pred_scores, expd_y, pred_y = get_ocsvme(res_h5file, kfolds, params_path, genre_tag=None)
 

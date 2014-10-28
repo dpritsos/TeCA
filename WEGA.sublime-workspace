@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"hd",
+				"h5d_fl1	statement"
+			],
+			[
+				"PR",
+				"PR_Y_lst	statement"
+			],
+			[
+				"a",
+				"append	function"
+			],
+			[
 				"as",
 				"astype"
 			],
@@ -34,10 +46,6 @@
 			[
 				"pc",
 				"pc_array_fl2	statement"
-			],
-			[
-				"a",
-				"append"
 			],
 			[
 				"In",
@@ -148,18 +156,43 @@
 	"buffers":
 	[
 		{
-			"file": "src/data_retrieval/rfsemixdata.py",
+			"file": "src/ploting/pr_curves.py",
 			"settings":
 			{
-				"buffer_size": 6619,
+				"buffer_size": 4951,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/ploting/pr_curves.py",
+			"file": "src/ploting/contigency_table.py",
 			"settings":
 			{
-				"buffer_size": 5225,
+				"buffer_size": 3216,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "[[9627   12  139    8   11  184  139   96    0    0    0    0]\n [ 167  188    0    0    0    2    1    0    0    0    0    0]\n [   7    0   61    0    0    0    0    1    0    0    0    0]\n [   0    0    0  192    0    1    0    0    0    0    0    0]\n [  30    0    0    0  189    2    0    0    0    0    0    0]\n [  18    0    0    0    0   11    0    0    0    0    0    0]\n [  42    0    0    0    0    0   60    0    0    0    0    0]\n [  92    0    0    0    0    0    0  102    0    0    0    0]\n [   0    0    0    0    0    0    0    0   20    0    0    0]\n [   6    0    0    0    0    0    0    0    0   20    0    0]\n [  11    0    0    0    0    0    0    0    0    0   20    0]\n [   0    0    0    0    0    0    0    1    0    0    0   20]]\n\n [[9439    8  144   21   12  178  165  118    0    0    0    0]\n [ 410  192    0    0    0    4    1    0    0    0    0    0]\n [   2    0   56    0    0    0    0    1    0    0    0    0]\n [   0    0    0  179    0    0    0    0    0    0    0    0]\n [  30    0    0    0  188    2    0    0    0    0    0    0]\n [  35    0    0    0    0   16    0    1    0    0    0    0]\n [  13    0    0    0    0    0   34    0    0    0    0    0]\n [  63    0    0    0    0    0    0   79    0    0    0    0]\n [   0    0    0    0    0    0    0    0   20    0    0    0]\n [   8    0    0    0    0    0    0    0    0   20    0    0]\n [   0    0    0    0    0    0    0    0    0    0   20    0]\n [   0    0    0    0    0    0    0    1    0    0    0   20]]",
+			"settings":
+			{
+				"buffer_size": 1515,
+				"line_ending": "Unix",
+				"name": "[[9627   12  139    8   11  184  139   96    0"
+			}
+		},
+		{
+			"file": "src/ploting/PR_curves_manually_creating_plot.py",
+			"settings":
+			{
+				"buffer_size": 6459,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/data_retrieval/rfsemixdata.py",
+			"settings":
+			{
+				"buffer_size": 6650,
 				"line_ending": "Unix"
 			}
 		},
@@ -172,14 +205,6 @@
 			}
 		},
 		{
-			"file": "src/ploting/contigency_table.py",
-			"settings":
-			{
-				"buffer_size": 3227,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "src/ploting/auc_tables.py",
 			"settings":
 			{
@@ -188,18 +213,18 @@
 			}
 		},
 		{
-			"file": "src/data_retrieval/ocsvmedata.py",
+			"file": "src/data_retrieval/rfsedata.py",
 			"settings":
 			{
-				"buffer_size": 5146,
+				"buffer_size": 5025,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "src/data_retrieval/rfsedata.py",
+			"file": "src/data_retrieval/ocsvmedata.py",
 			"settings":
 			{
-				"buffer_size": 5016,
+				"buffer_size": 5146,
 				"line_ending": "Unix"
 			}
 		}
@@ -267,6 +292,8 @@
 	],
 	"file_history":
 	[
+		"/home/dimitrios/Development_Workspace/WEGA/src/data_retrieval/ocsvmedata.py",
+		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/TEST_TODELETE.py",
 		"/home/dimitrios/.config/sublime-text-3/Packages/Anaconda/Default (Linux).sublime-keymap",
 		"/home/dimitrios/.config/sublime-text-3/Packages/Anaconda/Anaconda.sublime-settings",
 		"/home/dimitrios/Development_Workspace/WEGA/src/analytics/metrix.py",
@@ -289,7 +316,6 @@
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting_deprecated/crossplot_PR_CUR_IV_EnsblAlgo_Bagging_n_EnsblOCSVM.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/plot_docs_sizes.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting_deprecated/plot_PR_CUR_frm_pytables_IV.py",
-		"/home/dimitrios/Development_Workspace/WEGA/src/data_retrieval/ocsvmedata.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting_deprecated/plot_resaults_frm_OCSVM_Sparse.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting_deprecated/plot_resaults_frm_pytables_IV.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/auc_curves.py",
@@ -393,8 +419,7 @@
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/convert/tfdtools.py",
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/sparse/cngrams.py",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_trn_1.idx",
-		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_crv_2.idx",
-		"/home/dimitrios/ExtremePro_Workspace/ArtDesign_Site_ExtremePro.gr/Offers_2013_07_02_Kites/Offers_2013_07_02_Kites.html"
+		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_crv_2.idx"
 	],
 	"find":
 	{
@@ -412,6 +437,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"tables_data",
+			"res_h5file",
 			"docs",
 			"super",
 			"fl1",
@@ -537,9 +564,7 @@
 			"plt",
 			"1000",
 			"precision_score",
-			".",
-			"	\n",
-			"],"
+			"."
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -565,19 +590,562 @@
 			[
 				{
 					"buffer": 0,
-					"file": "src/data_retrieval/rfsemixdata.py",
+					"file": "src/ploting/pr_curves.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6619,
+						"buffer_size": 4951,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								5647,
-								5647
+								1557,
+								1557
+							]
+						],
+						"settings":
+						{
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"rulers":
+							[
+								100
+							],
+							"side_bar_folders_auto_load_folder": 1,
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 765.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "src/ploting/contigency_table.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3216,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								867,
+								867
+							]
+						],
+						"settings":
+						{
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"rulers":
+							[
+								100
+							],
+							"side_bar_folders_auto_load_folder": 1,
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 51.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1515,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1515,
+								1515
+							]
+						],
+						"settings":
+						{
+							"auto_name": "[[9627   12  139    8   11  184  139   96    0",
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/ploting/PR_curves_manually_creating_plot.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6459,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5462,
+								5462
+							]
+						],
+						"settings":
+						{
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"side_bar_folders_auto_load_folder": 1,
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Python/Python.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 51.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "src/data_retrieval/rfsemixdata.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6650,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5964,
+								5964
 							]
 						],
 						"settings":
@@ -698,153 +1266,14 @@
 							"wrap_width": 0
 						},
 						"translation.x": 0.0,
-						"translation.y": 1989.0,
+						"translation.y": 2091.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "src/ploting/pr_curves.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5225,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5217,
-								5217
-							]
-						],
-						"settings":
-						{
-							"codeintel": true,
-							"codeintel_config":
-							{
-								"JavaScript":
-								{
-									"codeintel_max_recursive_dir_depth": 2,
-									"codeintel_scan_files_in_project": false,
-									"javascriptExtraPaths":
-									[
-									]
-								},
-								"PHP":
-								{
-									"codeintel_max_recursive_dir_depth": 5,
-									"codeintel_scan_files_in_project": false,
-									"phpExtraPaths":
-									[
-									]
-								},
-								"Python":
-								{
-									"env":
-									{
-									}
-								}
-							},
-							"codeintel_enabled_languages":
-							[
-								"JavaScript",
-								"Mason",
-								"XBL",
-								"XUL",
-								"RHTML",
-								"SCSS",
-								"Python",
-								"HTML",
-								"Ruby",
-								"Python3",
-								"XML",
-								"Sass",
-								"XSLT",
-								"Django",
-								"HTML5",
-								"Perl",
-								"CSS",
-								"Twig",
-								"Less",
-								"Smarty",
-								"Node.js",
-								"Tcl",
-								"TemplateToolkit",
-								"PHP"
-							],
-							"codeintel_live": true,
-							"codeintel_live_enabled_languages":
-							[
-								"JavaScript",
-								"Mason",
-								"XBL",
-								"XUL",
-								"RHTML",
-								"SCSS",
-								"Python",
-								"HTML",
-								"Ruby",
-								"Python3",
-								"XML",
-								"Sass",
-								"XSLT",
-								"Django",
-								"HTML5",
-								"Perl",
-								"CSS",
-								"Twig",
-								"Less",
-								"Smarty",
-								"Node.js",
-								"Tcl",
-								"TemplateToolkit",
-								"PHP"
-							],
-							"codeintel_max_recursive_dir_depth": 10,
-							"codeintel_scan_exclude_dir":
-							{
-								"JavaScript":
-								[
-									"/build/",
-									"/min/"
-								]
-							},
-							"codeintel_scan_files_in_project": true,
-							"codeintel_selected_catalogs":
-							[
-								"PyWin32",
-								"jQuery",
-								"Rails"
-							],
-							"codeintel_snippets": true,
-							"codeintel_syntax_map":
-							{
-								"Python Django": "Python"
-							},
-							"codeintel_tooltips": "popup",
-							"rulers":
-							[
-								100
-							],
-							"side_bar_folders_auto_load_folder": 1,
-							"sublime_auto_complete": true,
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 309.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
+					"buffer": 5,
 					"file": "src/ploting/auc_curves.py",
 					"semi_transient": false,
 					"settings":
@@ -975,146 +1404,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "src/ploting/contigency_table.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3227,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								909,
-								909
-							]
-						],
-						"settings":
-						{
-							"codeintel": true,
-							"codeintel_config":
-							{
-								"JavaScript":
-								{
-									"codeintel_max_recursive_dir_depth": 2,
-									"codeintel_scan_files_in_project": false,
-									"javascriptExtraPaths":
-									[
-									]
-								},
-								"PHP":
-								{
-									"codeintel_max_recursive_dir_depth": 5,
-									"codeintel_scan_files_in_project": false,
-									"phpExtraPaths":
-									[
-									]
-								},
-								"Python":
-								{
-									"env":
-									{
-									}
-								}
-							},
-							"codeintel_enabled_languages":
-							[
-								"JavaScript",
-								"Mason",
-								"XBL",
-								"XUL",
-								"RHTML",
-								"SCSS",
-								"Python",
-								"HTML",
-								"Ruby",
-								"Python3",
-								"XML",
-								"Sass",
-								"XSLT",
-								"Django",
-								"HTML5",
-								"Perl",
-								"CSS",
-								"Twig",
-								"Less",
-								"Smarty",
-								"Node.js",
-								"Tcl",
-								"TemplateToolkit",
-								"PHP"
-							],
-							"codeintel_live": true,
-							"codeintel_live_enabled_languages":
-							[
-								"JavaScript",
-								"Mason",
-								"XBL",
-								"XUL",
-								"RHTML",
-								"SCSS",
-								"Python",
-								"HTML",
-								"Ruby",
-								"Python3",
-								"XML",
-								"Sass",
-								"XSLT",
-								"Django",
-								"HTML5",
-								"Perl",
-								"CSS",
-								"Twig",
-								"Less",
-								"Smarty",
-								"Node.js",
-								"Tcl",
-								"TemplateToolkit",
-								"PHP"
-							],
-							"codeintel_max_recursive_dir_depth": 10,
-							"codeintel_scan_exclude_dir":
-							{
-								"JavaScript":
-								[
-									"/build/",
-									"/min/"
-								]
-							},
-							"codeintel_scan_files_in_project": true,
-							"codeintel_selected_catalogs":
-							[
-								"PyWin32",
-								"jQuery",
-								"Rails"
-							],
-							"codeintel_snippets": true,
-							"codeintel_syntax_map":
-							{
-								"Python Django": "Python"
-							},
-							"codeintel_tooltips": "popup",
-							"side_bar_folders_auto_load_folder": 1,
-							"sublime_auto_complete": true,
-							"syntax": "Packages/Python/Python.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 102.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
+					"buffer": 6,
 					"file": "src/ploting/auc_tables.py",
 					"semi_transient": false,
 					"settings":
@@ -1246,24 +1540,24 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "src/data_retrieval/ocsvmedata.py",
+					"buffer": 7,
+					"file": "src/data_retrieval/rfsedata.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5146,
+						"buffer_size": 5025,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4540,
-								4540
+								4414,
+								4414
 							]
 						],
 						"settings":
@@ -1378,27 +1672,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 804.0,
+						"translation.y": 969.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "src/data_retrieval/rfsedata.py",
+					"buffer": 8,
+					"file": "src/data_retrieval/ocsvmedata.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5016,
+						"buffer_size": 5146,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4100,
-								4100
+								3749,
+								3749
 							]
 						],
 						"settings":
@@ -1513,10 +1807,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": -0.0,
-						"translation.y": 1071.0,
+						"translation.y": 765.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -1555,7 +1849,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 609.0
+		"height": 330.0
 	},
 	"output.find_results":
 	{
@@ -1610,8 +1904,8 @@
 	"show_minimap": true,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": false,
-	"side_bar_width": 50.0,
+	"side_bar_visible": true,
+	"side_bar_width": 223.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

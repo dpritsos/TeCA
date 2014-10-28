@@ -12,7 +12,8 @@ sys.path.append('../../src')
 import numpy as np
 
 
-def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num, genre_tag=None):
+def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num,
+                    genre_tag=None, binary=None):
 
     """Retrieval functions for the date returned from the RFSE method.
 
@@ -110,8 +111,8 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num, genre
 
             new_pc_col_lst = list()
 
-            for i, (ms_c1, ms_c2, pc_c1, pc_c2) in \
-                enumerate(zip(ms_arr1_cls, ms_arr2_cls, pc_arr1_cls, pc_arr2_cls)):
+            for i, (ms_c1, ms_c2, pc_c1, pc_c2) in enumerate(zip(
+                    ms_arr1_cls, ms_arr2_cls, pc_arr1_cls, pc_arr2_cls)):
 
                 i_max_ms_col = np.argmax(np.hstack((ms_c1, ms_c2)), axis=1)
 
@@ -146,7 +147,7 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num, genre
             exp_y = hf5_fl1.get_node(params_path+'/KFold'+str(k), name='expected_Y').read()
 
             #Collecting and the Truth Table of expected and predicted values.
-            EY_lst.append(np.where(exp_y == pre_y, 1, 0))
+            EY_lst.append(exp_y)
 
     else:
         raise Exception(
@@ -159,14 +160,16 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num, genre
 
     """
 
-    #Stack the lists to Single arrays for PS and EY respectively
+    #Stacking the lists to Single arrays for PS and EY respectively
     PS = np.hstack(PS_lst)
     EY = np.hstack(EY_lst)
     PR_Y = np.hstack(PR_Y_lst)
 
-    #print PR_Y[ PR_Y == 0 ]
+    #Converting in to binary case under binary variable condition.
+    if binary:
+        EY = np.where(EY == PR_Y, 1, 0)
 
-    #Short Results by Predicted Scores
+    #Shorting Results by Predicted Scores
     inv_srd_idx = np.argsort(PS)[::-1]
     PS = PS[inv_srd_idx]
     EY = EY[inv_srd_idx]

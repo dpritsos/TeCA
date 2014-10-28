@@ -7,7 +7,7 @@ sys.path.append('../../../DoGSWrapper/src')
 import tables as tb
 import numpy as np
 import collections as coll
-from data_retrieval.rfsedata import get_predictions as get_rfse
+#from data_retrieval.rfsedata import get_predictions
 from data_retrieval.rfsemixdata import get_predictions
 import base.param_combs as param_comb
 import analytics.metrix as mx
@@ -19,7 +19,7 @@ kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 params_od = coll.OrderedDict([
     ('vocab_size', [100000]),  # [5000, 10000, 50000, 100000]),
-    ('features_size', [10000]),  # [1000, 5000, 10000, 50000, 90000]
+    ('features_size', [5000]),  # [1000, 5000, 10000, 50000, 90000]
     #(Bagging', [0.66]),
     #('nu', [0.9]),  # [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),
     ('Sigma', [0.7]),  # [0.5, 0.7, 0.9]),
@@ -30,7 +30,7 @@ unknow_class = True
 
 # Defining the file name of the experimental results to be used
 h5d_fl = str(
-    #/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres'
+    #'/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres'
     #'/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_3Words_7Genres'
     '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_3Words_SANTINIS'
     #'/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS'
@@ -54,10 +54,14 @@ for params_lst, params_path in \
 
     if params_lst[0] > params_lst[1]:
 
-        rfse_data = get_rfse(h5d_fl1, kfolds, params_path, genre_tag=None)
-        #rfse_data = get_predictions(
-        #    h5d_fl1, h5d_fl2, kfolds, params_path, params_lst[2], gnr_num=12, genre_tag=None
-        #)
+        #rfse_data = get_predictions(h5d_fl1, kfolds, params_path, genre_tag=None, binary=True)
+
+        rfse_data = get_predictions(
+            h5d_fl1, h5d_fl2, kfolds, params_path, params_lst[2], gnr_num=12,
+            genre_tag=None, binary=False
+        )
+
+        print rfse_data
 
         # 3rd element contain predicted y values list
         pred_y_lst.append(rfse_data[2])
@@ -83,9 +87,9 @@ np.set_printoptions(precision=3, threshold=10000, suppress=True, linewidth=100)
 print conf_mtrx
 print pr_scores[:, :]
 
-# Saving the AUC means (with variance table)
+#Saving the AUC means (with variance table)
 #np.savetxt(conf_matrix_fname, conf_mtrx)
 
-# Closing HDF5 file
+#Closing HDF5 files
 h5d_fl1.close()
 h5d_fl2.close()
