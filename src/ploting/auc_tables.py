@@ -29,19 +29,19 @@ unknow_class = True
 
 # Defining the file name of the experimental results to be used
 h5d_fl = str(
-    #'/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres'
+    #'/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_4Chars_7Genres'
     #'/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_3Words_7Genres'
-    '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_3Words_SANTINIS'
+    #'/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_3Words_SANTINIS'
     #'/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS'
-    #'/home/dimitrios/Synergy-Crawler/KI-04/RFSE_1Words_KI04_minmax'
+    '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_1Words_KI04'
     #'/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_3Words_KI04'
 )
 
 h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
 h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
 
-#Defining the directory and file name for table to be saved
-aucz_mean_var_fname = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/ECIR2015/tables_data/AUC_tables/AUC_3Words_KI04_OCSVM_Nu&Feat.csv'
+#Defining the directory and file name for table to be saved.
+aucz_mean_var_fname = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/tables_data/AUC_1Words_KI04_MIX_FeatVSVoc.csv'
 
 
 #Beginning AUC-Params table building
@@ -59,7 +59,7 @@ for params_lst, params_path in zip(
 
         pred_scores, expd_y, pred_y = get_predictions(
             h5d_fl1, h5d_fl2, kfolds, params_path, params_lst[2], gnr_num=12,
-            genre_tag=None, binary=False
+            genre_tag=None, binary=True
         )
 
         prec, recl, t = mx.pr_curve(expd_y, pred_scores, full_curve=True)
@@ -81,8 +81,8 @@ for params_lst, params_path in zip(
 res = np.vstack(res_lst)
 
 #Variance Implementation.
-p1_lst = params_od['nu']
-p2_lst = params_od['features_size']
+p1_lst = params_od['features_size']
+p2_lst = params_od['vocab_size']
 
 #Table containing the results AUC means plus variance
 aucz_mean_var_table = np.zeros((len(p1_lst), len(p2_lst)*2))
@@ -95,7 +95,7 @@ for i, p1 in enumerate(p1_lst):
 
         j = skp1 + cc
 
-        auc_per_params = res[np.where((res[:, 2] == p1) & (res[:, 1] == p2))]
+        auc_per_params = res[np.where((res[:, 1] == p1) & (res[:, 0] == p2))]
 
         if auc_per_params.shape[0]:
             aucz_mean_var_table[i, j] = np.mean(auc_per_params[:, -1])
@@ -104,6 +104,7 @@ for i, p1 in enumerate(p1_lst):
         skp1 += 1
 
 #Saving the AUC means (with variance table)
+#print aucz_mean_var_table
 np.savetxt(aucz_mean_var_fname, aucz_mean_var_table)
 
 #Closing HDF5 files

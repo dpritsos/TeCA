@@ -94,11 +94,29 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num,
             #measure has been used.
             max_ms = np.max(ms_array_fl1, axis=0)
             min_ms = np.min(ms_array_fl1, axis=0)
-            ms_array_fl1 = (ms_array_fl1 - min_ms) / (max_ms - min_ms)
+
+            if (max_ms - min_ms).all() != 0:
+                #EXPLAIN HERE...
+                ms_array_fl1 = (ms_array_fl1 - min_ms) / (max_ms - min_ms)
+
+            else:
+                #EXPLAIN HERE...
+                mm = (max_ms - min_ms)
+                mm[np.where((mm == 0))] = 0.00000000000001
+                ms_array_fl1 = (ms_array_fl1 - min_ms) / mm
 
             max_ms = np.max(ms_array_fl2, axis=0)
             min_ms = np.min(ms_array_fl2, axis=0)
-            ms_array_fl2 = (ms_array_fl2 - min_ms) / (max_ms - min_ms)
+
+            if (max_ms - min_ms).all() != 0:
+                #EXPLAIN HERE...
+                ms_array_fl2 = (ms_array_fl2 - min_ms) / (max_ms - min_ms)
+
+            else:
+                #EXPLAIN HERE...
+                mm = (max_ms - min_ms)
+                mm[np.where((mm == 0))] = 0.00000000000001
+                ms_array_fl2 = (ms_array_fl2 - min_ms) / mm
 
             docs_num = ms_array_fl1.shape[1]
             itrs = np.arange(ms_array_fl1.shape[0])
