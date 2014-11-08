@@ -7,14 +7,16 @@ sys.path.append('../../../DoGSWrapper/src')
 import tables as tb
 import matplotlib.pyplot as plt
 
-from analytics.metrix import pr_curve, reclev_averaging
-    #roc_curve, reclev_max_around,
+from analytics.metrix import pr_curve, reclev_averaging, \
+    roc_curve, reclev_max_around
     #reclev_nearest, smooth_linear
 #from data_retrieval.rfsedata import get_predictions
 from data_retrieval.rfsemixdata import get_predictions
 import base.param_combs as param_comb
 import collections as coll
 import numpy as np
+
+import sklearn.metrics as skm
 #from data_retrieval.ocsvmedata import get_predictions as get_ocsvme
 #from sklearn import grid_search
 #from sklearn.metrics import roc_curve as roc
@@ -23,8 +25,8 @@ import numpy as np
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 params_od = coll.OrderedDict([
-    ('vocab_size', [100000]),  # [5000, 10000, 50000, 100000]),
-    ('features_size', [1000, 5000, 10000, 50000, 90000]),  # 1000, 5000, 10000, 50000, 90000]
+    ('vocab_size', [100000]),  #[5000, 10000, 50000, 100000]),
+    ('features_size', [10000]),  # 1000, 5000, 10000, 50000, 90000]
     #'3.Bagging', [0.66],
     # ('nu', [0.5]) #, 0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
     ('Sigma', [0.7]),  # [0.5, 0.7, 0.9])
@@ -32,7 +34,7 @@ params_od = coll.OrderedDict([
 ])
 
 h5d_fl = str(
-    #/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres'
+    #'/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres'
     #'/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_3Words_7Genres'
     '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_3Words_SANTINIS'
     #'/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS'
@@ -70,20 +72,23 @@ for params_lst, params_path in \
     if params_lst[0] > params_lst[1]:
 
         #pred_scores, expd_y, pred_y = get_predictions(
-        #    h5d_fl1, kfolds, params_path, genre_tag=None, binary=False
+        #    h5d_fl1, kfolds, params_path, genre_tag=None, binary=True
         #)
 
         pred_scores, expd_y, pred_y = get_predictions(
             h5d_fl1, h5d_fl2, kfolds, params_path, params_lst[2], gnr_num=12,
-            genre_tag=None, binary=True
+            genre_tag=None, binary=True, strata=(10, 1000)
         )
 
         #pred_scores, expd_y, pred_y = get_ocsvme(res_h5file, kfolds, params_path, genre_tag=None)
 
         #y, x, t = roc_curve(expd_y, pred_scores, full_curve=False)
-        y, x, t = pr_curve(expd_y, pred_scores, full_curve=True)
-        # y, x, t = precision_recall_curve(expd_y, pred_scores) #<== They are
-        # not 100% percent the same.
+        y, x, t = pr_curve(expd_y, pred_scores, full_curve=True, is_truth_tbl=True)
+
+        #Experimental ToDO
+        #y, x, t = PTPR_curve(expd_y, pred_scores, full_curve=False)
+
+        #y, x, t = skm.precision_recall_curve(expd_y, pred_scores)
 
         # Smoothing out the Precision (y axis) of the P-R Curve.
         # CRITICAL: The P sould be inverted from the lowest to
@@ -101,6 +106,8 @@ for params_lst, params_path in \
 
         y, x = reclev_averaging(y, x)
 
+        #y = y[::-1]
+
         #y, x = reclev_nearest(y, x)
 
         #y, x = reclev_max_around(y, x)
@@ -109,7 +116,8 @@ for params_lst, params_path in \
         ax1.plot(
             x, y,
             color[i] + line_type[i] + symbol[i], linewidth=1,
-            markeredgewidth=1, label="(" + str(i) + ") Feat " + str(params_lst[1])
+            markeredgewidth=1, label="(" + str(i) + ") Feat " + str(params_lst[2]) + \
+            " - " + str(params_lst[3])
         )
         # ax1.title("SANTINIS")
         # ax1.yticks([ .50, .55, .60, .65, .70, .75, .80, .85, .90, .95, 1.00])
@@ -141,7 +149,9 @@ plt.xticks(
 )
 """
 
-#print y, x
+print y, x
+plt.xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.02])
+plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.02])
 
 
 plt.show()

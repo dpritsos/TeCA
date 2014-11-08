@@ -4,6 +4,50 @@
 		"selected_items":
 		[
 			[
+				"pre_s",
+				"pre_score_grp1	statement"
+			],
+			[
+				"pre",
+				"prey_grp2"
+			],
+			[
+				"un",
+				"unique	function"
+			],
+			[
+				"Ite",
+				"Iterations"
+			],
+			[
+				"h5",
+				"h5d_fl2	statement"
+			],
+			[
+				"h5d",
+				"h5d_fl1	statement"
+			],
+			[
+				"aucz",
+				"aucz_mean_var_table	statement"
+			],
+			[
+				"ite",
+				"Iterations"
+			],
+			[
+				"F",
+				"False	class"
+			],
+			[
+				"m",
+				"metrics	module"
+			],
+			[
+				"par",
+				"params_lst	forflow"
+			],
+			[
 				"bi",
 				"binary	param"
 			],
@@ -26,10 +70,6 @@
 			[
 				"as",
 				"astype"
-			],
-			[
-				"h5",
-				"h5d_fl1	statement"
 			],
 			[
 				"zero",
@@ -74,10 +114,6 @@
 			[
 				"d",
 				"dtype"
-			],
-			[
-				"m",
-				"metrics  (module)"
 			],
 			[
 				"p",
@@ -167,7 +203,15 @@
 			"file": "src/ploting/pr_curves.py",
 			"settings":
 			{
-				"buffer_size": 5008,
+				"buffer_size": 5323,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "src/analytics/metrix.py",
+			"settings":
+			{
+				"buffer_size": 26949,
 				"line_ending": "Unix"
 			}
 		},
@@ -175,7 +219,7 @@
 			"file": "src/ploting/contigency_table.py",
 			"settings":
 			{
-				"buffer_size": 3251,
+				"buffer_size": 3229,
 				"line_ending": "Unix"
 			}
 		},
@@ -183,7 +227,7 @@
 			"file": "src/ploting/auc_tables.py",
 			"settings":
 			{
-				"buffer_size": 3379,
+				"buffer_size": 6394,
 				"line_ending": "Windows"
 			}
 		},
@@ -191,7 +235,7 @@
 			"file": "src/data_retrieval/rfsemixdata.py",
 			"settings":
 			{
-				"buffer_size": 6751,
+				"buffer_size": 8353,
 				"line_ending": "Unix"
 			}
 		},
@@ -199,7 +243,7 @@
 			"file": "src/data_retrieval/rfsedata.py",
 			"settings":
 			{
-				"buffer_size": 5174,
+				"buffer_size": 6392,
 				"line_ending": "Unix"
 			}
 		},
@@ -270,17 +314,21 @@
 	"expanded_folders":
 	[
 		"/home/dimitrios/Development_Workspace/WEGA/src",
+		"/home/dimitrios/Development_Workspace/WEGA/src/analytics",
 		"/home/dimitrios/Development_Workspace/WEGA/src/data_retrieval",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting"
 	],
 	"file_history":
 	[
+		"/usr/lib/python2.7/dist-packages/sklearn/metrics/metrics.py",
+		"/home/dimitrios/Development_Workspace/WEGA/src/analytics/metrix.py",
+		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/conf_percent_.csv",
+		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/conf_mtrx_.csv",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/TEST_TODELETE.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/data_retrieval/ocsvmedata.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/auc_curves.py",
 		"/home/dimitrios/.config/sublime-text-3/Packages/Anaconda/Default (Linux).sublime-keymap",
 		"/home/dimitrios/.config/sublime-text-3/Packages/Anaconda/Anaconda.sublime-settings",
-		"/home/dimitrios/Development_Workspace/WEGA/src/analytics/metrix.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/analytics/docmetrix.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/ploting/PR_curves_manually_creating_plot.py",
 		"/home/dimitrios/Development_Workspace/WEGA/src/sandbox/var-cov.py",
@@ -399,10 +447,7 @@
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_crv_0.idx",
 		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_trn_0.idx",
 		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/html2terms.py",
-		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/convert/tfdtools.py",
-		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/sparse/cngrams.py",
-		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_trn_1.idx",
-		"/home/dimitrios/Synergy-Crawler/KI-04/Kfolds_Vocabularies_4grams/kfold_crv_2.idx"
+		"/home/dimitrios/Development_Workspace/html2vectors/src/html2vect/base/convert/tfdtools.py"
 	],
 	"find":
 	{
@@ -420,6 +465,18 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"pre",
+			"score",
+			"pre",
+			"score",
+			"unknow_class",
+			"precision_recall_curve(",
+			"last_scr",
+			"fp_rate",
+			"scr",
+			"_binary_clf_curve",
+			"preci",
+			"fl1",
 			"get_rfse",
 			"False",
 			"tables_data",
@@ -535,19 +592,7 @@
 			"P",
 			"smthd_P",
 			"print",
-			"get_node",
-			"getNode",
-			"recl_lv_P_avg",
-			"fg1.",
-			"plt.",
-			"up_r_level_idxs",
-			"r",
-			"R",
-			"ipol_P",
-			"interpol_linear",
-			"res",
-			"plt",
-			"1000"
+			"get_node"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -568,7 +613,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -577,15 +622,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5008,
+						"buffer_size": 5323,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								288,
-								288
+								2863,
+								2863
 							]
 						],
 						"settings":
@@ -703,28 +748,163 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 0.0,
+						"translation.x": 0.0,
+						"translation.y": 1173.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "src/ploting/contigency_table.py",
+					"file": "src/analytics/metrix.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3251,
+						"buffer_size": 26949,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								175,
-								175
+								7828,
+								7828
+							]
+						],
+						"settings":
+						{
+							"codeintel": true,
+							"codeintel_config":
+							{
+								"JavaScript":
+								{
+									"codeintel_max_recursive_dir_depth": 2,
+									"codeintel_scan_files_in_project": false,
+									"javascriptExtraPaths":
+									[
+									]
+								},
+								"PHP":
+								{
+									"codeintel_max_recursive_dir_depth": 5,
+									"codeintel_scan_files_in_project": false,
+									"phpExtraPaths":
+									[
+									]
+								},
+								"Python":
+								{
+									"env":
+									{
+									}
+								}
+							},
+							"codeintel_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_live": true,
+							"codeintel_live_enabled_languages":
+							[
+								"JavaScript",
+								"Mason",
+								"XBL",
+								"XUL",
+								"RHTML",
+								"SCSS",
+								"Python",
+								"HTML",
+								"Ruby",
+								"Python3",
+								"XML",
+								"Sass",
+								"XSLT",
+								"Django",
+								"HTML5",
+								"Perl",
+								"CSS",
+								"Twig",
+								"Less",
+								"Smarty",
+								"Node.js",
+								"Tcl",
+								"TemplateToolkit",
+								"PHP"
+							],
+							"codeintel_max_recursive_dir_depth": 10,
+							"codeintel_scan_exclude_dir":
+							{
+								"JavaScript":
+								[
+									"/build/",
+									"/min/"
+								]
+							},
+							"codeintel_scan_files_in_project": true,
+							"codeintel_selected_catalogs":
+							[
+								"PyWin32",
+								"jQuery",
+								"Rails"
+							],
+							"codeintel_snippets": true,
+							"codeintel_syntax_map":
+							{
+								"Python Django": "Python"
+							},
+							"codeintel_tooltips": "popup",
+							"side_bar_folders_auto_load_folder": 1,
+							"sublime_auto_complete": true,
+							"syntax": "Packages/Python/Python.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2200.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "src/ploting/contigency_table.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3229,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								766,
+								766
 							]
 						],
 						"settings":
@@ -840,30 +1020,32 @@
 							"sublime_auto_complete": true,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": true,
+							"word_wrap": true,
+							"wrap_width": 0
 						},
-						"translation.x": -0.0,
+						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 3,
 					"file": "src/ploting/auc_tables.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3379,
+						"buffer_size": 6394,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1480,
-								1480
+								975,
+								975
 							]
 						],
 						"settings":
@@ -980,30 +1162,31 @@
 							"sublime_auto_complete": true,
 							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"translate_tabs_to_spaces": true,
+							"word_wrap": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 51.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 4,
 					"file": "src/data_retrieval/rfsemixdata.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6751,
+						"buffer_size": 8353,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6001,
-								6001
+								2927,
+								2927
 							]
 						],
 						"settings":
@@ -1124,27 +1307,27 @@
 							"wrap_width": 0
 						},
 						"translation.x": 0.0,
-						"translation.y": 2397.0,
+						"translation.y": 1122.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "src/data_retrieval/rfsedata.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5174,
+						"buffer_size": 6392,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4933,
-								4933
+								4554,
+								4554
 							]
 						],
 						"settings":
@@ -1263,14 +1446,14 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1683.0,
+						"translation.y": 1428.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 6,
 					"file": "src/ploting/PR_curves_manually_creating_plot.py",
 					"semi_transient": false,
 					"settings":
@@ -1282,8 +1465,8 @@
 						"selection":
 						[
 							[
-								5462,
-								5462
+								6376,
+								6376
 							]
 						],
 						"settings":
@@ -1396,10 +1579,10 @@
 							"syntax": "Packages/Python/Python.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 51.0,
+						"translation.y": 816.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 6,
 					"type": "text"
 				}
 			]
@@ -1438,7 +1621,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 330.0
+		"height": 289.0
 	},
 	"output.find_results":
 	{
@@ -1493,8 +1676,8 @@
 	"show_minimap": true,
 	"show_open_files": true,
 	"show_tabs": true,
-	"side_bar_visible": true,
-	"side_bar_width": 163.0,
+	"side_bar_visible": false,
+	"side_bar_width": 258.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

@@ -12,7 +12,7 @@ sys.path.append('../../src')
 import numpy as np
 
 
-def get_predictions(res_h5file, kfolds, params_path, genre_tag=None, binary=None):
+def get_predictions(res_h5file, kfolds, params_path, genre_tag=None, binary=None, strata=None):
     """Retrieval functions for the date returned from the RFSE method.
 
     Returns the Predicted Scores and the Expected Values for the sample set has been given to the
@@ -60,6 +60,9 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None, binary=None
     # Choosing whether or not to create a Truth table depeding on the genre_tag value.
     if isinstance(genre_tag, int):
 
+        if strata:
+            raise Exception("Stata argument not implemented to work in combination with genre_tag")
+
         # Collecting Scores for and Expected Values for every fold given in kfold list.
         for k in kfolds:
 
@@ -78,6 +81,7 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None, binary=None
             exp_y = res_h5file.get_node(params_path + '/KFold' + str(k), name='expected_Y').read()
             #exp_y = exp_y[0:-2500]
 
+            ####SOS - NEED TO BE TESTED AGAIN
             EY_lst.append(exp_y)
 
     elif genre_tag == None:
@@ -85,22 +89,51 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None, binary=None
         # Collecting Scores for and Expected Values for every fold given in kfold list.
         for k in kfolds:
 
-            # Loading expected and predicted values.
-            pred_scores = res_h5file.get_node(
-                params_path + '/KFold' + str(k), name='predicted_scores').read()
-            pred_scores = pred_scores  # [0:-1000]
-            PS_lst.append(pred_scores)
+            # Loading predicted scores.
+            pre_score = res_h5file.get_node(
+                params_path + '/KFold' + str(k), name='predicted_scores'
+            ).read()
 
+            # Getting the Expected genre tags.
             exp_y = res_h5file.get_node(params_path + '/KFold' + str(k), name='expected_Y').read()
-            exp_y = exp_y  # [0:-1000]
 
+            # Getting the Expected genre tags.
             pre_y = res_h5file.get_node(params_path + '/KFold' + str(k), name='predicted_Y').read()
-            pre_y = pre_y  # [0:-1000]
 
+            # Making a statified selection upon a specific group of the results.
+            if strata:
+
+                gpr_idx = -strata[1]
+
+                pre_score_grp1 = pre_score[0:gpr_idx]
+                pre_score_grp2 = pre_score[gpr_idx::]
+
+                pre_y_grp1 = pre_y[0:gpr_idx]
+                pre_y_grp2 = pre_y[gpr_idx::]
+
+                exp_y_grp1 = exp_y[0:gpr_idx]
+                exp_y_grp2 = exp_y[gpr_idx::]
+
+                # Perfroming Stratified selection.
+                unq_pred_tgs = np.unique(pre_y_grp2)
+
+                strata_idxs = np.hstack(
+                    [idx_arr[0:int(np.rint(idx_arr.shape[0]/strata[0]))] for idx_arr
+                        in [np.where((pre_y_grp2 == tg))[0] for tg in unq_pred_tgs]]
+                )
+
+                pre_score = np.hstack((pre_score_grp1, pre_score_grp2[strata_idxs]))
+                pre_y = np.hstack((pre_y_grp1, pre_y_grp2[strata_idxs]))
+                exp_y = np.hstack((exp_y_grp1, exp_y_grp2[strata_idxs]))
+
+            # Saving the Ensemble Prediction Scores.
+            PS_lst.append(pre_score)
+
+            # Saving the Class predictions.
             PR_Y_lst.append(pre_y)
 
             # Collecting and the Truth Table of expected and predicted values.
-            EY_lst.append(np.where(exp_y == pre_y, 1, 0))
+            EY_lst.append(exp_y)
 
     else:
         raise Exception(

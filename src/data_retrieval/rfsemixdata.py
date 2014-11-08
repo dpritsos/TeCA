@@ -13,7 +13,7 @@ import numpy as np
 
 
 def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num,
-                    genre_tag=None, binary=None):
+                    genre_tag=None, binary=None, strata=None):
 
     """Retrieval functions for the date returned from the RFSE method.
 
@@ -68,6 +68,9 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num,
 
         #Collecting Scores for and Expected Values for every fold given in kfold list.
         for k in kfolds:
+
+            #Getting the Expected genre tags
+            exp_y = hf5_fl1.get_node(params_path+'/KFold'+str(k), name='expected_Y').read()
 
             #Calulating Prediction Scores for the given Gerne i.e. assuming that the rest genres
             #being Negative examples
@@ -155,14 +158,37 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num,
                     pre_y[i] = np.argmax(max_gnr_scr)
                     pre_score[i] = np.max(max_gnr_scr)
 
+            #Making a statified selection upon a specific group of the results.
+            if strata:
+
+                gpr_idx = -strata[1]
+
+                pre_score_grp1 = pre_score[0:gpr_idx]
+                pre_score_grp2 = pre_score[gpr_idx::]
+
+                pre_y_grp1 = pre_y[0:gpr_idx]
+                pre_y_grp2 = pre_y[gpr_idx::]
+
+                exp_y_grp1 = exp_y[0:gpr_idx]
+                exp_y_grp2 = exp_y[gpr_idx::]
+
+                #Perfroming Stratified selection.
+                unq_pred_tgs = np.unique(pre_y_grp2)
+
+                strata_idxs = np.hstack(
+                    [idx_arr[0:int(np.rint(idx_arr.shape[0]/strata[0]))] for idx_arr
+                        in [np.where((pre_y_grp2 == tg))[0] for tg in unq_pred_tgs]]
+                )
+
+                pre_score = np.hstack((pre_score_grp1, pre_score_grp2[strata_idxs]))
+                pre_y = np.hstack((pre_y_grp1, pre_y_grp2[strata_idxs]))
+                exp_y = np.hstack((exp_y_grp1, exp_y_grp2[strata_idxs]))
+
             #Saving the Ensemble Prediction Scores.
             PS_lst.append(pre_score)
 
             #Saving the Class predictions.
             PR_Y_lst.append(pre_y)
-
-            #Getting the Expected genre tags
-            exp_y = hf5_fl1.get_node(params_path+'/KFold'+str(k), name='expected_Y').read()
 
             #Collecting and the Truth Table of expected and predicted values.
             EY_lst.append(exp_y)
