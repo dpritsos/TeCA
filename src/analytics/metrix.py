@@ -342,7 +342,50 @@ def smooth_linear(y, x=None, arr_type=np.float32):
     return smooth_y
 
 
-def reclev_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
+def zero_padding_PRC(P, R):
+    """ Zero Padding function for PRCs
+
+        This function is getting PRC and is paddig Y with Zeros and extends recall with the
+        rest of values are missing. The step (resolution) is used for the padding id the same
+        with the one occures based on the original curve. However, is getting a mean distance
+        and not the excat distance between P and R values that might variate. 
+
+        Input arguments:
+
+        P: is the numpy.array sequence of all y coodinates of the curve's points.
+        R: is the numpy.array sequence of all x coodinates of the curve's points.
+
+    Output:
+
+        P: is the padded P, an numpy.array sequence of all y coodinates of the curve's points.
+        R: is the padded R, an numpy.array sequence of all x coodinates of the curve's points.
+
+    """
+
+    #Padding Recall and precision with proper resolution.
+    #Finding the max recall level.
+    max_rec_lvl = np.max(R)
+
+    #Calculating resolution.
+    pding_step = max_rec_lvl / float(len(R))
+
+    #Some times in seems that the step is becoming 0.0 thus we replace it with 0.01.
+    if not pding_step:
+        pding_step = 0.01
+
+    #Padding Recall sequence.
+    R_pad = np.arange(max_rec_lvl + pding_step, 1 + pding_step, pding_step)
+    R = np.hstack((R, R_pad))
+
+    #Padding Precision sequence.
+    P_pad = np.zeros_like(R_pad)
+    P = np.hstack((P, P_pad))
+
+    #Returinting zero padded P and R
+    return P, R
+
+
+def reclev11_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
     """Recall Level Averaging function.
 
     It takes the Precision Recall (RP) Curve and returns an averaged PR curve at particular points
@@ -371,7 +414,10 @@ def reclev_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
         raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
     R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])
 
-    # The Array for stroring the Precition values respectively to the recall levels.
+    #Padding Recall and precision with proper resolution.
+    P, R = zero_padding_PRC(P, R)
+
+    #The Array for stroring the Precition values respectively to the recall levels.
     avg_P = np.zeros_like(R_Levels, dtype=np.float)
 
     # Init the smallest index from where the part of the line, which will be
@@ -416,7 +462,7 @@ def reclev_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
     return avg_P, R_Levels
 
 
-def reclev_nearest(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
+def reclev11_nearest(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
     """Nearest to the Recall Levels function.
 
     It takes the Precision Recall (RP) Curve and returns the Y values of the PR curve of the
@@ -445,6 +491,9 @@ def reclev_nearest(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
         raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
     R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])
 
+    #Padding Recall and precision with proper resolution.
+    P, R = zero_padding_PRC(P, R)
+
     # Init with zeros the array for saving the nearest recall levels indexes.
     idxs = np.zeros_like(R_Levels, dtype=np.int)
 
@@ -457,12 +506,17 @@ def reclev_nearest(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
     return P[idxs], R_Levels
 
 
-def reclev_max_around(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
-    """Maximum Y values around to the Recall Levels function.
+def reclev11_max(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
+    """Maximum Y above each Recall Levels in the sequence, function.
 
-    It takes the Precision Recall (RP) Curve and returns the maximum Y values of the PR curve of
-    the (x,y) points around to the recall levels (i.e. X values) as given by the user. The same
-    applies for any curve for which one would like to average it at any particular X positions.
+    #NOTE: This is the proper way to find the recall levels using the one of the two formulas 
+    based on the instruction given by TREC or other IR conferences and journals. 
+        TREC: max(p(r)), r >= (rj)
+        Others: max(p(r)), (rj) <= r <= (rj+1) 
+
+    It takes the Precision Recall (RP) Curve and returns the maximum Y values found for 
+    recall levels of the current recall level and above in the sequence. TREC's formual is 
+    used.
 
     Input arguments:
 
@@ -474,7 +528,7 @@ def reclev_max_around(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
 
     Output:
 
-        avg_P: is the numpy.array Maximum Precision values around the R levels.
+        avg_P: is the numpy.array Maximum Precision values between R levels.
         R_Levels: is the numpy.array of the Recall levels created based rcl_tuple argument
             or default, i.e. the 11 Recall Levels.
 
@@ -486,26 +540,24 @@ def reclev_max_around(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
         raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
     R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])
 
-    # Init with zeros the array for saving the indexes around the given recall
-    # levels with the highest precision value.
-    idxs = np.zeros_like(R_Levels, dtype=np.int)
+    #Padding Recall and precision with proper resolution.
+    P, R = zero_padding_PRC(P, R)
 
-    for i, r in enumerate(R_Levels[1::]):
+    #Init with zeros the array for saving the highest Precision for every R level.
+    max_P = np.zeros_like(R_Levels, dtype=np.float)
 
-        # Getting the two nearest values around the current recall level.
-        lft_idx = np.max(np.where(R < r))
-        rgt_idx = np.min(np.where(R >= r))
+    #Getting the maximum value of P from all the recall levels largers than carrent.
+    #Sequence starts form 0.1 and stops at 1. Or it follows the rcl_tuple argument instructions.
+    for i, r in enumerate(R_Levels):
 
-        # Getting the index around the current (in this loop) recall level with
-        # the highest precision value.
-        if P[lft_idx] >= P[rgt_idx]:
-            idxs[i + 1] = lft_idx
-        elif P[lft_idx] < P[rgt_idx]:
-            idxs[i + 1] = rgt_idx
+        #Getting all indices above r
+        idx_abv = np.where(R >= r)
 
-    # Using the above indexes for selecting the Y (i.e. precision) values from
-    # the PR curve to be returned.
-    return P[idxs], R_Levels
+        #Saving the maximum precisions
+        max_P[i] = np.max(P[idx_abv])
+
+    #Returing maximum Precisions fore 11 recall levels.
+    return max_P, R_Levels
 
 
 def contingency_table(expd_y, pred_y, unknow_class=False, arr_type=np.float32):

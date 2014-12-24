@@ -12,8 +12,8 @@ sys.path.append('../../src')
 import numpy as np
 
 
-def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma, gnr_num,
-                    genre_tag=None, binary=None, strata=None):
+def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
+                    sigma, genre_tag=None, binary=None, strata=None):
 
     """Retrieval functions for the date returned from the RFSE method.
 
