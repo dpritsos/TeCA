@@ -54,8 +54,8 @@ def h5d_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata):
                     expd_y, pred_scores, full_curve=True, is_truth_tbl=is_ttbl
                 )
 
-                #With Averaging.
-                prec, recl = mx.reclev_averaging(prec, recl)
+                ###Interpolated at 11-Recall-Levels.
+                prec, recl = mx.reclev11_max(prec, recl)
 
                 try:
                     auc_values.append(mx.auc(recl, prec))

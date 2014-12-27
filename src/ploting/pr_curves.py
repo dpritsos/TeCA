@@ -70,8 +70,6 @@ for params_lst, params_path in \
 
     if params_lst[0] > params_lst[1]:
 
-
-
         pred_scores, expd_y, pred_y = get_predictions(
         h5d_fl1, kfolds, params_path, genre_tag=None, binary=True, strata=None
             #(10, 1000)
@@ -126,14 +124,14 @@ for params_lst, params_path in \
             #" - " + str(params_lst[3])
         )
 
-        ax1.plot(
-            x1, y1,
-            color[i] + line_type[i] + symbol[i], linewidth=1,
-            markeredgewidth=1,
-            #label="KI04 - 3Words"
+        #ax1.plot(
+        #    x1, y1,
+        #    color[i] + line_type[i] + symbol[i], linewidth=1,
+        #    markeredgewidth=1,
+        #    #label="KI04 - 3Words"
             #"(" + str(i) + ") Feat " + str(params_lst[2]) + \
             #" - " + str(params_lst[3])
-        )
+        #)
 
         # ax1.title("SANTINIS")
         # ax1.yticks([ .50, .55, .60, .65, .70, .75, .80, .85, .90, .95, 1.00])

@@ -21,12 +21,12 @@ if __name__ == '__main__':
     case_od = coll.OrderedDict([
         ('doc_rep', ['3Words', '1Words', '4Chars']),
         ('corpus', ['7Genres', 'KI04', 'SANTINIS']),  #
-        ('dist', ['', 'MinMax', 'MIX']),  # 'MinMax', 'MIX'
+        ('dist', ['']),  # 'MinMax', 'MIX'
         ('vocab_size', [5000, 10000, 50000, 100000]),  #
         ('features_size', [1000, 5000, 10000, 50000, 90000]),  #
-        #('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
-        ('Sigma', [0.5, 0.7, 0.9]),  #
-        ('Iterations', [10, 50, 100])  #
+        ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
+        #('Sigma', [0.5, 0.7, 0.9]),  #
+        #('Iterations', [10, 50, 100])  #
     ])
 
     #List of all macro averaging precision recall values.
@@ -41,13 +41,13 @@ if __name__ == '__main__':
 
             #Selecting filepath
             if case[1] == '7Genres':
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_'
 
             elif case[1] == 'KI04':
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
 
             else:
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
 
             h5d_fl = h5d_fl + case[0] + '_' + case[1]
 
@@ -91,9 +91,9 @@ if __name__ == '__main__':
             param_od = coll.OrderedDict([
                 ('vocab_size', [case[3]]),
                 ('features_size', [case[4]]),
-                #('nu', [case[5]])
-                ('Sigma', [case[5]]),  #
-                ('Iterations', [case[6]])  #
+                ('nu', [case[5]])
+                #('Sigma', [case[5]]),  #
+                #('Iterations', [case[6]])  #
             ])
 
             aucz_var_table = h5d_auc_table(
@@ -123,15 +123,15 @@ if __name__ == '__main__':
 
             pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
 
-            auc = aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
+            auc = aucz_var_table[0, 3]  # For RFSE is 4, for OCSVME 3
 
             join_auc = 1
-            for a in m_aucz_var_table[0, 4::]:  # For RFSE is 4, for OCSVME 3
+            for a in m_aucz_var_table[0, 3::]:  # For RFSE is 4, for OCSVME 3
                 join_auc *= a
 
-            maucs_num = len(m_aucz_var_table[0, 4::])  # For RFSE is 4, for OCSVME 3
+            maucs_num = len(m_aucz_var_table[0, 3::])  # For RFSE is 4, for OCSVME 3
             #                                                  For RFSE is 4, for OCSVME 3
-            m_auc_f1 = maucs_num / np.sum([1.0/mauc for mauc in m_aucz_var_table[0, 4::]])
+            m_auc_f1 = maucs_num / np.sum([1.0/mauc for mauc in m_aucz_var_table[0, 3::]])
             if np.isnan(m_auc_f1):
                 m_auc_f1 = 0
 
@@ -163,7 +163,7 @@ if __name__ == '__main__':
 
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3, -4, -5, -6, -8]),
-        ('dist', ['', 'MinMax', 'MIX']),  # 'MinMax', 'MIX'
+        ('dist', ['']),  # 'MinMax', 'MIX'
         ('corpus', ['7Genres', 'KI04', 'SANTINIS']),
         ('doc_rep', ['3Words', '1Words', '4Chars'])
     ])

@@ -70,15 +70,6 @@ if __name__ == '__main__':
     #Parameters used for the experiments required for selecting specific or group of results
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-    params_od = coll.OrderedDict([
-        ('vocab_size', [5000, 10000, 50000, 100000]),
-        ('features_size', [1000, 5000, 10000, 50000, 90000]),
-        #(Bagging', [0.66]),
-        #('nu', [0.9]),  # [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),
-        ('Sigma', [0.5, 0.7, 0.9]),
-        ('Iterations', [10, 50, 100])
-    ])
-
     case_od = coll.OrderedDict([
         ('doc_rep', ['3Words', '1Words', '4Chars']),
         ('corpus', ['7Genres', 'KI04', 'SANTINIS']),
