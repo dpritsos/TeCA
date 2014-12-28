@@ -8,7 +8,7 @@ import tables as tb
 import matplotlib.pyplot as plt
 import numpy as np
 
-from analytics.metrix import pr_curve, reclev11_max
+from analytics.metrix import pr_curve, reclev11_max  # , reclev11_averaging
 from data_retrieval.rfsedata import get_predictions
 from data_retrieval.rfsemixdata import get_predictions as get_predictions_mix
 
@@ -44,10 +44,235 @@ kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 #### Paramter Combination for Cases to be ploted
 
+#++++++++++++++++++++++++++++++
+#  RFSE  
+#++++++++++++++++++++++++++++++
+"""
+#7Genres 3W for every Distance Measure.
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_7Genres_3W_F1Based_11AVG.eps'
 
 comb_lst = [
-    ['RFSE', '3Words', '7Genres', '', [100000, 50000, 0.5, 50]],
+    ['RFSE', '3Words', '7Genres', 'Cosine', [100000, 50000, 0.5, 50]],
+    ['RFSE', '3Words', '7Genres', 'MinMax', [100000, 90000, 0.5, 10]],
+    ['RFSE', '3Words', '7Genres', 'Comb', [100000, 50000, 0.5, 100]],
+    ['OCSVME', '3Words', '7Genres', '', [10000, 5000, 0.1]]
 ]
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[0], 2, 14, "3W - Cosine"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "3W - MinMax"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "3W - Comb"],
+    ['k' + line_type[5], 3, 0, "3W - Baseline"]
+]
+
+leg_pos = 3
+
+#KI04 1W for every Distance Measure.
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_KI04_1W_F1Based_11AVG.eps'
+
+comb_lst = [
+    ['RFSE', '1Words', 'KI04', 'Cosine', [100000, 50000, 0.5, 50]],
+    ['RFSE', '1Words', 'KI04', 'MinMax', [10000, 5000, 0.5, 100]],
+    ['RFSE', '1Words', 'KI04', 'Comb', [10000, 5000, 0.5, 100]],
+    ['OCSVME', '1Words', 'KI04', '', [10000, 1000, 0.1]],
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[0], 2, 14, "1W - Cosine"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "1W - MinMax"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "1W - Comb"],
+    ['k' + line_type[5], 3, 0, "1W - Baseline"]
+]
+
+leg_pos = 1
+
+
+#SANTINIS 3W for every Distance Measure.
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_SANTINIS_3W_F1Based_11AVG.eps'
+
+comb_lst = [
+    ['RFSE', '3Words', 'SANTINIS', 'Cosine', [50000, 10000, 0.7, 100]],
+    ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
+    ['RFSE', '3Words', 'SANTINIS', 'Comb', [100000, 1000, 0.5, 100]],
+    ['OCSVME', '3Words', 'SANTINIS', '', [50000, 10000, 0.1]]
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[0], 2, 14, "3W - Cosine"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "3W - MinMax"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "3W - Comb"],
+    ['k' + line_type[5], 3, 0, "3W - Baseline"]
+]
+
+leg_pos = 3
+
+#7Genre Distance Measure Cosine
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_7Genres_Cosine_F1Based_11AVG.eps'
+
+comb_lst = [
+    ['RFSE', '3Words', '7Genres', 'Cosine', [100000, 50000, 0.5, 50]],
+    ['RFSE', '1Words', '7Genres', 'Cosine', [100000, 50000, 0.5, 100]],
+    ['RFSE', '4Chars', '7Genres', 'Cosine', [50000, 5000, 0.5, 50]]
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[0], 2, 14, "3W - Cosine"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "1W - Cosine"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "4C - Cosine"],
+]
+
+leg_pos = 3
+
+
+#KI04 Distance Measure MinMax
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_KI04_MinMax_F1Based_11AVG.eps'
+
+comb_lst = [
+    ['RFSE', '3Words', 'KI04', 'MinMax', [100000, 90000, 0.5, 50]],
+    ['RFSE', '1Words', 'KI04', 'MinMax', [10000, 5000, 0.5, 100]],
+    ['RFSE', '4Chars', 'KI04', 'MinMax', [10000, 1000, 0.5, 100]]
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[0], 2, 14, "3W - MinMax"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "1W - MinMax"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "4C - MinMax"],
+]
+
+leg_pos = 3
+
+#SANTINIS Distance Measure MinMax
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_SANTINIS_MinMax_F1Based_11AVG.eps'
+
+comb_lst = [
+    ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
+    ['RFSE', '1Words', 'SANTINIS', 'MinMax', [100000, 10000, 0.7, 100]],
+    ['RFSE', '4Chars', 'SANTINIS', 'MinMax', [100000, 5000, 0.9, 100]]
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[0], 2, 14, "3W - MinMax"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "1W - MinMax"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "4C - MinMax"],
+]
+
+leg_pos = 3
+
+
+#7Genre F1 VS F05
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC_7Genres_F1vsF05_11AVG.eps'
+
+comb_lst = [
+    ['RFSE', '3Words', '7Genres', 'Cosine', [100000, 50000, 0.5, 50]],
+    ['RFSE', '3Words', '7Genres', 'Cosine', [100000, 50000, 0.7, 50]],
+    ['RFSE', '3Words', '7Genres', 'Cosine', [100000, 50000, 0.5, 100]],
+    ['OCSVME', '4Chars', '7Genres', '', [100000, 50000, 0.1]],
+    ['OCSVME', '3Words', '7Genres', '', [50000, 10000, 0.1]]
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[0], 2, 14, "3W - Cos - F1"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "3W - Cos - F0.5"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "3W - Cos - AUC"],
+    ['k' + line_type[3] + symbol[5], 2, 14, "4C - OCSVME - F1"],
+    ['k' + line_type[3] + symbol[4], 2, 14, "3W - OCSVME - F0.5"]
+]
+
+leg_pos = 3
+
+#KI04 F1 VS F05
+#++++++++++++++++++++ NOT PLOTED FOR NOW +++++++++++++++++++++++++++++++++++
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC_KI04_F1vsF05_11AVG.eps'
+
+plt_dsp_attr = [
+    ['k' + line_type[0] + symbol[0], 2, 14, "1W - MinMax - F1"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "1W - Cos - F0.5"],
+    ['k' + line_type[2] + symbol[2], 2, 14, "4C - Cos - F0.5"],
+    ['k' + line_type[3] + symbol[3], 2, 14, "1W - OCSVME - F1"],
+    ['k' + line_type[4] + symbol[4], 2, 14, "1W - OCSVME - F0.5"],
+    ['k' + line_type[5] + symbol[5], 2, 14, "3W - OCSVME - P"]
+]
+"""
+#SANTINIS F1 VS F05
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC_SANTINIS_F1vsF05_11AVG.eps'
+
+comb_lst = [
+    ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
+    ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
+    ['RFSE', '3Words', 'SANTINIS', 'Cosine', [100000, 1000, 0.5, 50]],
+    ['RFSE', '1Words', 'SANTINIS', 'Cosine', [50000, 1000, 0.5, 50]],
+    ['OCSVME', '3Words', 'SANTINIS', '', [50000, 10000, 0.1]],
+    ['OCSVME', '3Words', 'SANTINIS', '', [100000, 90000, 0.9]]
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[1], 2, 14, "3W - MinMax - F1"],
+    ['k' + line_type[1] + symbol[0], 2, 14, "3W - MinMax - F0.5"],
+    ['k' + line_type[1] + symbol[2], 2, 14, "3W - Cosine - AUC"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "1W - Cosine - mP"],
+    ['k' + line_type[3] + symbol[5], 2, 14, "3W - OCSVME - F1"],
+    ['k' + line_type[3] + symbol[4], 2, 14, "3W - OCSVME - mP"]
+]
+
+leg_pos = 3
+
+#++++++++++++++++++++++++++++++
+#  OCSVME  
+#++++++++++++++++++++++++++++++
+"""
+#7Genres
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_OCSVM_7Genres_F1Based_11AVG.eps'
+
+comb_lst = [
+    ['OCSVME', '3Words', '7Genres', '', [10000, 5000, 0.1]],
+    ['OCSVME', '1Words', '7Genres', '', [50000, 5000, 0.07]],
+    ['OCSVME', '4Chars', '7Genres', '', [100000, 50000, 0.1]]
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[0] + symbol[0], 2, 14, "3W - 7Genres"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "1W - 7Genres"],
+    ['k' + line_type[3] + symbol[3], 2, 14, "4C - 7Genres"]
+]
+
+leg_pos = 1
+
+#KI04
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_OCSVM_KI04_F1Based_11AVG.eps'
+
+comb_lst = [
+    ['OCSVME', '3Words', 'KI04', '', [100000, 5000, 0.3]],
+    ['OCSVME', '1Words', 'KI04', '', [10000, 1000, 0.1]],
+    ['OCSVME', '4Chars', 'KI04', '', [100000, 90000, 0.07]]
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[0] + symbol[0], 2, 14, "3W - KI04"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "1W - KI04"],
+    ['k' + line_type[3] + symbol[3], 2, 14, "4C - KI04"]
+]
+
+leg_pos = 1
+
+#SANTINIS
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_OCSVM_SANTINIS_F1Based_11AVG.eps'
+
+comb_lst = [
+    ['OCSVME', '3Words', 'SANTINIS', '', [50000, 10000, 0.1]],
+    ['OCSVME', '1Words', 'SANTINIS', '', [100000, 50000, 0.3]],
+    ['OCSVME', '4Chars', 'SANTINIS', '', [10000, 5000, 0.5]]
+]
+
+plt_dsp_attr = [
+    ['k' + line_type[6] + symbol[0], 2, 14, "3W - SANTINIS"],
+    ['k' + line_type[7] + symbol[1], 2, 14, "1W - SANTINIS"],
+    ['k' + line_type[8] + symbol[3], 2, 14, "4C - SANTINIS"]
+]
+
+leg_pos = 1
+
+"""
+
 
 
 ####
@@ -67,7 +292,7 @@ for i, comb_val in enumerate(comb_lst):
         elif comb_val[2] == 'KI04':
             h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_'
 
-        else:
+        elif comb_val[2] == 'SANTINIS':
             h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_'
 
     elif comb_val[0] == 'OCSVME':
@@ -78,7 +303,7 @@ for i, comb_val in enumerate(comb_lst):
         elif comb_val[2] == 'KI04':
             h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
 
-        else:
+        elif comb_val[2] == 'SANTINIS':
             h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
 
     h5d_fl = h5d_fl + comb_val[1] + '_' + comb_val[2]
@@ -86,7 +311,7 @@ for i, comb_val in enumerate(comb_lst):
     # Selecting files to open and setting the mix flag on/off
     mix = False
 
-    if comb_val[3] == 'MIX':
+    if comb_val[3] == 'Comb':
         h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
         h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
         mix = True
@@ -95,12 +320,12 @@ for i, comb_val in enumerate(comb_lst):
         h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
         h5d_fl2 = h5d_fl1
 
-    else:
+    elif comb_val[3] == 'Cosine' or comb_val[3] == '':
         h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
         h5d_fl2 = h5d_fl1
 
     #Getting the predictions
-    if comb_val[3] == 'MIX':
+    if comb_val[3] == 'Comb':
 
         #Building the parapmeters path
         params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
@@ -120,7 +345,7 @@ for i, comb_val in enumerate(comb_lst):
         )
 
     #Closing the h5d files.
-    if comb_val[3] == 'MIX':
+    if comb_val[3] == 'Comb':
         h5d_fl1.close()
         h5d_fl2.close()
     else:
@@ -135,9 +360,10 @@ for i, comb_val in enumerate(comb_lst):
     ###Do the Plotting
     ax.plot(
         x, y,
-        'k' + line_type[i] + symbol[i], linewidth=1,
-        markersize=10,
-        label = comb_val[1] +'-'+ comb_val[3].replace('', 'Cosine').replace('MIX', 'Comb') +'-'+ 'F1'
+        plt_dsp_attr[i][0],
+        linewidth=plt_dsp_attr[i][1],
+        markersize=plt_dsp_attr[i][2],
+        label=plt_dsp_attr[i][3]
     )
 
     """
@@ -174,12 +400,12 @@ for i, comb_val in enumerate(comb_lst):
 #Give the poper attributes for better ploting
 plt.grid(True)
 #plt.legend(loc='upper left', bbox_to_anchor=(0.62, 0.4), ncol=1, fancybox=True, shadow=True, fontsize=16)
-plt.legend(loc=4, fancybox=True, shadow=True, fontsize=16)
-plt.yticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1], fontsize=16)
-plt.xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], fontsize=16)
+plt.legend(loc=leg_pos, fancybox=True, shadow=True, fontsize=16)
+plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], fontsize=18)
+plt.xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], fontsize=18)
 plt.tight_layout()
 
 #Saving the ploting to File
-#plt.savefig(fig_save_file, bbox_inches='tight')
+plt.savefig(fig_save_file, bbox_inches='tight')
 
 plt.show()
