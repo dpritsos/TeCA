@@ -1,6 +1,6 @@
 """
     This module included ROC, PRC, AUC, Interpolation, etc., functions.
-    Details can be found in each funciton separatly.
+    Details can be found in each function separately.
 
     Aurthor: Dimitrios Pritos
 
@@ -24,9 +24,9 @@ def roc_curve(trh_arr, scr_arr, full_curve=False, arr_type=np.float32):
     TP and FP as we go. In this way an ROC graph can be created from a linear scan. Cited in
     "ROC Graphs: Notes and Practical Considerations for Researchers" by Tom Fawcett.
 
-    Input argumens:
+    Input arguments:
 
-        trh_arr: The binay expected classes array, i.e. the real classies of the samples
+        trh_arr: The binary expected classes array, i.e. the real classes of the samples
             has been given to the Classifier.
             Valid values:  +1 for positive samples
                             0 or -1 for negative samples.
@@ -56,10 +56,10 @@ def roc_curve(trh_arr, scr_arr, full_curve=False, arr_type=np.float32):
                     Only {1,0} or {1,-1} (float or integer) sets of values are valid.")
 
     # Checking the expected values (True/False) for 'full_curve' argument
-    if not isinstance(full_curve, bool) and not full_curve in [0, 1]:
-        raise Exception("full_curve agument expected values are: Only {0,1} or {True,False}.")
+    if not isinstance(full_curve, bool) and full_curve not in [0, 1]:
+        raise Exception("full_curve argument expected values are: Only {0,1} or {True,False}.")
 
-    # In place convertion of numerical type in case the input is in integer.
+    # In place conversion of numerical type in case the input is in integer.
     trh_arr = trh_arr.astype(arr_type, copy=False)
     scr_arr = scr_arr.astype(arr_type, copy=False)
 
@@ -117,13 +117,13 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
     i.e. any instance that is classified positive with respect to a given threshold will be
     classified positive for all lower thresholds as well. Therefore, we can simply sort the test
     instances decreasing by f scores and move down the list, processing one instance at a time and
-    updating TP as we go. In this way an PR graph can be created from a linear scan. Followin the
+    updating TP as we go. In this way an PR graph can be created from a linear scan. Following the
     same line of thought as the algorithm is described for ROC curves which has been cited in
     "ROC Graphs: Notes and Practical Considerations for Researchers" by Tom Fawcett.
 
-    Input argumens:
+    Input arguments:
 
-        trh_arr: The binay real labels array, i.e. the real classies of the samples
+        trh_arr: The binary real labels array, i.e. the real classes of the samples
             has been given to the Classifier.
             (*)Alternatively, given the flag is_truth_tbl == True the trh_arr can me the truth
             table of prediction, i.e. Expected Y == Predicted Y.
@@ -139,9 +139,9 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
             If its values is 0 or False it will return a point for only the unique input scores,
             i.e. numpy.unique(scr_arr) returning values.
 
-        is_truth_tbl: This flag indicates when the positive sum will be the one given form the
-            Ground Truth or it will be equal to the lenght of the trh_arr when this is a Truth
-            Table of precisions.
+        is_truth_tbl: This flag indicates whether the positive sum will be the one given form the
+            Ground Truth or it will be equal to the length of the trh_arr (when this is a Truth
+            Table of precisions).
 
     Output:
 
@@ -160,10 +160,10 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
                     Only {1,0} or {1,-1} (float or integer) sets of values are valid.")
 
     # Checking the expected values (True/False) for 'full_curve' argument
-    if not isinstance(full_curve, bool) and not full_curve in [0, 1]:
-        raise Exception("full_curve agument expected values are: Only {0,1} or {True,False}.")
+    if not isinstance(full_curve, bool) and full_curve not in [0, 1]:
+        raise Exception("full_curve argument expected values are: Only {0,1} or {True,False}.")
 
-    # In place convertion of numerical type in case the input is in integer.
+    # In place conversion of numerical type in case the input is in integer.
     trh_arr = trh_arr.astype(arr_type, copy=False)
     scr_arr = scr_arr.astype(arr_type, copy=False)
 
@@ -172,11 +172,11 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
 
     # Counting the total number of positive.
     if is_truth_tbl:
-        #This is actually correct only when the input is the truth table of predictions.
+        # This is actually correct only when the input is the truth table of predictions.
         pos_sum = float(trh_arr.shape[0])
 
     else:
-        #This is the correct for binary input, i.e. the Ground Truth is used as input argument.
+        # This is the correct for binary input, i.e. the Ground Truth is used as input argument.
         pos_sum = trh_arr.sum()
 
     # Initialising True Positive and False Positive counters.
@@ -186,7 +186,7 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
     precision = list()
     recall = list()
 
-    # Appeding fist fixed point (x, y) = (0, 1).
+    # Appending fist fixed point (x, y) = (0, 1).
     # This point might be a duplicate in best case or misleading in worst case.
     precision.append(1.0)
     recall.append(0.0)
@@ -233,14 +233,14 @@ def auc(x, y, arr_type=np.float32):
 
     Input arguments:
 
-        x: is the numpy.array sequence of all x coodinates of the curve's points.
-        y: is the numpy.array sequence of all y coodinates of the curve's points.
+        x: is the numpy.array sequence of all x coordinates of the curve's points.
+        y: is the numpy.array sequence of all y coordinates of the curve's points.
         arr_type: (optional) user-defined arrays type. default numpy.flaot32
 
     Output:
 
         auc: a floating point value equal to the sum of trapezoids formed
-            by the curve's points given as aruments.
+            by the curve's points given as arguments.
 
     """
 
@@ -255,7 +255,7 @@ def auc(x, y, arr_type=np.float32):
     if x.size < 2:
         raise ValueError("AUC cannot computed given a single point.")
 
-    # In place convertion of numerical type in case the input is in integer.
+    # In place conversion of numerical type in case the input is in integer.
     x = x.astype(arr_type, copy=False)
     y = y.astype(arr_type, copy=False)
 
@@ -267,7 +267,7 @@ def auc(x, y, arr_type=np.float32):
     # Checking the Sequence. If x it is in random order the input is not a proper curve.
     if not np.array_equal(np.sort(x), x) and not np.array_equal(np.sort(x), x[::-1]):
         raise Exception(
-            "X-coordinate sequence is in random oder: Impossible to calculate the AUC correctly.")
+            "X-coordinate sequence is in random order: Impossible to calculate the AUC correctly.")
 
     # Calculating the delta-x's, i.e. bases of trapezoids.
     dx = np.abs(np.diff(x))
@@ -288,16 +288,16 @@ def smooth_linear(y, x=None, arr_type=np.float32):
     required for all x values.
 
     In case the x values are provided then only the y thresholds (local maxima) with their
-    respective x values will be retunred.
+    respective x values will be returned.
 
-    NOTE: ***The Y sequence sould be inverted from the lowest to the highest values ***
+    NOTE: ***The Y sequence should be inverted from the lowest to the highest values ***
           *** I works properly for curves that increasing or decreasing for all x values
               (Think about it by studying the code bellow)***
 
-     Input arguments:
+    Input arguments:
 
-        y: is the numpy.array sequence of all y coodinates of the curve's points.
-        x: is the numpy.array sequence of all x coodinates of the curve's points.
+        y: is the numpy.array sequence of all y coordinates of the curve's points.
+        x: is the numpy.array sequence of all x coordinates of the curve's points.
         arr_type: (optional) user-defined arrays type. default numpy.flaot32
 
     Output:
@@ -316,7 +316,7 @@ def smooth_linear(y, x=None, arr_type=np.float32):
     max_y = -1
     for yval in y:
 
-        # The same local maxima is appended to the list until a greater value is occuring.
+        # The same local maxima is appended to the list until a greater value is occurring.
         if yval > max_y:
             max_y = yval
 
@@ -331,57 +331,57 @@ def smooth_linear(y, x=None, arr_type=np.float32):
         # Getting the unique maximum values.
         y_thresholds, u_inds = np.unique(smooth_y, return_index=True)
 
-        # Getting the respective x for each threashold.
+        # Getting the respective x for each threshold.
         smooth_x = np.array(x, dtype=arr_type)[u_inds]
 
-        # Retunring the values.
+        # Returning the values.
         return y_thresholds, smooth_x
 
     # Returning the smoothed y values sequence where the values between the local maxima
-    # has been replaced with the local maxima values, whenever a new one has been occuring
+    # has been replaced with the local maxima values, whenever a new one has been occurring
     return smooth_y
 
 
 def zero_padding_PRC(P, R):
     """ Zero Padding function for PRCs
 
-        This function is getting PRC and is paddig Y with Zeros and extends recall with the
+        This function is getting PRC and is padding Y with Zeros and extends recall with the
         rest of values are missing. The step (resolution) is used for the padding id the same
-        with the one occures based on the original curve. However, is getting a mean distance
-        and not the excat distance between P and R values that might variate. 
+        with the one occurs based on the original curve. However, is getting a mean distance
+        and not the exact distance between P and R values that might variate.
 
         Input arguments:
 
-        P: is the numpy.array sequence of all y coodinates of the curve's points.
-        R: is the numpy.array sequence of all x coodinates of the curve's points.
+        P: is the numpy.array sequence of all y coordinates of the curve's points.
+        R: is the numpy.array sequence of all x coordinates of the curve's points.
 
     Output:
 
-        P: is the padded P, an numpy.array sequence of all y coodinates of the curve's points.
-        R: is the padded R, an numpy.array sequence of all x coodinates of the curve's points.
+        P: is the padded P, an numpy.array sequence of all y coordinates of the curve's points.
+        R: is the padded R, an numpy.array sequence of all x coordinates of the curve's points.
 
     """
 
-    #Padding Recall and precision with proper resolution.
-    #Finding the max recall level.
+    # Padding Recall and precision with proper resolution.
+    # Finding the max recall level.
     max_rec_lvl = np.max(R)
 
-    #Calculating resolution.
+    # Calculating resolution.
     pding_step = max_rec_lvl / float(len(R))
 
-    #Some times in seems that the step is becoming 0.0 thus we replace it with 0.01.
+    # Some times in seems that the step is becoming 0.0 thus we replace it with 0.01.
     if not pding_step:
         pding_step = 0.01
 
-    #Padding Recall sequence.
+    # Padding Recall sequence.
     R_pad = np.arange(max_rec_lvl + pding_step, 1 + pding_step, pding_step)
     R = np.hstack((R, R_pad))
 
-    #Padding Precision sequence.
+    # Padding Precision sequence.
     P_pad = np.zeros_like(R_pad)
     P = np.hstack((P, P_pad))
 
-    #Returinting zero padded P and R
+    # Returning zero padded P and R
     return P, R
 
 
@@ -394,11 +394,11 @@ def reclev11_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
 
     Input arguments:
 
-        P: is the numpy.array sequence of all y coodinates of the curve's points.
-        R: is the numpy.array sequence of all x coodinates of the curve's points.
-        rcl_tuple: A three elements tuple for x poition to be averaged where fist is the
-            starting position, the second is the ending position and the thired is the
-            increament step.
+        P: is the numpy.array sequence of all y coordinates of the curve's points.
+        R: is the numpy.array sequence of all x coordinates of the curve's points.
+        rcl_tuple: A three elements tuple for x position to be averaged where fist is the
+            starting position, the second is the ending position and the third is the
+            increment step.
 
     Output:
 
@@ -408,16 +408,16 @@ def reclev11_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
 
     """
 
-    # Creating the array of recall leves for which the curve will be averaged.
+    # Creating the array of recall levels for which the curve will be averaged.
     # Default: 11 recall levels (0 to 10).
     if len(rcl_tuple) != 3:
-        raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
+        raise Exception("Two (2) or three (3) arguments are expected an input for this function.")
     R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])
 
-    #Padding Recall and precision with proper resolution.
+    # Padding Recall and precision with proper resolution.
     P, R = zero_padding_PRC(P, R)
 
-    #The Array for stroring the Precition values respectively to the recall levels.
+    # The Array for storing the Precision values respectively to the recall levels.
     avg_P = np.zeros_like(R_Levels, dtype=np.float)
 
     # Init the smallest index from where the part of the line, which will be
@@ -429,7 +429,7 @@ def reclev11_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
     last_avg_P = P[0]
 
     # Averaging the part of the PR Curve at each level of the given recall
-    # levels (defaut 11 levels).
+    # levels (default 11 levels).
     for i, r in enumerate(R_Levels[0:-1]):
 
         # Getting the closest index to the recall level of the current loop.
@@ -438,9 +438,9 @@ def reclev11_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
         current_rl_idx = np.max(np.where(np.abs(R - r) == np.min(np.abs(R - r))))
 
         # Alternatively it could be used the first occurred index respective to the minimum
-        #distance. However, the above approach returns an averaged curve close to the real one
-        #(with full points).
-        #current_rl_idx = (np.abs(R - r)).argmin()
+        # distance. However, the above approach returns an averaged curve close to the real one
+        # (with full points).
+        # current_rl_idx = (np.abs(R - r)).argmin()
 
         # Averaging each part of the line from the last recall level to the current one.
         avg_P[i] = np.mean(P[last_rl_idx: current_rl_idx])
@@ -455,8 +455,9 @@ def reclev11_averaging(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
         # Making the current highest index of the current loop to be the smallest one.
         last_rl_idx = current_rl_idx
 
-    # Averaging the last part of the line. Letting the last point to be calculated outside of the
-    #above loop it is assured that all point of the last part of the curve are taken in to account.
+    # Averaging the last part of the line. Letting the last point to be calculated
+    # outside of the above loop it is assured that all point of the last part of the curve are
+    # taken in to account.
     avg_P[-1] = np.mean(P[last_rl_idx::])
 
     return avg_P, R_Levels
@@ -471,11 +472,11 @@ def reclev11_nearest(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
 
     Input arguments:
 
-        P: is the numpy.array sequence of all y coodinates of the curve's points.
-        R: is the numpy.array sequence of all x coodinates of the curve's points.
-        rcl_tuple: A three elements tuple for x poition to be averaged where fist is the
-            starting position, the second is the ending position and the thired is the
-            increament step.
+        P: is the numpy.array sequence of all y coordinates of the curve's points.
+        R: is the numpy.array sequence of all x coordinates of the curve's points.
+        rcl_tuple: A three elements tuple for x position to be averaged where fist is the
+            starting position, the second is the ending position and the third is the
+            increment step.
 
     Output:
 
@@ -485,13 +486,13 @@ def reclev11_nearest(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
 
     """
 
-    # Creating the array of recall leves for which the curve will be averaged.
+    # Creating the array of recall levels for which the curve will be averaged.
     # Default: 11 recall levels (0 to 10).
     if len(rcl_tuple) != 3:
         raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
     R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])
 
-    #Padding Recall and precision with proper resolution.
+    # Padding Recall and precision with proper resolution.
     P, R = zero_padding_PRC(P, R)
 
     # Init with zeros the array for saving the nearest recall levels indexes.
@@ -506,25 +507,26 @@ def reclev11_nearest(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
     return P[idxs], R_Levels
 
 
-def reclev11_max(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
+def reclev11_max(P, R, rcl_tuple=(0.0, 1.1, 0.1), trec=True):
     """Maximum Y above each Recall Levels in the sequence, function.
 
-    #NOTE: This is the proper way to find the recall levels using the one of the two formulas 
-    based on the instruction given by TREC or other IR conferences and journals. 
+    # NOTE: This is the proper way to find the recall levels using the one of the two formulas
+    based on the instruction given by TREC or other IR conferences and journals.
         TREC: max(p(r)), r >= (rj)
-        Others: max(p(r)), (rj) <= r <= (rj+1) 
+        Others: max(p(r)), (rj) <= r <= (rj+1)
 
-    It takes the Precision Recall (RP) Curve and returns the maximum Y values found for 
-    recall levels of the current recall level and above in the sequence. TREC's formual is 
+    It takes the Precision Recall (RP) Curve and returns the maximum Y values found for
+    recall levels of the current recall level and above in the sequence. TREC's formula is
     used.
 
     Input arguments:
 
-        P: is the numpy.array sequence of all y coodinates of the curve's points.
-        R: is the numpy.array sequence of all x coodinates of the curve's points.
-        rcl_tuple: A three elements tuple for x poition to be averaged where fist is the
-            starting position, the second is the ending position and the thired is the
-            increament step.
+        P: is the numpy.array sequence of all y coordinates of the curve's points.
+        R: is the numpy.array sequence of all x coordinates of the curve's points.
+        rcl_tuple: a three elements tuple for x position to be averaged where fist is the
+            starting position, the second is the ending position and the third is the
+            increment step.
+        trec: is the Boolean flag whether the TREC algorithm is used or not.
 
     Output:
 
@@ -534,38 +536,44 @@ def reclev11_max(P, R, rcl_tuple=(0.0, 1.1, 0.1)):
 
     """
 
-    # Creating the array of recall leves for which the curve will be averaged.
+    # Creating the array of recall levels for which the curve will be averaged.
     # Default: 11 recall levels (0 to 10).
     if len(rcl_tuple) != 3:
         raise Exception("Two (2) or five (5) arguments are expected an input for this function.")
     R_Levels = np.arange(rcl_tuple[0], rcl_tuple[1], rcl_tuple[2])
 
-    #Padding Recall and precision with proper resolution.
+    # Padding Recall and precision with proper resolution.
     P, R = zero_padding_PRC(P, R)
 
-    #Init with zeros the array for saving the highest Precision for every R level.
+    # Init with zeros the array for saving the highest Precision for every R level.
     max_P = np.zeros_like(R_Levels, dtype=np.float)
 
-    #Getting the maximum value of P from all the recall levels largers than carrent.
-    #Sequence starts form 0.1 and stops at 1. Or it follows the rcl_tuple argument instructions.
+    # Defining interpolation condition. TREC based or not.
+    if trec:
+        cond = lambda r, R: np.where(R >= r)
+    else:
+        cond = lambda r, R: np.where((R >= r) & (R <= r + 0.1))
+
+    # Getting the maximum value of P from all the recall levels larger than current.
+    # Sequence starts form 0.1 and stops at 1. Or it follows the rcl_tuple argument instructions.
     for i, r in enumerate(R_Levels):
 
-        #Getting all indices above r
-        idx_abv = np.where(R >= r)
+        # Getting all indices above r and bellow (r + 0.1), when TREC condition is not used.
+        idx_abv = cond(r, R)
 
-        #Saving the maximum precisions
+        # Saving the maximum precisions
         max_P[i] = np.max(P[idx_abv])
 
-    #Returing maximum Precisions fore 11 recall levels.
+    # Returning maximum Precisions fore 11 recall levels.
     return max_P, R_Levels
 
 
 def contingency_table(expd_y, pred_y, unknow_class=False, arr_type=np.float32):
-    """Contingency talbe building the function.
+    """Contingency table building the function.
 
     It takes the expected Y and the predicted Y values of a Classifier and it is returning the
     contingency_table. The number of classes are detected by the different tags (i.e. integers)
-    located in the expeted Y list/array argument. In in case tags others than the ones in the
+    located in the expected Y list/array argument. In in case tags others than the ones in the
     expected Y list are found into the predictions list then a Zero Class (i.e. Don't Know) will
     considered fist in order of rows and columns respectively.
 
@@ -577,10 +585,10 @@ def contingency_table(expd_y, pred_y, unknow_class=False, arr_type=np.float32):
         red_y: is the numpy.array or python list contains the instance prediction of the
             classifier.
 
-        unknow_class: (optional) defines whether 0 index in contigency table will be condidered as
-            unknow class irrespectivly of its occurnace into the expected tags list and any class
-            tag not given to the expected tag list will be concidered as unkown class (0 index),
-            too.
+        unknow_class: (optional) defines whether 0 index in contingency table will be considered as
+            unknown class irrespectively of its occurrence into the expected tags list and any
+            class tag not given to the expected tag list will be considered as unknown class
+            (0 index), too.
 
         arr_type: (optional) user-defined arrays type. default numpy.flaot32
 
@@ -640,20 +648,20 @@ def contingency_table(expd_y, pred_y, unknow_class=False, arr_type=np.float32):
 
 
 def precision_recall_scores(conting_tbl, arr_type=np.float32):
-    """Precision and Recall scores. (it requries a contigency table as an input)
+    """Precision and Recall scores. (it requires a contingency table as an input)
 
-    It takes a contigency table (i.e. a confusion matrix) as an input and returns the precision
-    and recall scores for each class in 2D array. In the precision recall table row indexs are
-    respective to the classes assigned to the contigency tables.
+    It takes a contingency table (i.e. a confusion matrix) as an input and returns the precision
+    and recall scores for each class in 2D array. In the precision recall table row index are
+    respective to the classes assigned to the contingency tables.
 
     Input arguments:
 
-        contig_tbl: is the contigency table (i.e. confusion matrix).
+        contig_tbl: is the contingency table (i.e. confusion matrix).
         arr_type: (optional) user-defined arrays type. default numpy.flaot32
 
     Output:
 
-        prec_recl_scores: a table of precision and recal scores for each class of the contigency
+        prec_recl_scores: a table of precision and recall scores for each class of the contingency
         table.
 
     """
@@ -673,7 +681,76 @@ def precision_recall_scores(conting_tbl, arr_type=np.float32):
     return prec_recl_scores
 
 
-#Pure Python Imprementation
+def bcubed_pr_scores(clstrs_y, cats_y, arr_type=np.float32):
+    """BCubed Precision and Recall Scores.
+
+    The BCubed Precision and Recall scores are measures for estimating the performance of a
+    clustering task. In particular BCubed-Precision of an item is the proportion of items in its
+    cluster which have the item’s category (including itself). The BCubed-Recall of items in its
+    category which have the item's clusters (including itself). The overall BCubed Precision and
+    the overall BCubed recall is the averaged respective score of all items in the distribution.
+    Since the average is calculated over items, it is not necessary to apply any weighting
+    according to the size of clusters or categories. These scores calculation is implemented based
+    on the formal definition of them cited in Amigo et al. 2009.
+
+    Arguments
+    ---------
+        clstrs_y: An array of all the clusters tags assigned to each data point by the clustering
+                  algorithm and the indeces of the array are indicating the respective data points.
+        cats_y: An array of all the category tags expected for each data point by assigned by the
+                clustering algorithm. The data points indeces expected to be with the same order as
+                the clstrs_y array.
+
+    Output
+    ------
+        pre_bc: The overall BCubed-Precision.
+        rec_bc: The overall BCubed-Recall.
+
+    """
+
+    if clstrs_y.shape[0] != cats_y.shape[0]:
+        raise Exception('Clusters tags and expected tags vectors should have the same size of' +
+                        ' elements, however, not necessarily the same tags (or same kind).')
+
+    size_per_clstr = np.bincount(clstrs_y)
+    size_per_cats = np.bincount(cats_y)
+    print size_per_clstr, size_per_cats
+
+    ith_pre_bc = np.zeros_like(clstrs_y, dtype=arr_type)
+    ith_rec_bc = np.zeros_like(clstrs_y, dtype=arr_type)
+
+    for i, (clr_y, cat_y) in enumerate(zip(clstrs_y, cats_y)):
+
+        # Finding the number of elements having the same cluster tag as the i'th data point.
+        ith_same_clstr_cntr = np.where(clstrs_y == clr_y)[0]
+
+        # Finding the number of elements having the same category tag as the i'th data point.
+        ith_same_cat_cntr = np.where(cats_y == cat_y)[0]
+
+        # Counting the data points correctly clustered, i.e. the amount of array indeces...
+        # ...returned for the cluster tags being the same as the ones returned for the...
+        # ...category tags.
+        truth_arr_clr_cat = np.bincount(np.in1d(ith_same_clstr_cntr, ith_same_cat_cntr))[1]
+
+        # Calculating the BCubed Precision and Recall scores for the i'th data point.
+        ith_pre_bc[i] = truth_arr_clr_cat / float(size_per_clstr[clr_y])
+        ith_rec_bc[i] = truth_arr_clr_cat / float(size_per_cats[cat_y])
+
+    # Calculating the Overall BCubed Precision and recall.
+    pre_bc = np.mean(ith_pre_bc)
+    rec_bc = np.mean(ith_rec_bc)
+
+    # Returning Overall Bcubed Precision and Overall Bcubed Recall.
+    return pre_bc, rec_bc
+
+
+def bcubed_pr_curves(clsrts_arr, scrs_arr,
+                     full_curve=False, is_truth_tbl=False, arr_type=np.float32):
+    """
+    """
+    pass
+
+# Pure Python Implementation
 class purepy(object):
 
     @staticmethod
@@ -693,7 +770,7 @@ class purepy(object):
                 bin_int = 1 if bin_val == 'Y' else 0
                 scr_ybin_lst.append((scr_d[key], bin_int))
             else:
-                # add no provided aswares with negative value in Ground-Truth file
+                # add no provided answers with negative value in Ground-Truth file
                 neg_cnt += 1 if bin_val == 'N' else 0
 
         scr_ybin_srd_lst = sorted(
@@ -703,9 +780,9 @@ class purepy(object):
         fp_rate = list()
 
         last_scr = -1
-        #append [0, neg_cnt / float(neg_sum)]
-        #tp_rate.append( 0.0 )
-        #fp_rate.append( neg_cnt / float(neg_sum) )
+        # append [0, neg_cnt / float(neg_sum)]
+        # tp_rate.append( 0.0 )
+        # fp_rate.append( neg_cnt / float(neg_sum) )
 
         for i, (scr, y) in enumerate(scr_ybin_srd_lst):
 

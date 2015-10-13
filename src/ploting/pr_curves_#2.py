@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+
+
+# !/usr/bin/env python
 
 import sys
 sys.path.append('../../src')
@@ -8,19 +10,21 @@ import tables as tb
 import matplotlib.pyplot as plt
 import numpy as np
 
-from analytics.metrix import pr_curve, reclev11_max  # , reclev11_averaging
+from analytics.metrix import pr_curve, reclev11_max  #  , reclev11_averaging
 from data_retrieval.rfsedata import get_predictions
 from data_retrieval.rfsemixdata import get_predictions as get_predictions_mix
 
 
-#Symbols for plosting.
+# Symbols for plosting.
 symbol = ['o', 'v', '^', '*', '<', 's', '+', 'x', '>', 'H', '1', '2', '3', '4', 'D', 'h',
           '8', 'd', 'p', '.', ',']
 line_type = ['--', '--', '--', '-', '-', '-', '--', '--', '--', '-', '-', '-', '--.', '-',
              '-', '-', '-', '--', '--', '--', '--']
 
 
-#Funciton for creating the parameter paths requred for get_predicitons()
+
+
+# Funciton for creating the parameter paths requred for get_predicitons()
 def plist2ppath(params_lst, ensbl='RFSE'):
 
     if ensbl == 'RFSE':
@@ -42,13 +46,16 @@ def plist2ppath(params_lst, ensbl='RFSE'):
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 
-#### Paramter Combination for Cases to be ploted
 
-#++++++++++++++++++++++++++++++
-#  RFSE  
-#++++++++++++++++++++++++++++++
+### Parameter Combination for Cases to be plotted
+
+# ++++++++++++++++++++++++++++++
+#   RFSE  
+# ++++++++++++++++++++++++++++++
+
+
 """
-#7Genres 3W for every Distance Measure.
+# 7Genres 3W for every Distance Measure.
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_7Genres_3W_F1Based_11AVG.eps'
 
 comb_lst = [
@@ -66,8 +73,36 @@ plt_dsp_attr = [
 ]
 
 leg_pos = 3
+"""
 
-#KI04 1W for every Distance Measure.
+# 7Genres for every Similarity Measure & Document Representation with KI04 Optimal Parameters.
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_7Genres_ParamsMostOccured_F1Based_11AVG.eps'
+
+comb_lst = [
+    ['RFSE', '1Words', '7Genres', 'Cosine', [100000, 5000, 0.5, 100]],
+    ['RFSE', '4Chars', '7Genres', 'Cosine', [100000, 5000, 0.5, 100]],
+    ['RFSE', '1Words', '7Genres', 'MinMax', [100000, 5000, 0.5, 100]],
+    ['RFSE', '4Chars', '7Genres', 'MinMax', [100000, 5000, 0.5, 100]],
+    #['RFSE', '1Words', '7Genres', 'Comb', [100000, 5000, 0.5, 100]],
+    #['RFSE', '4Chars', '7Genres', 'Comb', [100000, 5000, 0.5, 100]],
+    ['OCSVME', '4Chars', '7Genres', '', [100000, 50000, 0.1]]
+]
+
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[0], 2, 14, "1W - Cosine"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "4C - Cosine"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "1W - MinMax"],
+    ['k' + line_type[1] + symbol[4], 2, 14, "4C - MinMax"],
+    #['m' + line_type[1] + symbol[5], 2, 14, "1W - Comb"],
+    #['y' + line_type[1] + symbol[6], 2, 14, "4C - Comb"],
+    ['k' + line_type[5], 3, 0, "4C - Baseline"]
+]
+
+leg_pos = 4
+
+"""
+# KI04 1W for every Distance Measure.
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_KI04_1W_F1Based_11AVG.eps'
 
 comb_lst = [
@@ -87,7 +122,8 @@ plt_dsp_attr = [
 leg_pos = 1
 
 
-#SANTINIS 3W for every Distance Measure.
+
+# SANTINIS 3W for every Distance Measure.
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_SANTINIS_3W_F1Based_11AVG.eps'
 
 comb_lst = [
@@ -105,8 +141,36 @@ plt_dsp_attr = [
 ]
 
 leg_pos = 3
+"""
+"""
+# SANTINIS for every Similarity Measure & Document Representation with KI04 Optimal Parameters.
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_SANTINIS_ParamsMostOccured_F1Based_11AVG.eps'
 
-#7Genre Distance Measure Cosine
+comb_lst = [
+    ['RFSE', '1Words', 'SANTINIS', 'Cosine', [100000, 5000, 0.5, 100]],
+    ['RFSE', '4Chars', 'SANTINIS', 'Cosine', [100000, 5000, 0.5, 100]],
+    ['RFSE', '1Words', 'SANTINIS', 'MinMax', [100000, 5000, 0.5, 100]],
+    ['RFSE', '4Chars', 'SANTINIS', 'MinMax', [100000, 5000, 0.5, 100]],
+    #['RFSE', '1Words', 'SANTINIS', 'Comb', [100000, 5000, 0.5, 100]],
+    #['RFSE', '4Chars', 'SANTINIS', 'Comb', [100000, 5000, 0.5, 100]],
+    ['OCSVME', '4Chars', 'SANTINIS', '', [10000, 5000, 0.5]]
+]
+
+
+plt_dsp_attr = [
+    ['k' + line_type[1] + symbol[0], 2, 14, "1W - Cosine"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "4C - Cosine"],
+    ['k' + line_type[1] + symbol[3], 2, 14, "1W - MinMax"],
+    ['k' + line_type[1] + symbol[4], 2, 14, "4C - MinMax"],
+    #['m' + line_type[1] + symbol[5], 2, 14, "1W - Comb"],
+    #['y' + line_type[1] + symbol[6], 2, 14, "4C - Comb"],
+    ['k' + line_type[5], 3, 0, "4C - Baseline"]
+]
+
+leg_pos = 4
+"""
+"""
+# 7Genre Distance Measure Cosine
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_7Genres_Cosine_F1Based_11AVG.eps'
 
 comb_lst = [
@@ -124,7 +188,8 @@ plt_dsp_attr = [
 leg_pos = 3
 
 
-#KI04 Distance Measure MinMax
+
+# KI04 Distance Measure MinMax
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_KI04_MinMax_F1Based_11AVG.eps'
 
 comb_lst = [
@@ -141,7 +206,9 @@ plt_dsp_attr = [
 
 leg_pos = 3
 
-#SANTINIS Distance Measure MinMax
+
+
+# SANTINIS Distance Measure MinMax
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_SANTINIS_MinMax_F1Based_11AVG.eps'
 
 comb_lst = [
@@ -159,7 +226,8 @@ plt_dsp_attr = [
 leg_pos = 3
 
 
-#7Genre F1 VS F05
+
+# 7Genre F1 VS F05
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC_7Genres_F1vsF05_11AVG.eps'
 
 comb_lst = [
@@ -180,8 +248,12 @@ plt_dsp_attr = [
 
 leg_pos = 3
 
-#KI04 F1 VS F05
-#++++++++++++++++++++ NOT PLOTED FOR NOW +++++++++++++++++++++++++++++++++++
+
+
+
+
+# KI04 F1 VS F05
+# ++++++++++++++++++++ NOT PLOTED FOR NOW +++++++++++++++++++++++++++++++++++
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC_KI04_F1vsF05_11AVG.eps'
 
 plt_dsp_attr = [
@@ -192,35 +264,48 @@ plt_dsp_attr = [
     ['k' + line_type[4] + symbol[4], 2, 14, "1W - OCSVME - F0.5"],
     ['k' + line_type[5] + symbol[5], 2, 14, "3W - OCSVME - P"]
 ]
-"""
-#SANTINIS F1 VS F05
+
+
+
+# SANTINIS F1 VS F05
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC_SANTINIS_F1vsF05_11AVG.eps'
 
 comb_lst = [
+    
+
     ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
-    ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
+    # ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
+    
+
     ['RFSE', '3Words', 'SANTINIS', 'Cosine', [100000, 1000, 0.5, 50]],
-    ['RFSE', '1Words', 'SANTINIS', 'Cosine', [50000, 1000, 0.5, 50]],
+    # ['RFSE', '1Words', 'SANTINIS', 'Cosine', [50000, 1000, 0.5, 50]],
     ['OCSVME', '3Words', 'SANTINIS', '', [50000, 10000, 0.1]],
     ['OCSVME', '3Words', 'SANTINIS', '', [100000, 90000, 0.9]]
 ]
 
 plt_dsp_attr = [
-    ['k' + line_type[1] + symbol[1], 2, 14, "3W - MinMax - F1"],
-    ['k' + line_type[1] + symbol[0], 2, 14, "3W - MinMax - F0.5"],
+    
+
+    ['k' + line_type[3] + symbol[6], 2, 14, "3W - MinMax - F1"],
+    # ['k' + line_type[1] + symbol[0], 2, 14, "3W - MinMax - F0.5"],
+    
+
     ['k' + line_type[1] + symbol[2], 2, 14, "3W - Cosine - AUC"],
-    ['k' + line_type[1] + symbol[3], 2, 14, "1W - Cosine - mP"],
+    # ['k' + line_type[1] + symbol[3], 2, 14, "1W - Cosine - mP"],
     ['k' + line_type[3] + symbol[5], 2, 14, "3W - OCSVME - F1"],
-    ['k' + line_type[3] + symbol[4], 2, 14, "3W - OCSVME - mP"]
+    ['k' + line_type[1] + symbol[4], 2, 14, "3W - OCSVME - mP"]
 ]
 
 leg_pos = 3
 
-#++++++++++++++++++++++++++++++
-#  OCSVME  
-#++++++++++++++++++++++++++++++
-"""
-#7Genres
+
+
+# ++++++++++++++++++++++++++++++
+#   OCSVME  
+# ++++++++++++++++++++++++++++++
+
+
+# 7Genres
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_OCSVM_7Genres_F1Based_11AVG.eps'
 
 comb_lst = [
@@ -237,7 +322,9 @@ plt_dsp_attr = [
 
 leg_pos = 1
 
-#KI04
+
+
+# KI04
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_OCSVM_KI04_F1Based_11AVG.eps'
 
 comb_lst = [
@@ -254,7 +341,8 @@ plt_dsp_attr = [
 
 leg_pos = 1
 
-#SANTINIS
+
+# SANTINIS
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_OCSVM_SANTINIS_F1Based_11AVG.eps'
 
 comb_lst = [
@@ -270,20 +358,15 @@ plt_dsp_attr = [
 ]
 
 leg_pos = 1
-
 """
 
-
-
-####
-
-#### The Ploting Process Starts Here ####
-fig = plt.figure(num=1, figsize=(10, 8), dpi=80, facecolor='w', edgecolor='k')
+# # # #  The Ploting Process Starts Here # # # # 
+fig = plt.figure(num=1, figsize=(12, 6), dpi=80, facecolor='w', edgecolor='k')
 ax = fig.add_subplot(111)
 
 for i, comb_val in enumerate(comb_lst):
 
-    #Selecting filepath
+    # Selecting filepath
     if comb_val[0] == 'RFSE':
 
         if comb_val[2] == '7Genres':
@@ -308,7 +391,7 @@ for i, comb_val in enumerate(comb_lst):
 
     h5d_fl = h5d_fl + comb_val[1] + '_' + comb_val[2]
 
-    # Selecting files to open and setting the mix flag on/off
+    #  Selecting files to open and setting the mix flag on/off
     mix = False
 
     if comb_val[3] == 'Comb':
@@ -324,10 +407,10 @@ for i, comb_val in enumerate(comb_lst):
         h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
         h5d_fl2 = h5d_fl1
 
-    #Getting the predictions
+    # Getting the predictions
     if comb_val[3] == 'Comb':
 
-        #Building the parapmeters path
+        # Building the parapmeters path
         params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
 
         pred_scores, expd_y, pred_y = get_predictions_mix(
@@ -335,31 +418,34 @@ for i, comb_val in enumerate(comb_lst):
             genre_tag=None, binary=True, strata=None
         )
 
-    else :
+    else:
 
-        #Building the parapmeters path
+        # Building the parapmeters path
         params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
 
         pred_scores, expd_y, pred_y = get_predictions(
             h5d_fl1, kfolds, params_path, genre_tag=None, binary=True, strata=None
         )
 
-    #Closing the h5d files.
+    # Closing the h5d files.
     if comb_val[3] == 'Comb':
         h5d_fl1.close()
         h5d_fl2.close()
     else:
         h5d_fl1.close()
 
-    ###Create the Actual PRC.
+    # # # Create the Actual PRC.
     y, x, t = pr_curve(expd_y, pred_scores, full_curve=True, is_truth_tbl=True)
 
-    ###Get the max 11 Recall Leves in TREC way.
-    y, x = reclev11_max(y, x)
+    # # # Get the max 11 Recall Leves in TREC way.
+    y, x = reclev11_max(y, x, trec=False)
 
-    ###Do the Plotting
+    # Selecting array indices with non-zero cells.
+    non_zero_idx = np.where(y > 0)
+
+    # # # Do the Plotting
     ax.plot(
-        x, y,
+        x[non_zero_idx], y[non_zero_idx],
         plt_dsp_attr[i][0],
         linewidth=plt_dsp_attr[i][1],
         markersize=plt_dsp_attr[i][2],
@@ -396,16 +482,18 @@ for i, comb_val in enumerate(comb_lst):
     )
     """
 
+# Give the poper attributes for better ploting
 
-#Give the poper attributes for better ploting
 plt.grid(True)
-#plt.legend(loc='upper left', bbox_to_anchor=(0.62, 0.4), ncol=1, fancybox=True, shadow=True, fontsize=16)
+# plt.legend(
+#   loc='upper left', bbox_to_anchor=(0.62, 0.4), ncol=1, fancybox=True, shadow=True, fontsize=16
+# )
 plt.legend(loc=leg_pos, fancybox=True, shadow=True, fontsize=16)
-plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], fontsize=18)
+plt.yticks(fontsize=18)
 plt.xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], fontsize=18)
 plt.tight_layout()
 
-#Saving the ploting to File
+# Saving the ploting to File
 plt.savefig(fig_save_file, bbox_inches='tight')
 
 plt.show()
