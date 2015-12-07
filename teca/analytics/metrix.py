@@ -686,7 +686,7 @@ def bcubed_pr_scores(clstrs_y, cats_y, arr_type=np.float32):
 
     The BCubed Precision and Recall scores are measures for estimating the performance of a
     clustering task. In particular BCubed-Precision of an item is the proportion of items in its
-    cluster which have the item’s category (including itself). The BCubed-Recall of items in its
+    cluster which have the item's category (including itself). The BCubed-Recall of items in its
     category which have the item's clusters (including itself). The overall BCubed Precision and
     the overall BCubed recall is the averaged respective score of all items in the distribution.
     Since the average is calculated over items, it is not necessary to apply any weighting

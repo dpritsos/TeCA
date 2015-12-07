@@ -2,7 +2,9 @@
 import sys
 import numpy as np
 
-sys.path.append('../../src')
+sys.path.append('../../teca')
+
+print sys.path
 
 from analytics.metrix import bcubed_pr_scores
 
