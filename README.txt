@@ -1,2 +1,2 @@
 
-WEGA: WEb Genre Analytics
+TeCA: Text Categorisation Analytics
