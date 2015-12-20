@@ -24,16 +24,16 @@ params_range = coll.OrderedDict([
       # [0.3, 0.1, 'rndred_trn_rest4_test'],
       [0.3, 0.1, 'rndred_trn_fixed_test'],
    ]),
-   ('vocab_size', [10, 50, 500, 1000, 5000, 10000, 50000, 100000]),  # 50, 100,
-   ('max_iter', [30, 100, 300]),
-   ('converg_diff', [0.0005, 0.001, 0.005, 0.01, 0.05, 0.1, 0.5]),
-   ('learing_rate', [0.001]),  # 0.0003, , 0.003, 0.01, 0.03, 0.1, 0.3
+   ('vocab_size', [10]),  # 50, 100, 50, 500, 1000, 5000, 10000, 50000, 100000
+   ('max_iter', [30]),  # 100, 300
+   ('converg_diff', [0.0005]),  # 0.001, 0.005, 0.01, 0.05, 0.1, 0.5
+   ('learing_rate', [0.01]),  # 0.0003, , 0.003, 0.01, 0.03, 0.1, 0.3
    ('#', [0, 1, 2])
 ])
 
 h5df_str = str(
-    '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/SemiSupClust_1W_7Genres/' +
-    'CosineKmeans_1W_7Genres.h5'
+    '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/SemiSupClust_3C_7Genres/' +
+    'HMRFKmeans_3C_7Genres.h5'
     # '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/
     # '/home/dimitrios/Synergy-Crawler/SANTINIS/
     # '/home/dimitrios/Synergy-Crawler/SANTINIS/
@@ -72,13 +72,13 @@ for params_lst, params_path in \
 
         clstr_y = clstr_y.reshape(1, clstr_y.shape[0])
 
-        #print clstr_y.shape
-        #print clss_y.shape
+        print clstr_y.shape
+        print clss_y.shape
         print clstr_params
 
-        #pre_bc, rec_bc = bcubed_pr_scores(clstr_y[0], clss_y[0])
+        pre_bc, rec_bc = bcubed_pr_scores(clstr_y[0], clss_y[0])
 
-        #print params_lst, pre_bc, rec_bc
+        print params_lst, pre_bc, rec_bc
 
         # plt.locator_params(nbins=4)
         # ax1.plot(
