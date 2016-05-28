@@ -12,7 +12,7 @@ sys.path.append('../../src')
 import numpy as np
 
 
-def get_predictions(res_h5file, params_path, genre_tag=None, binary=None, strata=None):
+def get_predictions(res_h5file, kfolds, params_path, genre_tag=None, binary=None, strata=None):
     """Retrieval functions for the date returned from the RFSE method.
 
     Returns the Predicted Scores and the Expected Values for the sample set has been given to the
@@ -52,7 +52,7 @@ def get_predictions(res_h5file, params_path, genre_tag=None, binary=None, strata
 
     """
 
-    #  Initializing.
+    # Initializing.
     PS_lst = list()  # Ensemble Predicted Scores
     EY_lst = list()  # Ensemble Truth Table
     PR_Y_lst = list()  # Ensemble Predicted Y's

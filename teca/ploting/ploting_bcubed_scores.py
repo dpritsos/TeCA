@@ -22,18 +22,18 @@ params_range = coll.OrderedDict([
    #  ('kfolds', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
    ('train_split_step_method', [
       # [0.3, 0.1, 'rndred_trn_rest4_test'],
-      [0.3, 0.1, 'rndred_trn_fixed_test'],
+      [0.10, 0.5, 'rndred_trn_fixed_test'],
    ]),
-   ('vocab_size', [10]),  # 50, 100, 50, 500, 1000, 5000, 10000, 50000, 100000
-   ('max_iter', [30]),  # 100, 300
-   ('converg_diff', [0.0005]),  # 0.001, 0.005, 0.01, 0.05, 0.1, 0.5
-   ('learing_rate', [0.01]),  # 0.0003, , 0.003, 0.01, 0.03, 0.1, 0.3
-   ('#', [0, 1, 2])
+   ('vocab_size', [500, 2000]),  # 10, 50, 500, 5000, 10000,
+   ('max_iter', [100]),  # 30, 100, 300
+   ('converg_diff', [0.001]),  # 0.0005, 0.005, 0.01, 0.05, 0.1, 0.5
+   ('learing_rate', [0.003, 0.01, 0.1]),  # 0.3, ,0.03, , 0.001
+   ('#', [0])
 ])
 
 h5df_str = str(
-    '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/SemiSupClust_3C_7Genres/' +
-    'HMRFKmeans_3C_7Genres.h5'
+    '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/SemiSupClust_2C_7Genres_title_urls_n_anchors/' +
+    'HMRFKmeans_2C_7Genres_10%_5-10k_(title, urls_anchor)_cy.h5'
     # '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/
     # '/home/dimitrios/Synergy-Crawler/SANTINIS/
     # '/home/dimitrios/Synergy-Crawler/SANTINIS/
@@ -72,13 +72,11 @@ for params_lst, params_path in \
 
         clstr_y = clstr_y.reshape(1, clstr_y.shape[0])
 
-        print clstr_y.shape
-        print clss_y.shape
-        print clstr_params
+        pre_bc, rec_bc, size_per_clstr, size_per_cats = bcubed_pr_scores(clstr_y[0], clss_y[0])
 
-        pre_bc, rec_bc = bcubed_pr_scores(clstr_y[0], clss_y[0])
+        print str(clstr_y.shape[1]) + ", " + ", ".join([str(i) for i in size_per_clstr[1::]]) + ", " + ", ".join([str(i) for i in size_per_cats[1::]]) + ", " + ", ".join([str(i) for i in clstr_params]) + ", " +  str(params_lst[1]) + ", " + str(pre_bc) + ", " + str(rec_bc)
 
-        print params_lst, pre_bc, rec_bc
+        # ", ".join([str(i) for i in params_lst])
 
         # plt.locator_params(nbins=4)
         # ax1.plot(

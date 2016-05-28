@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import sys
-sys.path.append('../../src')
-sys.path.append('../../../DoGSWrapper/src')
+sys.path.append('../../teca')
+sys.path.append('../../../DoGSWrapper/dogswrapper')
 
 import tables as tb
 import numpy as np
@@ -70,15 +70,26 @@ if __name__ == '__main__':
     #Parameters used for the experiments required for selecting specific or group of results
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+    #case_od = coll.OrderedDict([
+    #    ('doc_rep', ['3Words', '1Words', '4Chars']),
+    #    ('corpus', ['7Genres', 'KI04', 'SANTINIS']),
+    #    ('dist', ['', 'MinMax', 'MIX']),  #, 'MinMax', 'MIX'
+    #    ('vocab_size', [5000, 10000, 50000, 100000]),
+    #    ('features_size', [1000, 5000, 10000, 50000, 90000]),
+    #    #('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
+    #    ('Sigma', [0.5, 0.7, 0.9]),
+    #    ('Iterations', [10, 50, 100])
+    #])
+
     case_od = coll.OrderedDict([
-        ('doc_rep', ['3Words', '1Words', '4Chars']),
-        ('corpus', ['7Genres', 'KI04', 'SANTINIS']),
-        ('dist', ['', 'MinMax', 'MIX']),  #, 'MinMax', 'MIX'
-        ('vocab_size', [5000, 10000, 50000, 100000]),
-        ('features_size', [1000, 5000, 10000, 50000, 90000]),
-        #('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
-        ('Sigma', [0.5, 0.7, 0.9]),
-        ('Iterations', [10, 50, 100])
+        ('doc_rep', ['4Chars', ]),
+        ('corpus', ['7Genres', ]),
+        ('dist', ['', ]),
+        ('vocab_size', [100000]),
+        ('features_size', [90000]),
+        ('nu', [0.1, ])
+        #('Sigma', [0.5, 0.7, 0.9]),
+        #('Iterations', [10, 50, 100])
     ])
 
     #Creating tables for tall the above cases.
@@ -92,13 +103,13 @@ if __name__ == '__main__':
 
             #Selecting filepath
             if case[1] == '7Genres':
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_'
 
             elif case[1] == 'KI04':
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
 
             else:
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
 
             h5d_fl = h5d_fl + case[0] + '_' + case[1]
 
@@ -148,12 +159,13 @@ if __name__ == '__main__':
             )
 
             # Saving tables
-            np.savetxt(conf_mtrx_fname, conf_mtrx)
+            # np.savetxt(conf_mtrx_fname, conf_mtrx)
 
-            pr_tabel[np.where((pr_tabel==np.NaN))] = 0.0
-            np.savetxt(pr_tabel_fname, pr_tabel)
+            # pr_tabel[np.where((pr_tabel==np.NaN))] = 0.0
+            # np.savetxt(pr_tabel_fname, pr_tabel)
 
-            #np.set_printoptions(precision=3, threshold=10000, suppress=True, linewidth=100)
+            np.set_printoptions(precision=3, threshold=10000, suppress=True, linewidth=100)
+            print pr_tabel
             #print conf_mtrx
             #print pr_scores[:, :]"""
 

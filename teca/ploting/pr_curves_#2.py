@@ -3,8 +3,8 @@
 # !/usr/bin/env python
 
 import sys
-sys.path.append('../../src')
-sys.path.append('../../../DoGSWrapper/src')
+sys.path.append('../../teca')
+sys.path.append('../../../DoGSWrapper/dogswrapper')
 
 import tables as tb
 import matplotlib.pyplot as plt
@@ -50,7 +50,7 @@ kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 ### Parameter Combination for Cases to be plotted
 
 # ++++++++++++++++++++++++++++++
-#   RFSE  
+#   RFSE
 # ++++++++++++++++++++++++++++++
 
 
@@ -73,19 +73,20 @@ plt_dsp_attr = [
 ]
 
 leg_pos = 3
-"""
+
 
 # 7Genres for every Similarity Measure & Document Representation with KI04 Optimal Parameters.
-fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_7Genres_ParamsMostOccured_F1Based_11AVG.eps'
+fig_save_file =
+#'/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_7Genres_ParamsMostOccured_F1Based_11AVG.eps'
 
 comb_lst = [
-    ['RFSE', '1Words', '7Genres', 'Cosine', [100000, 5000, 0.5, 100]],
-    ['RFSE', '4Chars', '7Genres', 'Cosine', [100000, 5000, 0.5, 100]],
-    ['RFSE', '1Words', '7Genres', 'MinMax', [100000, 5000, 0.5, 100]],
-    ['RFSE', '4Chars', '7Genres', 'MinMax', [100000, 5000, 0.5, 100]],
-    #['RFSE', '1Words', '7Genres', 'Comb', [100000, 5000, 0.5, 100]],
-    #['RFSE', '4Chars', '7Genres', 'Comb', [100000, 5000, 0.5, 100]],
-    ['OCSVME', '4Chars', '7Genres', '', [100000, 50000, 0.1]]
+    ['RFSE', '4Chars', 'SANTINIS', 'Cosine', [50000, 1000, 0.7, 100]],
+    ['RFSE', '4Chars', 'SANTINIS', 'Cosine', [50000, 1000, 0.9, 100]],
+    # ['RFSE', '1Words', '7Genres', 'MinMax', [100000, 5000, 0.5, 100]],
+    # ['RFSE', '4Chars', '7Genres', 'MinMax', [100000, 5000, 0.5, 100]],
+    # ['RFSE', '1Words', '7Genres', 'Comb', [100000, 5000, 0.5, 100]],
+    # ['RFSE', '4Chars', '7Genres', 'Comb', [100000, 5000, 0.5, 100]],
+    # ['OCSVME', '4Chars', '7Genres', '', [100000, 50000, 0.1]]
 ]
 
 
@@ -101,7 +102,7 @@ plt_dsp_attr = [
 
 leg_pos = 4
 
-"""
+
 # KI04 1W for every Distance Measure.
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_RFSE_KI04_1W_F1Based_11AVG.eps'
 
@@ -271,11 +272,11 @@ plt_dsp_attr = [
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC_SANTINIS_F1vsF05_11AVG.eps'
 
 comb_lst = [
-    
+
 
     ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
     # ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
-    
+
 
     ['RFSE', '3Words', 'SANTINIS', 'Cosine', [100000, 1000, 0.5, 50]],
     # ['RFSE', '1Words', 'SANTINIS', 'Cosine', [50000, 1000, 0.5, 50]],
@@ -284,11 +285,11 @@ comb_lst = [
 ]
 
 plt_dsp_attr = [
-    
+
 
     ['k' + line_type[3] + symbol[6], 2, 14, "3W - MinMax - F1"],
     # ['k' + line_type[1] + symbol[0], 2, 14, "3W - MinMax - F0.5"],
-    
+
 
     ['k' + line_type[1] + symbol[2], 2, 14, "3W - Cosine - AUC"],
     # ['k' + line_type[1] + symbol[3], 2, 14, "1W - Cosine - mP"],
@@ -301,28 +302,31 @@ leg_pos = 3
 
 
 # ++++++++++++++++++++++++++++++
-#   OCSVME  
+#   OCSVME
 # ++++++++++++++++++++++++++++++
 
-
+"""
 # 7Genres
-fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_OCSVM_7Genres_F1Based_11AVG.eps'
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC11AVG_RFSE_MIXvsMinMax_SANTINIS_F05.eps'
 
 comb_lst = [
-    ['OCSVME', '3Words', '7Genres', '', [10000, 5000, 0.1]],
-    ['OCSVME', '1Words', '7Genres', '', [50000, 5000, 0.07]],
-    ['OCSVME', '4Chars', '7Genres', '', [100000, 50000, 0.1]]
+    ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
+    ['RFSE', '4Chars', 'SANTINIS', 'Comb', [100000, 500, 0.5, 100]],
+    ['RFSE', '3Words', 'SANTINIS', 'Cosine', [100000, 5000, 0.9, 50]],
+    # ['OCSVME', '3Words', 'SANTINIS', '', [100000, 50000, 0.07]],
+
 ]
 
 plt_dsp_attr = [
-    ['k' + line_type[0] + symbol[0], 2, 14, "3W - 7Genres"],
-    ['k' + line_type[1] + symbol[1], 2, 14, "1W - 7Genres"],
-    ['k' + line_type[3] + symbol[3], 2, 14, "4C - 7Genres"]
+    ['k' + line_type[0] + symbol[1], 2, 14, "3W - MinMax"],
+    ['k' + line_type[0] + symbol[2], 2, 14, "4C - Cos&MM"],
+    ['k' + line_type[3] , 2, 14, "Baseline: 3W - Cosine"],
+    # ['k' + line_type[3] + symbol[3], 2, 14, "Baseline"],
 ]
 
 leg_pos = 1
 
-
+"""
 
 # KI04
 fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PR_Curves_OCSVM_KI04_F1Based_11AVG.eps'
@@ -360,7 +364,7 @@ plt_dsp_attr = [
 leg_pos = 1
 """
 
-# # # #  The Ploting Process Starts Here # # # # 
+# # # #  The Ploting Process Starts Here # # # #
 fig = plt.figure(num=1, figsize=(12, 6), dpi=80, facecolor='w', edgecolor='k')
 ax = fig.add_subplot(111)
 
@@ -434,10 +438,10 @@ for i, comb_val in enumerate(comb_lst):
     else:
         h5d_fl1.close()
 
-    # # # Create the Actual PRC.
+    # Create the Actual PRC.
     y, x, t = pr_curve(expd_y, pred_scores, full_curve=True, is_truth_tbl=True)
 
-    # # # Get the max 11 Recall Leves in TREC way.
+    # Get the max 11 Recall Leves in TREC way.
     y, x = reclev11_max(y, x, trec=False)
 
     # Selecting array indices with non-zero cells.

@@ -26,7 +26,7 @@ def roc_curve(trh_arr, scr_arr, full_curve=False, arr_type=np.float32):
 
     Input arguments:
 
-        trh_arr: The binary expected classes array, i.e. the real classes of the samples
+        trh_arr: The binary expected classes array, i.e. the REAL LABLES of the samples
             has been given to the Classifier.
             Valid values:  +1 for positive samples
                             0 or -1 for negative samples.
@@ -43,7 +43,7 @@ def roc_curve(trh_arr, scr_arr, full_curve=False, arr_type=np.float32):
     Output:
 
         tp_rate (Recall): True positive rate values array.
-        tf_rate: False positive rate values array.
+        fp_rate: False positive rate values array.
         unique_scores: Unique Scores from scr_arr argument. These values are the thresholds
             where new points in ROC curve where added.
 
@@ -67,8 +67,8 @@ def roc_curve(trh_arr, scr_arr, full_curve=False, arr_type=np.float32):
     trh_arr[np.where(trh_arr == -1)] = 0
 
     # Counting the total number of positive and negative samples.
-    pos_sum = trh_arr.sum()
-    neg_sum = trh_arr.size - pos_sum
+    pos_sum = float(trh_arr.sum())
+    neg_sum = float(trh_arr.size - pos_sum)
 
     # Initialising True Positive and False Positive counters.
     tp = 0
@@ -123,10 +123,10 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
 
     Input arguments:
 
-        trh_arr: The binary real labels array, i.e. the real classes of the samples
+        trh_arr: The binary REAL LABLES array, i.e. the real classes of the samples
             has been given to the Classifier.
-            (*)Alternatively, given the flag is_truth_tbl == True the trh_arr can me the truth
-            table of prediction, i.e. Expected Y == Predicted Y.
+            (*)Alternatively, given the flag is_truth_tbl == True the trh_arr can be the
+            TRUTH TABLE of predictions, i.e. that is the results of Expected Y == Predicted Y.
             Valid values:  +1 for positive samples.
                             0 or -1 for negative samples.
             arr_type: (optional) user-defined arrays type. default numpy.flaot32
@@ -177,7 +177,7 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
 
     else:
         # This is the correct for binary input, i.e. the Ground Truth is used as input argument.
-        pos_sum = trh_arr.sum()
+        pos_sum = float(trh_arr.sum())
 
     # Initialising True Positive and False Positive counters.
     tp = 0
@@ -220,7 +220,7 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
     return precision, recall, np.unique(scr_arr)
 
 
-def auc(x, y, arr_type=np.float32):
+def auc(x, y, is_zcc=True, arr_type=np.float32):
     """Area Under the Curve (AUC).
 
     Returns the Area Under the Curve of a given curve (ROC, PR, etc.). The trapezoid approximation
@@ -235,6 +235,8 @@ def auc(x, y, arr_type=np.float32):
 
         x: is the numpy.array sequence of all x coordinates of the curve's points.
         y: is the numpy.array sequence of all y coordinates of the curve's points.
+        is_zcc: (optional) user-defined whether the input curve is zero-padded....
+        ...In addiont with this option the curve is assumed to be Continuous. Default value is True
         arr_type: (optional) user-defined arrays type. default numpy.flaot32
 
     Output:
@@ -268,6 +270,11 @@ def auc(x, y, arr_type=np.float32):
     if not np.array_equal(np.sort(x), x) and not np.array_equal(np.sort(x), x[::-1]):
         raise Exception(
             "X-coordinate sequence is in random order: Impossible to calculate the AUC correctly.")
+
+    # NOTE: This is option assuming that the curve is Continuous and Zero padded
+    if is_zcc:
+        y = y[np.where(y != 0.0)[0]]
+        x = x[np.where(y != 0.0)[0]]
 
     # Calculating the delta-x's, i.e. bases of trapezoids.
     dx = np.abs(np.diff(x))
@@ -714,7 +721,7 @@ def bcubed_pr_scores(clstrs_y, cats_y, arr_type=np.float32):
 
     size_per_clstr = np.bincount(clstrs_y)
     size_per_cats = np.bincount(cats_y)
-    print size_per_clstr, size_per_cats
+    # print size_per_clstr, size_per_cats
 
     ith_pre_bc = np.zeros_like(clstrs_y, dtype=arr_type)
     ith_rec_bc = np.zeros_like(clstrs_y, dtype=arr_type)
@@ -741,7 +748,7 @@ def bcubed_pr_scores(clstrs_y, cats_y, arr_type=np.float32):
     rec_bc = np.mean(ith_rec_bc)
 
     # Returning Overall Bcubed Precision and Overall Bcubed Recall.
-    return pre_bc, rec_bc
+    return pre_bc, rec_bc, size_per_clstr, size_per_cats
 
 
 def bcubed_pr_curves(clsrts_arr, scrs_arr,

@@ -14,8 +14,8 @@ import base.param_combs as param_comb
 import analytics.metrix as mx
 
 
-def h5d_pr_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata, trec):
-    """Area Under the Curve(AUC) paired with table of parameters for PR curve.
+def h5d_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata, trec):
+    """Area Under the Curve(AUC) paired with table of parameters
 
         # # #  Make proper Definition here # # #
 
@@ -61,7 +61,7 @@ def h5d_pr_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata, 
                 try:
                     auc_values.append(mx.auc(recl, prec))
                 except:
-                    print "Warning:", params_path, "PR AUC is for these params has set to 0.0"
+                    print "Warning:", params_path, "AUC is for these params has set to 0.0"
                     auc_values.append(0.0)
 
             else:
@@ -87,8 +87,7 @@ def h5d_pr_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata, 
                     try:
                         auc_values.append(auc(recl, prec))
                     except:
-                        print "Warning:", params_path,\
-                            "PR AUC is for these params has setted to 0.0"
+                        print "Warning:", params_path, "AUC is for these params has setted to 0.0"
                         auc_values.append(0.0)
 
             # Extending parameters list with AUC(s).
@@ -103,8 +102,8 @@ def h5d_pr_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata, 
     return np.vstack(res_lst)
 
 
-def h5d_pr_auc_table_2d(h5d_fl1, h5d_fl2, kfolds, params_od, mix, tbl_params, is_ttbl, strata):
-    """Area Under the Curve(AUC) 2D table of parameters for PR curve.
+def h5d_auc_table_2d(h5d_fl1, h5d_fl2, kfolds, params_od, mix, tbl_params, is_ttbl, strata):
+    """Area Under the Curve(AUC) 2D table of parameters
 
         # # #  Make proper Definition here # # #
 
@@ -151,83 +150,6 @@ def h5d_pr_auc_table_2d(h5d_fl1, h5d_fl2, kfolds, params_od, mix, tbl_params, is
             skp1 += 1
 
     return aucz_mean_var_table
-
-
-def h5d_roc_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata):
-    """Area Under the Curve(AUC) paired with table of parameters for ROC curve.
-
-        # # #  Make proper Definition here # # #
-
-    """
-
-    # Beginning AUC-Params table building.
-    res_lst = list()
-
-    #  Loading data in a convenient form.
-    for params_lst, params_path in zip(
-        param_comb.ParamGridIter(params_od, 'list'),
-            param_comb.ParamGridIter(params_od, 'path')):
-
-        # Defining list for AUC values storage. For this loop.
-        auc_values = list()
-
-        if params_lst[0] > params_lst[1]:
-
-            if mix:
-
-                pred_scores, expd_y, pred_y = get_predictions_mix(
-                    h5d_fl1, h5d_fl2, kfolds, params_path, params_lst[2],
-                    genre_tag=None, binary=is_ttbl, strata=strata
-                )
-
-            else:
-
-                pred_scores, expd_y, pred_y = get_predictions(
-                    h5d_fl1, kfolds, params_path, genre_tag=None, binary=is_ttbl, strata=strata
-                )
-
-            if is_ttbl:
-
-                # Calculating the ROC curve.
-                tp_rate, fp_rate, uscor = mx.roc_curve(expd_y, pred_scores, full_curve=True)
-
-                try:
-                    auc_values.append(mx.auc(recl, prec))
-                except:
-                    print "Warning:", params_path, "ROC AUC is for these params has set to 0.0"
-                    auc_values.append(0.0)
-
-            else:
-
-                # Finding unique genres.
-                gnr_tgs = np.unique(expd_y)
-
-                # Calculating AUC per genre tag.
-                for gnr in gnr_tgs:
-
-                    # Converting expected Y to binary format.
-                    expd_y_bin = np.where((expd_y == gnr), 1, 0)
-
-                    # Calculating the ROC curve.
-                    tp_rate, fp_rate, uscor = mx.roc_curve(expd_y, pred_scores, full_curve=True)
-
-                    try:
-                        auc_values.append(auc(recl, prec))
-                    except:
-                        print "Warning:", params_path,\
-                            "ROC AUC is for these params has setted to 0.0"
-                        auc_values.append(0.0)
-
-            # Extending parameters list with AUC(s).
-            params_lst.extend(auc_values)
-
-            # Appending the parameters list together with their respective AUC(s).
-            res_lst.append(params_lst)
-
-    # Stacking and returning the data collected in a 2D array. Last column contain the AUC for...
-    # ...every parameters values possible combination.
-
-    return np.vstack(res_lst)
 
 
 # One Run for all cases.
