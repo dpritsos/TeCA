@@ -12,8 +12,8 @@ sys.path.append('../../src')
 import numpy as np
 
 
-def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
-                    sigma, genre_tag=None, binary=None, strata=None):
+def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path, sigma,
+                    genre_tag=None, binary=None, strata=None):
 
     """Retrieval functions for the date returned from the RFSE method.
 
@@ -54,28 +54,29 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
 
     """
 
-    #Initialising.
-    #Ensemble Predicted Scores
+    # Initialising.
+    # Ensemble Predicted Scores
     PS_lst = list()
-    #Ensemble Truth Table
+    # Ensemble Truth Table
     EY_lst = list()
-    #Ensemble Predicted Y's
+    # Ensemble Predicted Y's
     PR_Y_lst = list()
 
+    if isinstance(genre_tag, int):
 
-    #Choosing whether or not to create a Truth table depeding on the genre_tag value.
-    if genre_tag == None:
+        if strata:
+            raise Exception("Strata argument not implemented to work in combination with genre_tag")
 
-        #Collecting Scores for and Expected Values for every fold given in kfold list.
+        # Collecting Scores for and Expected Values for every fold given in kfold list.
         for k in kfolds:
 
-            #Getting the Expected genre tags
+            # Getting the Expected genre tags
             exp_y = hf5_fl1.get_node(params_path+'/KFold'+str(k), name='expected_Y').read()
 
-            #Calulating Prediction Scores for the given Gerne i.e. assuming that the rest genres
-            #being Negative examples
+            # Calulating Prediction Scores for the given Gerne i.e. assuming that the rest genres
+            # being Negative examples
 
-            #File #1
+            # File # 1
             pc_array_fl1 = hf5_fl1.get_node(
                 params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
             ).read()
@@ -84,7 +85,7 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
                 params_path+'/KFold'+str(k), name='max_sim_scores_per_iter'
             ).read()
 
-            #File #2
+            # File # 2
             pc_array_fl2 = hf5_fl2.get_node(
                 params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
             ).read()
@@ -93,17 +94,17 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
                 params_path+'/KFold'+str(k), name='max_sim_scores_per_iter'
             ).read()
 
-            #Normalising max-similarity scores for being comparable irrespectively of the
-            #measure has been used.
+            # Normalising max-similarity scores for being comparable irrespectively of the
+            # measure has been used.
             max_ms = np.max(ms_array_fl1, axis=0)
             min_ms = np.min(ms_array_fl1, axis=0)
 
             if (max_ms - min_ms).all() != 0:
-                #EXPLAIN HERE...
+                # EXPLAIN HERE...
                 ms_array_fl1 = (ms_array_fl1 - min_ms) / (max_ms - min_ms)
 
             else:
-                #EXPLAIN HERE...
+                # EXPLAIN HERE...
                 mm = (max_ms - min_ms)
                 mm[np.where((mm == 0))] = 0.00000000000001
                 ms_array_fl1 = (ms_array_fl1 - min_ms) / mm
@@ -112,11 +113,11 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
             min_ms = np.min(ms_array_fl2, axis=0)
 
             if (max_ms - min_ms).all() != 0:
-                #EXPLAIN HERE...
+                # EXPLAIN HERE...
                 ms_array_fl2 = (ms_array_fl2 - min_ms) / (max_ms - min_ms)
 
             else:
-                #EXPLAIN HERE...
+                # EXPLAIN HERE...
                 mm = (max_ms - min_ms)
                 mm[np.where((mm == 0))] = 0.00000000000001
                 ms_array_fl2 = (ms_array_fl2 - min_ms) / mm
@@ -128,7 +129,7 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
             pc_arr1_cls = np.hsplit(pc_array_fl1, docs_num)
             pc_arr2_cls = np.hsplit(pc_array_fl2, docs_num)
 
-            #print pc_arr2_cls
+            # print pc_arr2_cls
 
             new_pc_col_lst = list()
 
@@ -137,16 +138,136 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
 
                 i_max_ms_col = np.argmax(np.hstack((ms_c1, ms_c2)), axis=1)
 
-                #EXPLAIN THIS IN DETAIL...
+                # EXPLAIN THIS IN DETAIL...
                 pc4max_ms = np.hstack((pc_c1, pc_c2))[itrs, i_max_ms_col]
 
                 new_pc_col_lst.append(pc4max_ms)
 
-            #The matrix of predicted classes per iteration. It is transposed because vstack is
-            #required for lists to be concatenated correctly.
-            ###pc_array = np.vstack(new_pc_col_lst).T
+            # The matrix of predicted classes per iteration. It is transposed because vstack is
+            # required for lists to be concatenated correctly.
+            # # # pc_array = np.vstack(new_pc_col_lst).T
 
-            #Calculating the Predicted Class and the Sigma scores for each document.
+            pc_per_iter = np.vstack(new_pc_col_lst)
+
+            # Since it is a Binary case get the positive and negavtive scores. Then keeping...
+            # ...the postivie scores as the Predition scores.
+            gnr_pred_pos = np.where(pc_per_iter == genre_tag, 1, 0)
+            pos_ps = np.sum(gnr_pred_pos, axis=1) / float(len(itrs))
+
+            gnr_pred_neg = np.where(pc_per_iter == genre_tag, 0, 1)
+            neg_ps = np.sum(gnr_pred_neg, axis=1) / float(len(itrs))
+
+            # Caclulating the predicions in 1-vs-All case. Calculating the Predicted Class...
+            # ...and the Sigma scores for each document.
+            pre_y = np.zeros(docs_num)
+            pre_score = np.zeros(docs_num)
+
+            for i, (ps, ns) in enumerate(zip(pos_ps, neg_ps)):
+
+                if ps > ns and ps >= sigma:
+
+                    pre_y[i] = 1.0
+                    pre_score[i] = ps
+
+                elif ns > ps and ns > sigma:
+
+                    pre_score[i] = ns
+
+                # else: let everythong to be Zero OR I might need to recosider it!
+
+            # Saving the Ensemble Prediction Scores.
+            PS_lst.append(pre_score)
+
+            # Saving the Class predictions.
+            PR_Y_lst.append(pre_y)
+
+            # Collecting and the Truth Table of expected and predicted values.
+            EY_lst.append(exp_y)
+
+    # Choosing whether or not to create a Truth table depeding on the genre_tag value.
+    if genre_tag is None:
+
+        # Collecting Scores for and Expected Values for every fold given in kfold list.
+        for k in kfolds:
+
+            # Getting the Expected genre tags
+            exp_y = hf5_fl1.get_node(params_path+'/KFold'+str(k), name='expected_Y').read()
+
+            # Calulating Prediction Scores for the given Gerne i.e. assuming that the rest genres
+            # being Negative examples
+
+            # File # 1
+            pc_array_fl1 = hf5_fl1.get_node(
+                params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
+            ).read()
+
+            ms_array_fl1 = hf5_fl1.get_node(
+                params_path+'/KFold'+str(k), name='max_sim_scores_per_iter'
+            ).read()
+
+            # File # 2
+            pc_array_fl2 = hf5_fl2.get_node(
+                params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
+            ).read()
+
+            ms_array_fl2 = hf5_fl2.get_node(
+                params_path+'/KFold'+str(k), name='max_sim_scores_per_iter'
+            ).read()
+
+            # Normalising max-similarity scores for being comparable irrespectively of the
+            # measure has been used.
+            max_ms = np.max(ms_array_fl1, axis=0)
+            min_ms = np.min(ms_array_fl1, axis=0)
+
+            if (max_ms - min_ms).all() != 0:
+                # EXPLAIN HERE...
+                ms_array_fl1 = (ms_array_fl1 - min_ms) / (max_ms - min_ms)
+
+            else:
+                # EXPLAIN HERE...
+                mm = (max_ms - min_ms)
+                mm[np.where((mm == 0))] = 0.00000000000001
+                ms_array_fl1 = (ms_array_fl1 - min_ms) / mm
+
+            max_ms = np.max(ms_array_fl2, axis=0)
+            min_ms = np.min(ms_array_fl2, axis=0)
+
+            if (max_ms - min_ms).all() != 0:
+                # EXPLAIN HERE...
+                ms_array_fl2 = (ms_array_fl2 - min_ms) / (max_ms - min_ms)
+
+            else:
+                # EXPLAIN HERE...
+                mm = (max_ms - min_ms)
+                mm[np.where((mm == 0))] = 0.00000000000001
+                ms_array_fl2 = (ms_array_fl2 - min_ms) / mm
+
+            docs_num = ms_array_fl1.shape[1]
+            itrs = np.arange(ms_array_fl1.shape[0])
+            ms_arr1_cls = np.hsplit(ms_array_fl1, docs_num)
+            ms_arr2_cls = np.hsplit(ms_array_fl2, docs_num)
+            pc_arr1_cls = np.hsplit(pc_array_fl1, docs_num)
+            pc_arr2_cls = np.hsplit(pc_array_fl2, docs_num)
+
+            # print pc_arr2_cls
+
+            new_pc_col_lst = list()
+
+            for i, (ms_c1, ms_c2, pc_c1, pc_c2) in enumerate(zip(
+                    ms_arr1_cls, ms_arr2_cls, pc_arr1_cls, pc_arr2_cls)):
+
+                i_max_ms_col = np.argmax(np.hstack((ms_c1, ms_c2)), axis=1)
+
+                # EXPLAIN THIS IN DETAIL...
+                pc4max_ms = np.hstack((pc_c1, pc_c2))[itrs, i_max_ms_col]
+
+                new_pc_col_lst.append(pc4max_ms)
+
+            # The matrix of predicted classes per iteration. It is transposed because vstack is
+            # required for lists to be concatenated correctly.
+            # # # pc_array = np.vstack(new_pc_col_lst).T
+
+            # Calculating the Predicted Class and the Sigma scores for each document.
             pre_y = np.zeros(docs_num)
             pre_score = np.zeros(docs_num)
 
@@ -158,7 +279,7 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
                     pre_y[i] = np.argmax(max_gnr_scr)
                     pre_score[i] = np.max(max_gnr_scr)
 
-            #Making a statified selection upon a specific group of the results.
+            # Making a statified selection upon a specific group of the results.
             if strata:
 
                 gpr_idx = -strata[1]
@@ -172,7 +293,7 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
                 exp_y_grp1 = exp_y[0:gpr_idx]
                 exp_y_grp2 = exp_y[gpr_idx::]
 
-                #Perfroming Stratified selection.
+                # Perfroming Stratified selection.
                 unq_pred_tgs = np.unique(pre_y_grp2)
 
                 strata_idxs = np.hstack(
@@ -184,40 +305,29 @@ def get_predictions(hf5_fl1, hf5_fl2, kfolds, params_path,
                 pre_y = np.hstack((pre_y_grp1, pre_y_grp2[strata_idxs]))
                 exp_y = np.hstack((exp_y_grp1, exp_y_grp2[strata_idxs]))
 
-            #Saving the Ensemble Prediction Scores.
+            # Saving the Ensemble Prediction Scores.
             PS_lst.append(pre_score)
 
-            #Saving the Class predictions.
+            # Saving the Class predictions.
             PR_Y_lst.append(pre_y)
 
-            #Collecting and the Truth Table of expected and predicted values.
+            # Collecting and the Truth Table of expected and predicted values.
             EY_lst.append(exp_y)
 
-    else:
-        raise Exception(
-            "Invalid genre_tag argument's value: Valid arguments are either" +
-            " and integer (as genre tag) of 'None'"
-        )
-
-    """
-    elif isinstance(genre_tag, int):
-
-    """
-
-    #Stacking the lists to Single arrays for PS and EY respectively
+    # Stacking the lists to Single arrays for PS and EY respectively
     PS = np.hstack(PS_lst)
     EY = np.hstack(EY_lst)
     PR_Y = np.hstack(PR_Y_lst)
 
-    #Converting in to binary case under binary variable condition.
+    # Converting in to binary case under binary variable condition.
     if binary:
         EY = np.where(EY == PR_Y, 1, 0)
 
-    #Shorting Results by Predicted Scores
+    # Shorting Results by Predicted Scores
     inv_srd_idx = np.argsort(PS)[::-1]
     PS = PS[inv_srd_idx]
     EY = EY[inv_srd_idx]
     PR_Y = PR_Y[inv_srd_idx]
 
-    #Retunring Predicted Scores and Expected Values
+    # Retunring Predicted Scores and Expected Values
     return (PS, EY, PR_Y)

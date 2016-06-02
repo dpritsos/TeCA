@@ -12,7 +12,8 @@ sys.path.append('../../src')
 import numpy as np
 
 
-def get_predictions(res_h5file, kfolds, params_path, genre_tag=None, binary=None, strata=None):
+def get_predictions(res_h5file, kfolds, params_path, sigma,
+                    genre_tag=None, binary=None, strata=None):
     """Retrieval functions for the date returned from the RFSE method.
 
     Returns the Predicted Scores and the Expected Values for the sample set has been given to the
@@ -66,41 +67,65 @@ def get_predictions(res_h5file, kfolds, params_path, genre_tag=None, binary=None
         #  Collecting Scores for and Expected Values for every fold given in kfold list.
         for k in kfolds:
 
-            # Calculating Prediction Scores for the given Genre i.e. assuming that the
-            # rest genres being Negative examples
+            # Getting predicited classed per iteration.
             pc_per_iter = res_h5file.get_node(
-                params_path + '/KFold' + str(k), name='predicted_classes_per_iter').read()
-            # pc_per_iter = pc_per_iter[0:-2500]
-            # genre_tag = genre_tag[0:-2500]
-            gnr_pred_cnt = np.where(pc_per_iter == genre_tag, 1, 0)
+                params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
+            ).read()
 
-            fold_ps = np.sum(gnr_pred_cnt, axis=0) / np.float(pc_per_iter.shape[0])
-            PS_lst.append(fold_ps)
+            # Since it is a Binary case get the positive and negavtive scores. Then keeping...
+            # ...the postivie scores as the Predition scores.
+            gnr_pred_pos = np.where(pc_per_iter == genre_tag, 1, 0)
+            pos_ps = np.sum(gnr_pred_pos, axis=1) / np.float(pc_per_iter.shape[0])
 
-            #  Collecting the excepted tag values by conventing them first in binary form.
+            gnr_pred_neg = np.where(pc_per_iter == genre_tag, 0, 1)
+            neg_ps = np.sum(gnr_pred_neg, axis=1) / np.float(pc_per_iter.shape[0])
+
+            # Caclulating the predicions in 1-vs-All case. Calculating the Predicted Class...
+            # ...and the Sigma scores for each document.
+            pre_y = np.zeros_like(pos_ps)
+            pre_score = np.zeros_like(pos_ps)
+
+            for i, (ps, ns) in enumerate(zip(pos_ps, neg_ps)):
+
+                if ps > ns and ps >= sigma:
+
+                    pre_y[i] = 1.0
+                    pre_score[i] = ps
+
+                elif ns > ps and ns > sigma:
+
+                    pre_score[i] = ns
+
+                # else: let everythong to be Zero OR I might need to recosider it!
+
+            #  Predicted Y(s) and Prediction Scores has been calculated on the given Genre...
+            #  ...i.e. assuming that the rest genres being Negative examples,...
+            #  ...based on 'sigma' threshold.
+            PR_Y_lst.append(pre_y)
+
+            PS_lst.append(pre_score)
+
+            # Collecting the excepted tag values by conventing them first in binary form.
             exp_y = res_h5file.get_node(params_path + '/KFold' + str(k), name='expected_Y').read()
-            # exp_y = exp_y[0:-2500]
-
-            # # # # SOS - NEED TO BE TESTED AGAIN
-            EY_lst.append(exp_y)
+            EY_lst.append(np.where(exp_y == genre_tag, 1, 0))
 
     elif genre_tag is None:
 
         #  Collecting Scores for and Expected Values for every fold given in kfold list.
         for k in kfolds:
 
-            #  Loading predicted scores.
+            # Loading predicted scores.
             pre_score = res_h5file.get_node(
                 params_path + '/KFold' + str(k), name='predicted_scores'
             ).read()
 
-            #  Getting the Expected genre tags.
+            # Getting the Expected genre tags.
             exp_y = res_h5file.get_node(params_path + '/KFold' + str(k), name='expected_Y').read()
 
-            #  Getting the Expected genre tags.
+            # Getting the Expected genre tags.
             pre_y = res_h5file.get_node(params_path + '/KFold' + str(k), name='predicted_Y').read()
 
-            #  Making a stratified selection upon a specific group of the results.
+            # Making a stratified selection upon a specific group of the results.
             if strata:
 
                 gpr_idx = -strata[1]

@@ -24,13 +24,13 @@ def h5d_prereccon_table(h5d_fl1, h5d_fl2, kfolds, params_path, sigma,
     # Beginning Contingency table building
     if mix:
         rfse_data = get_predictions_mix(
-            h5d_fl1, h5d_fl2, kfolds, params_path, sigma,
+            h5d_fl1, h5d_fl2, kfolds, params_path, sigma=sigma,
             genre_tag=None, binary=False, strata=strata
         )
 
     else:
         rfse_data = get_predictions(
-            h5d_fl1, kfolds, params_path, genre_tag=None, binary=False, strata=strata
+            h5d_fl1, kfolds, params_path, sigma=sigma, genre_tag=None, binary=False, strata=strata
         )
 
     # 3rd element contain predicted y values list.

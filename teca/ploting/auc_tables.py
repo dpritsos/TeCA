@@ -37,14 +37,15 @@ def h5d_pr_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata, 
             if mix:
 
                 pred_scores, expd_y, pred_y = get_predictions_mix(
-                    h5d_fl1, h5d_fl2, kfolds, params_path, params_lst[2],
+                    h5d_fl1, h5d_fl2, kfolds, params_path, sigma=params_lst[2],
                     genre_tag=None, binary=is_ttbl, strata=strata
                 )
 
             else:
 
                 pred_scores, expd_y, pred_y = get_predictions(
-                    h5d_fl1, kfolds, params_path, genre_tag=None, binary=is_ttbl, strata=strata
+                    h5d_fl1, kfolds, params_path, sigma=params_lst[2],
+                    genre_tag=None, binary=is_ttbl, strata=strata
                 )
 
             if is_ttbl:
@@ -69,27 +70,69 @@ def h5d_pr_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata, 
                 # Finding unique genres.
                 gnr_tgs = np.unique(expd_y)
 
+                # Precsion and Recall scores lists of the PR curve per genre.
+                prec_lst = list()
+                recl_lst = list()
+
                 # Calculating AUC per genre tag.
                 for gnr in gnr_tgs:
 
+                    if mix:
+                        print 'OK'
+                        pred_scores, expd_y, pred_y = get_predictions_mix(
+                            h5d_fl1, h5d_fl2, kfolds, params_path, sigma=params_lst[2],
+                            genre_tag=gnr, binary=is_ttbl, strata=strata
+                        )
+
+                    else:
+
+                        pred_scores, expd_y, pred_y = get_predictions(
+                            h5d_fl1, kfolds, params_path, sigma=params_lst[2],
+                            genre_tag=gnr, binary=is_ttbl, strata=strata
+                        )
+
                     # Converting expected Y to binary format.
-                    expd_y_bin = np.where((expd_y == gnr), 1, 0)
+                    # expd_y_bin = np.where((expd_y == gnr), 1, 0)
 
-                    # NOTE:Option is_truth_tbl is critical to be selected correctly depending...
-                    # ...on the input.
-                    prec, recl, t = mx.pr_curve(
-                        expd_y_bin, pred_scores, full_curve=True, is_truth_tbl=is_ttbl
-                    )
+                    if np.sum(expd_y):
+                        print 'IN#1'
+                        # NOTE:Option is_truth_tbl is critical to be selected correctly depending...
+                        # ...on the input.
+                        prec, recl, t = mx.pr_curve(
+                            expd_y, pred_scores, full_curve=True, is_truth_tbl=is_ttbl
+                        )
 
-                    # Interpolated at 11-Recall-Levels.
-                    prec, recl = mx.reclev11_max(prec, recl, trec=trec)
+                        # Interpolated at 11-Recall-Levels.
+                        prec, recl = mx.reclev11_max(prec, recl, trec=trec)
 
-                    try:
-                        auc_values.append(auc(recl, prec))
-                    except:
-                        print "Warning:", params_path,\
-                            "PR AUC is for these params has setted to 0.0"
-                        auc_values.append(0.0)
+                        # Keeping Precsion and Recall scores of the PR curve per genre.
+                        prec_lst.append(prec)
+                        recl_lst.append(recl)
+
+                    # In case of Zero predictions for a Genre is occuring.
+                    else:
+                        print "IN"
+                        prec_lst.append(np.zeros((11), dtype=np.float))
+                        recl_lst.append(np.zeros((11), dtype=np.float))
+
+                # IT MIGHT BE HERE: Interpolated at 11-Recall-Levels.
+
+                # Calculating the PR Averaged Macro Curves values.
+                # print np.vstack(prec_lst)
+                prec_arr = np.mean(np.vstack(prec_lst), axis=0)
+                # print 'stack'
+                print prec_arr
+                # 0/0
+                recl_arr = np.mean(np.vstack(recl_lst), axis=0)
+
+
+
+                try:
+                    auc_values.append(auc(recl, prec))
+                except:
+                    print "Warning:", params_path,\
+                        "PR AUC is for these params has setted to 0.0"
+                    auc_values.append(0.0)
 
             # Extending parameters list with AUC(s).
             params_lst.extend(auc_values)
@@ -198,25 +241,7 @@ def h5d_roc_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata)
                     auc_values.append(0.0)
 
             else:
-
-                # Finding unique genres.
-                gnr_tgs = np.unique(expd_y)
-
-                # Calculating AUC per genre tag.
-                for gnr in gnr_tgs:
-
-                    # Converting expected Y to binary format.
-                    expd_y_bin = np.where((expd_y == gnr), 1, 0)
-
-                    # Calculating the ROC curve.
-                    tp_rate, fp_rate, uscor = mx.roc_curve(expd_y, pred_scores, full_curve=True)
-
-                    try:
-                        auc_values.append(auc(recl, prec))
-                    except:
-                        print "Warning:", params_path,\
-                            "ROC AUC is for these params has setted to 0.0"
-                        auc_values.append(0.0)
+                raise Exception("NOT WORKING YET!!!")
 
             # Extending parameters list with AUC(s).
             params_lst.extend(auc_values)

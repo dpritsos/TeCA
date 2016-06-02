@@ -102,12 +102,12 @@ if __name__ == '__main__':
             ])
 
             pr_aucz_var_table = h5d_pr_auc_table(
-                h5d_fl1, h5d_fl2, kfolds, param_od, mix, is_ttbl=True, strata=None, trec=False
+                h5d_fl1, h5d_fl2, kfolds, param_od, mix, is_ttbl=False, strata=None, trec=False
             )
 
-            roc_aucz_var_table = h5d_roc_auc_table(
-                h5d_fl1, h5d_fl2, kfolds, param_od, mix, is_ttbl=True, strata=None
-            )
+            # roc_aucz_var_table = h5d_roc_auc_table(
+            #     h5d_fl1, h5d_fl2, kfolds, param_od, mix, is_ttbl=True, strata=None
+            # )
 
             # This is Marco AUC where the Genre are not considered as Truth Table Case...
             # ...that is every AUC for every Genre is different then they all are macro-averaged.
@@ -132,7 +132,7 @@ if __name__ == '__main__':
 
             pr_auc = pr_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
 
-            roc_auc = roc_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
+            # roc_auc = roc_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
 
             # join_auc = 1
             # for a in m_aucz_var_table[0, 4::]:  # For RFSE is 4, for OCSVME 3
@@ -144,7 +144,7 @@ if __name__ == '__main__':
             #     m_auc_f1 = 0
 
             # Macro Averaging AUCs per Genre.
-            case.extend([macro_pr[0], macro_pr[1], roc_auc, pr_auc, f05, f1])
+            case.extend([macro_pr[0], macro_pr[1], pr_auc, f05, f1])
             # m_auc_f1, join_auc, auc, pr_mean, f05, f1
             pr_macro_lst.append(case)
 
@@ -171,7 +171,7 @@ if __name__ == '__main__':
     pr_macroavgs = np.vstack(pr_macro_lst)
 
     prnt_case_od = coll.OrderedDict([
-        ('critirion_idx', [-1, -2, -3, -4]),  # -5, -6, -8
+        ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
         ('dist', ['', 'MinMax', 'MIX']),  # 'MinMax', 'MIX'
         ('corpus', ['7Genres', 'KI04', 'SANTINIS']),
         ('doc_rep', ['3Words', '1Words', '4Chars'])

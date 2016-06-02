@@ -757,6 +757,31 @@ def bcubed_pr_curves(clsrts_arr, scrs_arr,
     """
     pass
 
+
+def openness(tn, ts, tg):
+    """ Returing the Openess Score.
+
+    Openness score based on the definision found in Scheirer2012 'Towards Open Set Recognition'
+
+    Arguments
+    ---------
+        tn: Training set size, i.e. number of classes/clusters known given for training.
+        ts: Test set size, i.e. number of classes/clusters known and unkown given for test.
+        tg: Target set szie, i.e. number of classes/clusters known.
+
+    Output
+    ------
+        The Openness Score.
+
+    """
+
+    tn = float(tn)
+    ts = float(ts)
+    tg = float(tg)
+
+    return 1 - np.sqrt((2*tn)/(ts+tg))
+
+
 # Pure Python Implementation
 class purepy(object):
 
