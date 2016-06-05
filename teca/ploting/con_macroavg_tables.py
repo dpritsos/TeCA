@@ -8,11 +8,10 @@ import tables as tb
 import numpy as np
 import collections as coll
 import base.param_combs as param_comb
-from prereccon_tables import h5d_prereccon_table
-from auc_tables import h5d_pr_auc_table, h5d_roc_auc_table
+from prconf_tables import PRConf_table
+from auc_tables import params_prauc_tables
 
-
-# One Run for all cases
+# Run for all cases
 if __name__ == '__main__':
 
     # Parameters used for the experiments required for selecting specific or group of results
@@ -84,9 +83,9 @@ if __name__ == '__main__':
             # print pr_tabel_fname
 
             # Calculating the tables
-            pr_table = h5d_prereccon_table(
+            pr_table = PRConf_table(
                 h5d_fl1, h5d_fl2, kfolds, params_path, mix,
-                strata=None, unknow_class=True, prereccon=1
+                strata=None, unknown_class=True, prereccon=1
             )
 
             # print pr_table
@@ -101,8 +100,9 @@ if __name__ == '__main__':
                 ('Iterations', [case[6]])  #
             ])
 
-            pr_aucz_var_table = h5d_pr_auc_table(
-                h5d_fl1, h5d_fl2, kfolds, param_od, mix, is_ttbl=False, strata=None, trec=False
+            pr_aucz_var_table = params_prauc_tables(
+                h5d_fl1, h5d_fl2, 'multiclass_macro', kfolds, param_od, mix,
+                strata=None, trec=False, unknown_class=True
             )
 
             # roc_aucz_var_table = h5d_roc_auc_table(

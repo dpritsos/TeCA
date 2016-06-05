@@ -220,50 +220,10 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
     return precision, recall, np.unique(scr_arr)
 
 
-def pr_curve_macro(pre_y, exp_y, scrz, unknow_class=False, full_curve=False, arr_type=np.float32):
+def pr_curve_macro(pre_y, exp_y, scrz, unknown_class=False, full_curve=False, arr_type=np.float32):
     """Precision-Recall (PR) curves.
 
-    Returns the Precision-Recall curve given the truth table, i.e. the binary real labels of the
-    samples and the scores/probabilities returned by the classifier, either as final result or in
-    an indeterminate stage of the classification/prediction.
-
-    This algorithm has been developed for exploiting the monotonicity of the curve,
-    i.e. any instance that is classified positive with respect to a given threshold will be
-    classified positive for all lower thresholds as well. Therefore, we can simply sort the test
-    instances decreasing by f scores and move down the list, processing one instance at a time and
-    updating TP as we go. In this way an PR graph can be created from a linear scan. Following the
-    same line of thought as the algorithm is described for ROC curves which has been cited in
-    "ROC Graphs: Notes and Practical Considerations for Researchers" by Tom Fawcett.
-
-    Input arguments:
-
-        trh_arr: The binary REAL LABLES array, i.e. the real classes of the samples
-            has been given to the Classifier.
-            (*)Alternatively, given the flag is_truth_tbl == True the trh_arr can be the
-            TRUTH TABLE of predictions, i.e. that is the results of Expected Y == Predicted Y.
-            Valid values:  +1 for positive samples.
-                            0 or -1 for negative samples.
-            arr_type: (optional) user-defined arrays type. default numpy.flaot32
-
-        scr_arr: The Classifier's returning scores/probabilities array for samples
-            being positive.
-
-        full_curve: Expected values are {0,1} or {True, False}:
-            If its values is 1 or True it will return a point for every input score in scr_arr.
-            If its values is 0 or False it will return a point for only the unique input scores,
-            i.e. numpy.unique(scr_arr) returning values.
-
-        is_truth_tbl: This flag indicates whether the positive sum will be the one given form the
-            Ground Truth or it will be equal to the length of the trh_arr (when this is a Truth
-            Table of precisions).
-
-    Output:
-
-        precision: Precision values array.
-        recall: Recall values array (equivalent to the True positive rate) .
-        tp_rate: False positive rate values array.
-        unique_scores: Unique Scores from scr_arr argument. These values are the thresholds
-            where new points in PR curve where added.
+    ??????????????????????????????????????????????
 
     """
 
@@ -293,7 +253,7 @@ def pr_curve_macro(pre_y, exp_y, scrz, unknow_class=False, full_curve=False, arr
     cls_num = len(np.unique(exp_y))
 
     # Getting the number of samples per class.
-    if unknow_class:
+    if unknown_class: #OOOOOOOOOOOOOOOOOOOOOOOOOOOOPPPPPPPPPPPPPPPPPPPPPPPSSSSSSSSSSSSSSSSSSSSSS
         smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))
     else:
         smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))[1::]
@@ -304,7 +264,7 @@ def pr_curve_macro(pre_y, exp_y, scrz, unknow_class=False, full_curve=False, arr
         doc_cnt += 1.0
 
         conf_mtrx = contingency_table(
-            exp_y[:i+1], pre_y[:i+1], unknow_class=unknow_class, arr_type=arr_type
+            exp_y[:i+1], pre_y[:i+1], unknown_class=unknown_class, arr_type=arr_type
         )
 
         if scr != last_scr or full_curve:
@@ -319,8 +279,9 @@ def pr_curve_macro(pre_y, exp_y, scrz, unknow_class=False, full_curve=False, arr
             )
 
             # Calculating Macro-Recall.
+            print np.diag(conf_mtrx), smpls_per_cls
             recall.append(
-                np.sum(np.diag(conf_mtrx) / smpls_per_cls)/cls_num
+                np.sum(np.diag(conf_mtrx) / smpls_per_cls) / cls_num
             )
 
     # Append last point if not already
@@ -698,7 +659,7 @@ def reclev11_max(P, R, rcl_tuple=(0.0, 1.1, 0.1), trec=True):
     return max_P, R_Levels
 
 
-def contingency_table(expd_y, pred_y, unknow_class=False, arr_type=np.float32):
+def contingency_table(expd_y, pred_y, unknown_class=False, arr_type=np.float32):
     """Contingency table building the function.
 
     It takes the expected Y and the predicted Y values of a Classifier and it is returning the
@@ -715,10 +676,10 @@ def contingency_table(expd_y, pred_y, unknow_class=False, arr_type=np.float32):
         red_y: is the numpy.array or python list contains the instance prediction of the
             classifier.
 
-        unknow_class: (optional) defines whether 0 index in contingency table will be considered as
+        unknown_class: (optional) defines whether 0 index in contingency table will be considered as
             unknown class irrespectively of its occurrence into the expected tags list and any
-            class tag not given to the expected tag list will be considered as unknown class
-            (0 index), too.
+            class tag not given to the expected tag list will also be considered as unknown class
+            (0 index).
 
         arr_type: (optional) user-defined arrays type. default numpy.flaot32
 
@@ -735,12 +696,12 @@ def contingency_table(expd_y, pred_y, unknow_class=False, arr_type=np.float32):
         raise Exception(
             "Input arguments length inconsistency: expd_y and pred_y must have the same length.")
 
-    if not unknow_class and not (set(pred_y) & set(expd_y) == set(pred_y)):
+    if not unknown_class and not (set(pred_y) & set(expd_y) == set(pred_y)):
         raise Exception(
             "Predicted Y(s) tags list contains values not valid in expected Y(s) list tags.")
 
     uncl = 0
-    if unknow_class:
+    if unknown_class:
 
         unknow_class_tags_idxs = np.where((pred_y == expd_y) == False)
 
