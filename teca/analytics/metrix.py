@@ -220,6 +220,129 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
     return precision, recall, np.unique(scr_arr)
 
 
+def pr_curve_macro(pre_y, exp_y, scrz, unknow_class=False, full_curve=False, arr_type=np.float32):
+    """Precision-Recall (PR) curves.
+
+    Returns the Precision-Recall curve given the truth table, i.e. the binary real labels of the
+    samples and the scores/probabilities returned by the classifier, either as final result or in
+    an indeterminate stage of the classification/prediction.
+
+    This algorithm has been developed for exploiting the monotonicity of the curve,
+    i.e. any instance that is classified positive with respect to a given threshold will be
+    classified positive for all lower thresholds as well. Therefore, we can simply sort the test
+    instances decreasing by f scores and move down the list, processing one instance at a time and
+    updating TP as we go. In this way an PR graph can be created from a linear scan. Following the
+    same line of thought as the algorithm is described for ROC curves which has been cited in
+    "ROC Graphs: Notes and Practical Considerations for Researchers" by Tom Fawcett.
+
+    Input arguments:
+
+        trh_arr: The binary REAL LABLES array, i.e. the real classes of the samples
+            has been given to the Classifier.
+            (*)Alternatively, given the flag is_truth_tbl == True the trh_arr can be the
+            TRUTH TABLE of predictions, i.e. that is the results of Expected Y == Predicted Y.
+            Valid values:  +1 for positive samples.
+                            0 or -1 for negative samples.
+            arr_type: (optional) user-defined arrays type. default numpy.flaot32
+
+        scr_arr: The Classifier's returning scores/probabilities array for samples
+            being positive.
+
+        full_curve: Expected values are {0,1} or {True, False}:
+            If its values is 1 or True it will return a point for every input score in scr_arr.
+            If its values is 0 or False it will return a point for only the unique input scores,
+            i.e. numpy.unique(scr_arr) returning values.
+
+        is_truth_tbl: This flag indicates whether the positive sum will be the one given form the
+            Ground Truth or it will be equal to the length of the trh_arr (when this is a Truth
+            Table of precisions).
+
+    Output:
+
+        precision: Precision values array.
+        recall: Recall values array (equivalent to the True positive rate) .
+        tp_rate: False positive rate values array.
+        unique_scores: Unique Scores from scr_arr argument. These values are the thresholds
+            where new points in PR curve where added.
+
+    """
+
+    # Checking the expected values (True/False) for 'full_curve' argument
+    if not isinstance(full_curve, bool) and full_curve not in [0, 1]:
+        raise Exception("full_curve argument expected values are: Only {0,1} or {True,False}.")
+
+    # In place conversion of numerical type in case the input is in integer.
+    exp_y = exp_y.astype(arr_type, copy=False)
+    pre_y = pre_y.astype(arr_type, copy=False)
+    scrz = scrz.astype(arr_type, copy=False)
+
+    # Initialising True Positive and False Positive rates.
+    precision = list()
+    recall = list()
+
+    # Appending fist fixed point (x, y) = (0, 1).
+    # This point might be a duplicate in best case or misleading in worst case.
+    precision.append(1.0)
+    recall.append(0.0)
+
+    # Initialising last score and document counter.
+    last_scr = -1
+    doc_cnt = 0.0
+
+    # Getting the number of classes.
+    cls_num = len(np.unique(exp_y))
+
+    # Getting the number of samples per class.
+    if unknow_class:
+        smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))
+    else:
+        smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))[1::]
+
+    # Building the PR curve
+    for i, scr in enumerate(scrz):
+
+        doc_cnt += 1.0
+
+        conf_mtrx = contingency_table(
+            exp_y[:i+1], pre_y[:i+1], unknow_class=unknow_class, arr_type=arr_type
+        )
+
+        if scr != last_scr or full_curve:
+
+            # Calculating Macro-Precision.
+            precision.append(
+                np.sum(
+                    [dg/float(pred_docs)
+                        for dg, pred_docs in zip(np.diag(conf_mtrx), np.sum(conf_mtrx, axis=1))
+                        if pred_docs > 0]
+                )/doc_cnt
+            )
+
+            # Calculating Macro-Recall.
+            recall.append(
+                np.sum(np.diag(conf_mtrx) / smpls_per_cls)/cls_num
+            )
+
+    # Append last point if not already
+    precision.append(
+        np.sum(
+            [dg/float(pred_docs)
+                for dg, pred_docs in zip(np.diag(conf_mtrx), np.sum(conf_mtrx, axis=1))
+                if pred_docs > 0]
+        )/doc_cnt
+    )
+    recall.append(
+        np.sum(np.diag(conf_mtrx) / smpls_per_cls)/cls_num
+    )
+
+    # Converting Precision and Recall lists to numpy.arrays
+    precision = np.array(precision, dtype=arr_type)
+    recall = np.array(recall, dtype=arr_type)
+
+    # Returning the ROC curve
+    return precision, recall, np.unique(scrz)
+
+
 def auc(x, y, is_zcc=True, arr_type=np.float32):
     """Area Under the Curve (AUC).
 

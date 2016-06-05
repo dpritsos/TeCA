@@ -85,8 +85,8 @@ if __name__ == '__main__':
 
             # Calculating the tables
             pr_table = h5d_prereccon_table(
-                h5d_fl1, h5d_fl2, kfolds, params_path, case[5], mix, strata=None,
-                unknow_class=True, prereccon=1
+                h5d_fl1, h5d_fl2, kfolds, params_path, mix,
+                strata=None, unknow_class=True, prereccon=1
             )
 
             # print pr_table

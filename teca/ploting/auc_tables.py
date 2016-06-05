@@ -8,8 +8,7 @@ import collections as coll
 sys.path.append('../../teca')
 sys.path.append('../../../DoGSWrapper/dogswrapper')
 
-from data_retrieval.rfsedata import get_predictions
-from data_retrieval.rfsemixdata import get_predictions as get_predictions_mix
+from data_retrieval.rfsedata import multiclass_multimeasure_res, multiclass_res, onevsall_res, onevsall_multimeasure_res
 import base.param_combs as param_comb
 import analytics.metrix as mx
 
@@ -36,16 +35,14 @@ def h5d_pr_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata, 
 
             if mix:
 
-                pred_scores, expd_y, pred_y = get_predictions_mix(
-                    h5d_fl1, h5d_fl2, kfolds, params_path, sigma=params_lst[2],
-                    genre_tag=None, binary=is_ttbl, strata=strata
+                pred_scores, expd_y, pred_y = multiclass_multimeasure_res(
+                    h5d_fl1, h5d_fl2, kfolds, params_path, binary=is_ttbl, strata=strata
                 )
 
             else:
 
-                pred_scores, expd_y, pred_y = get_predictions(
-                    h5d_fl1, kfolds, params_path, sigma=params_lst[2],
-                    genre_tag=None, binary=is_ttbl, strata=strata
+                pred_scores, expd_y, pred_y = multiclass_res(
+                    h5d_fl1, kfolds, params_path, binary=is_ttbl, strata=strata
                 )
 
             if is_ttbl:
@@ -78,57 +75,41 @@ def h5d_pr_auc_table(h5d_fl1, h5d_fl2, kfolds, params_od, mix, is_ttbl, strata, 
                 for gnr in gnr_tgs:
 
                     if mix:
-                        print 'OK'
-                        pred_scores, expd_y, pred_y = get_predictions_mix(
-                            h5d_fl1, h5d_fl2, kfolds, params_path, sigma=params_lst[2],
-                            genre_tag=gnr, binary=is_ttbl, strata=strata
+
+                        pred_scores, expd_y, pred_y = onevsall_multimeasure_res(
+                            h5d_fl1, h5d_fl2, gnr, kfolds, params_path
                         )
 
                     else:
 
-                        pred_scores, expd_y, pred_y = get_predictions(
-                            h5d_fl1, kfolds, params_path, sigma=params_lst[2],
-                            genre_tag=gnr, binary=is_ttbl, strata=strata
+                        pred_scores, expd_y, pred_y = onevsall_res(
+                            h5d_fl1, gnr, kfolds, params_path
                         )
 
                     # Converting expected Y to binary format.
                     # expd_y_bin = np.where((expd_y == gnr), 1, 0)
 
-                    if np.sum(expd_y):
-                        print 'IN#1'
-                        # NOTE:Option is_truth_tbl is critical to be selected correctly depending...
-                        # ...on the input.
-                        prec, recl, t = mx.pr_curve(
-                            expd_y, pred_scores, full_curve=True, is_truth_tbl=is_ttbl
-                        )
+                    # NOTE:Option is_truth_tbl is critical to be selected correctly depending...
+                    # ...on the input.
+                    prec, recl, t = mx.pr_curve_macro(
+                        expd_y, pred_y, pred_scores, full_curve=True, unknow_class=False
+                    )
 
-                        # Interpolated at 11-Recall-Levels.
-                        prec, recl = mx.reclev11_max(prec, recl, trec=trec)
+                    # Interpolated at 11-Recall-Levels.
+                    prec, recl = mx.reclev11_max(prec, recl, trec=trec)
 
-                        # Keeping Precsion and Recall scores of the PR curve per genre.
-                        prec_lst.append(prec)
-                        recl_lst.append(recl)
-
-                    # In case of Zero predictions for a Genre is occuring.
-                    else:
-                        print "IN"
-                        prec_lst.append(np.zeros((11), dtype=np.float))
-                        recl_lst.append(np.zeros((11), dtype=np.float))
+                    # Keeping Precsion and Recall scores of the PR curve per genre.
+                    prec_lst.append(prec)
+                    recl_lst.append(recl)
 
                 # IT MIGHT BE HERE: Interpolated at 11-Recall-Levels.
 
                 # Calculating the PR Averaged Macro Curves values.
-                # print np.vstack(prec_lst)
                 prec_arr = np.mean(np.vstack(prec_lst), axis=0)
-                # print 'stack'
-                print prec_arr
-                # 0/0
                 recl_arr = np.mean(np.vstack(recl_lst), axis=0)
 
-
-
                 try:
-                    auc_values.append(auc(recl, prec))
+                    auc_values.append(mx.auc(recl_arr, prec_arr))
                 except:
                     print "Warning:", params_path,\
                         "PR AUC is for these params has setted to 0.0"

@@ -7,14 +7,13 @@ sys.path.append('../../../DoGSWrapper/dogswrapper')
 import tables as tb
 import numpy as np
 import collections as coll
-from data_retrieval.rfsedata import get_predictions
-from data_retrieval.rfsemixdata import get_predictions as get_predictions_mix
+from data_retrieval.rfsedata import multiclass_multimeasure_res, multiclass_res, onevsall_res, onevsall_multimeasure_res
 import base.param_combs as param_comb
 import analytics.metrix as mx
 
 
-def h5d_prereccon_table(h5d_fl1, h5d_fl2, kfolds, params_path, sigma,
-                      mix, strata, unknow_class, prereccon=0):
+def h5d_prereccon_table(h5d_fl1, h5d_fl2, kfolds, params_path, mix,
+                        strata, unknow_class, prereccon=0):
     """Precision Recall Tables and Contigency tables from H5D files.
 
         ### Make proper Definition here ###
@@ -23,14 +22,13 @@ def h5d_prereccon_table(h5d_fl1, h5d_fl2, kfolds, params_path, sigma,
 
     # Beginning Contingency table building
     if mix:
-        rfse_data = get_predictions_mix(
-            h5d_fl1, h5d_fl2, kfolds, params_path, sigma=sigma,
-            genre_tag=None, binary=False, strata=strata
+        rfse_data = multiclass_multimeasure_res(
+            h5d_fl1, h5d_fl2, kfolds, params_path, binary=False, strata=strata
         )
 
     else:
-        rfse_data = get_predictions(
-            h5d_fl1, kfolds, params_path, sigma=sigma, genre_tag=None, binary=False, strata=strata
+        rfse_data = multiclass_res(
+            h5d_fl1, kfolds, params_path, binary=False, strata=strata
         )
 
     # 3rd element contain predicted y values list.
