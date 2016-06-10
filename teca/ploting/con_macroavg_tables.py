@@ -19,13 +19,13 @@ if __name__ == '__main__':
 
     case_od = coll.OrderedDict([
         ('doc_rep', ['3Words', '1Words', '4Chars']),
-        ('corpus', ['7Genres', 'KI04', 'SANTINIS']),  #
-        ('dist', ['', 'MinMax', 'MIX']),  # 'MinMax', 'MIX'
-        ('vocab_size', [5000, 10000, 50000, 100000]),  #
-        ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),  #
+        ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('dist', ['', 'MinMax', 'MIX']),
+        ('vocab_size', [5000, 10000, 50000, 100000]),
+        ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),
         # ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
-        ('Sigma', [0.5, 0.7, 0.9]),  #
-        ('Iterations', [10, 50, 100])  #
+        ('Sigma', [0.5, 0.7, 0.9]),
+        ('Iterations', [10, 50, 100])
     ])
 
     # List of all macro averaging precision recall values.
@@ -78,20 +78,9 @@ if __name__ == '__main__':
             # conf_mtrx_fname = conf_mtrx_fname.replace('0.', '0')
             # conf_mtrx_fname = conf_mtrx_fname + '.csv'
 
-            # Reformationg parametera path to be given properly to the h5d_pre_rec_table function.
-            params_path = '/' + '/'.join(case_path.split('/')[4::])
-            # print pr_tabel_fname
+            # ### Calculating the PR Curves ###
 
-            # Calculating the tables
-            pr_table = PRConf_table(
-                h5d_fl1, h5d_fl2, kfolds, params_path, mix,
-                strata=None, unknown_class=True, prereccon=1
-            )
-
-            # print pr_table
-            # 0/0
-
-            # Preparing input for h5d_auc_table().
+            # Preparing input for params_prauc_tables().
             param_od = coll.OrderedDict([
                 ('vocab_size', [case[3]]),
                 ('features_size', [case[4]]),
@@ -105,17 +94,18 @@ if __name__ == '__main__':
                 strata=None, trec=False, unknown_class=True
             )
 
-            # roc_aucz_var_table = h5d_roc_auc_table(
-            #     h5d_fl1, h5d_fl2, kfolds, param_od, mix, is_ttbl=True, strata=None
-            # )
+            # ### Calculating Marco Averaging of Precision, Recall, F1, F0.5 ###
 
-            # This is Marco AUC where the Genre are not considered as Truth Table Case...
-            # ...that is every AUC for every Genre is different then they all are macro-averaged.
-            # m_aucz_var_table = h5d_auc_table(
-            #     h5d_fl1, h5d_fl2, kfolds, param_od, mix, is_ttbl=False, strata=None
-            # )
+            # Reformationg parametera path to be given properly to PRConf_table().
+            params_path = '/' + '/'.join(case_path.split('/')[4::])
+            # print pr_tabel_fname
 
-            # Calculating Marco Averaging of Precision and Recall.
+            # Calculating the tables
+            pr_table = PRConf_table(
+                h5d_fl1, h5d_fl2, kfolds, params_path, mix,
+                strata=None, unknown_class=True, prereccon=1
+            )
+
             pr_table[np.where(np.isnan(pr_table))] = 0  # Only for OCSVME
             macro_pr = np.mean(pr_table, axis=0)
             macro_pr[np.where(np.isnan(macro_pr))] = 0
@@ -172,7 +162,7 @@ if __name__ == '__main__':
 
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
-        ('dist', ['', 'MinMax', 'MIX']),  # 'MinMax', 'MIX'
+        ('dist', ['', 'MinMax', 'MIX']),
         ('corpus', ['7Genres', 'KI04', 'SANTINIS']),
         ('doc_rep', ['3Words', '1Words', '4Chars'])
     ])
