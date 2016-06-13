@@ -1,15 +1,18 @@
 # !/usr/bin/env python
 
 import sys
-sys.path.append('../../teca')
-sys.path.append('../../../DoGSWrapper/dogswrapper')
-
 import tables as tb
 import numpy as np
 import collections as coll
+import time as tm
+import json
+sys.path.append('../../teca')
+sys.path.append('../../../DoGSWrapper/dogswrapper')
+
 import base.param_combs as param_comb
 from prconf_tables import PRConf_table
 from auc_tables import params_prauc_tables
+
 
 # Run for all cases
 if __name__ == '__main__':
@@ -19,7 +22,7 @@ if __name__ == '__main__':
 
     case_od = coll.OrderedDict([
         ('doc_rep', ['3Words', '1Words', '4Chars']),
-        ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('corpus', ['7Genres']),  # , 'SANTINIS', 'KI04', '7Genres'
         ('dist', ['', 'MinMax', 'MIX']),
         ('vocab_size', [5000, 10000, 50000, 100000]),
         ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),
@@ -36,6 +39,9 @@ if __name__ == '__main__':
                                param_comb.ParamGridIter(case_od, 'path')):
 
         if case[3] > case[4]:
+
+            # Starting timing for this loop for monitoring the cosuption of the socre calculations.
+            start_tm = tm.time()
 
             # Selecting filepath
             if case[1] == '7Genres':
@@ -67,16 +73,6 @@ if __name__ == '__main__':
             else:
                 h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
                 h5d_fl2 = h5d_fl1
-
-            # Defining save file name
-            # conf_mtrx_fname = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/' + \
-            #     'Journal_IPM-Elsevier/tables_data/Confusion_tables/Conf_'
-
-            # conf_mtrx_fname = conf_mtrx_fname + '_'.join(case[0:3]) + \
-            #     '_pset(' + ','.join([str(i) for i in case[3::]]) + ')'
-            # conf_mtrx_fname = conf_mtrx_fname.replace('__', '_Cos_')  #  _Cos_ OCSVME
-            # conf_mtrx_fname = conf_mtrx_fname.replace('0.', '0')
-            # conf_mtrx_fname = conf_mtrx_fname + '.csv'
 
             # ### Calculating the PR Curves ###
 
@@ -138,6 +134,11 @@ if __name__ == '__main__':
             # m_auc_f1, join_auc, auc, pr_mean, f05, f1
             pr_macro_lst.append(case)
 
+            # Printing the case and the time cosumed for calculation.
+            print case
+            timel = tm.gmtime(tm.time() - start_tm)[3:6] + ((tm.time() - int(start_tm))*1000,)
+            print "Time elapsed : %d:%d:%d:%d" % timel
+
             # print pr_macro_lst
 
             # Saving tables
@@ -157,49 +158,55 @@ if __name__ == '__main__':
             else:
                 h5d_fl1.close()
 
-    # Getting macro averaged P, R, F1, F05
+    # Getting the macro averaged P, R, F1, F05
     pr_macroavgs = np.vstack(pr_macro_lst)
 
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
         ('dist', ['', 'MinMax', 'MIX']),
-        ('corpus', ['7Genres', 'KI04', 'SANTINIS']),
+        ('corpus', ['7Genres']),  # , 'KI04', 'SANTINIS'
         ('doc_rep', ['3Words', '1Words', '4Chars'])
     ])
 
-    for idx, dm, cr, dr in param_comb.ParamGridIter(prnt_case_od, 'list'):
+    # Saving Resaults to the following file.
+    with open('/home/dimitrios/MaxScore_Resaults_7Genre.txt', 'w') as score_sf:
 
-        # Getting Combination.
-        selctd_rows = pr_macroavgs[
-            np.where(
-                (pr_macroavgs[:, 0] == dr) &
-                (pr_macroavgs[:, 1] == cr) &
-                (pr_macroavgs[:, 2] == dm)
-            )
-        ]
+        for idx, dm, cr, dr in param_comb.ParamGridIter(prnt_case_od, 'list'):
 
-        # Printing... for f1 = -1 idx, f05 = -2 idx, auc = -4 idx
+            # Getting Combination.
+            selctd_rows = pr_macroavgs[
+                np.where(
+                    (pr_macroavgs[:, 0] == dr) &
+                    (pr_macroavgs[:, 1] == cr) &
+                    (pr_macroavgs[:, 2] == dm)
+                )
+            ]
 
-        print
+            # Printing... for f1 = -1 idx, f05 = -2 idx, auc = -4 idx
 
-        if idx == -1:
-            print "F1"
-        elif idx == -2:
-            print "F0.5"
-        elif idx == -3:
-            print "PR AUC"
-        elif idx == -4:
-            print "ROC AUC"
-        elif idx == -5:
-            print "Mean"
-        elif idx == -6:
-            print "Marco JoinP AUCs / GeoMean"
-        elif idx == -7:
-            print "Marco AUCs JP F1"
-        elif idx == -8:
-            print "Precision"
+            if idx == -1:
+                score_sf.write("F1 ")
+            elif idx == -2:
+                score_sf.write("F0.5 ")
+            elif idx == -3:
+                score_sf.write("PR AUC ")
+            elif idx == -4:
+                score_sf.write("ROC AUC ")
+            elif idx == -5:
+                score_sf.write("Mean ")
+            elif idx == -6:
+                score_sf.write("Marco JoinP AUCs / GeoMean ")
+            elif idx == -7:
+                score_sf.write("Marco AUCs JP F1 ")
+            elif idx == -8:
+                score_sf.write("Precision ")
 
-        # Printing Optimal.
-        values_float_array = np.array(selctd_rows[:, idx], dtype=np.float64)
-        opt_idx = np.argmax(values_float_array)
-        print selctd_rows[opt_idx, :]
+            # Printing Optimal.
+            values_float_array = np.array(selctd_rows[:, idx], dtype=np.float64)
+            try:
+                opt_idx = np.argmax(values_float_array)
+                json.dump(fp=score_sf, obj=list(selctd_rows[opt_idx, :]))
+                score_sf.write("\n")
+            except:
+                score_sf.write("Empty Array\n")
+                print "Empty Array"
