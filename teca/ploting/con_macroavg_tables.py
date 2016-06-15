@@ -96,21 +96,24 @@ if __name__ == '__main__':
             params_path = '/' + '/'.join(case_path.split('/')[4::])
             # print pr_tabel_fname
 
-            # Calculating the tables
-            pr_table = PRConf_table(
+            # Calculating the Precision and Recall Scores per Genre. Precision for a Genre is...
+            # ...only calculated when there is at least one sample being counted for this Genre.
+            pre_cls_vect, rcl_cls_vect = PRConf_table(
                 h5d_fl1, h5d_fl2, kfolds, params_path, mix,
                 strata=None, unknown_class=True, prereccon=1
             )
 
-            pr_table[np.where(np.isnan(pr_table))] = 0  # Only for OCSVME
-            macro_pr = np.mean(pr_table, axis=0)
-            macro_pr[np.where(np.isnan(macro_pr))] = 0
+            # NOTE: The Precision and Recall vectors of scores per Genre might not have the same...
+            # ...leght due to Unknown_Class tag expected or not expected case or just because...
+            # ...for some Class we have NO Predicitons at all.
+            macro_p = np.mean(pre_cls_vect)
+            macro_r = np.mean(rcl_cls_vect)
 
-            f1 = 2.0 * macro_pr[0]*macro_pr[1] / (macro_pr[0]+macro_pr[1])
+            f1 = 2.0 * macro_p*macro_r / (macro_p+macro_r)
             if np.isnan(f1):
                 f1 = 0
 
-            f05 = 1.25 * macro_pr[0]*macro_pr[1] / (0.25*macro_pr[0]+macro_pr[1])
+            f05 = 1.25 * macro_p*macro_r / (0.25*macro_p+macro_r)
             if np.isnan(f05):
                 f05 = 0
 
@@ -130,7 +133,7 @@ if __name__ == '__main__':
             #     m_auc_f1 = 0
 
             # Macro Averaging AUCs per Genre.
-            case.extend([macro_pr[0], macro_pr[1], pr_auc, f05, f1])
+            case.extend([macro_p, macro_r, pr_auc, f05, f1])
             # m_auc_f1, join_auc, auc, pr_mean, f05, f1
             pr_macro_lst.append(case)
 
@@ -164,12 +167,12 @@ if __name__ == '__main__':
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
         ('dist', ['', 'MinMax', 'MIX']),
-        ('corpus', ['7Genres']),  # , 'KI04', 'SANTINIS'
+        ('corpus', ['7Genres']),  # , 'KI04', 'SANTINIS', 7Genres
         ('doc_rep', ['3Words', '1Words', '4Chars'])
     ])
 
     # Saving Resaults to the following file.
-    with open('/home/dimitrios/MaxScore_Resaults_7Genre.txt', 'w') as score_sf:
+    with open('/home/dimitrios/MaxScore_Resaults_SANTINIS.txt', 'w') as score_sf:
 
         for idx, dm, cr, dr in param_comb.ParamGridIter(prnt_case_od, 'list'):
 

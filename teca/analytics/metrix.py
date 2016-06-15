@@ -146,7 +146,7 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
     Output:
 
         precision: Precision values array.
-        recall: Recall values array (equivalent to the True positive rate) .
+        recall: Recall values array (equivalent to the True positive rate).
         tp_rate: False positive rate values array.
         unique_scores: Unique Scores from scr_arr argument. These values are the thresholds
             where new points in PR curve where added.
@@ -221,49 +221,42 @@ def pr_curve(trh_arr, scr_arr, full_curve=False, is_truth_tbl=False, arr_type=np
 
 
 def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, arr_type=np.float32):
-    """Macro Precision-Recall (PR) curves.
+    """Macro Precision-Recall (PR) curves for Multi-Class classification algorithms' output.
 
     Returns the Macro Precision-Recall curve of an multiclass classfication algorithm's outpout.
-    The
-    samples and the scores/probabilities returned by the classifier, either as final result or in
-    an indeterminate stage of the classification/prediction.
-
+    This algorithm is calcilating the Contigency-table (Confusion matrix) for all the classifier's
+    predicitons up to the current sample's predictions where the score for the prediciton changes.
+    However, it is possible given the full_curve agument equal to True value, to get the
+    Macro-Precision and the Macro-Recall for every sample irrespectively of the prediction scores.
     This algorithm has been developed for exploiting the monotonicity of the curve,
     i.e. any instance that is classified positive with respect to a given threshold will be
-    classified positive for all lower thresholds as well. Therefore, we can simply sort the test
-    instances decreasing by f scores and move down the list, processing one instance at a time and
-    updating TP as we go. In this way an PR graph can be created from a linear scan. Following the
-    same line of thought as the algorithm is described for ROC curves which has been cited in
-    "ROC Graphs: Notes and Practical Considerations for Researchers" by Tom Fawcett.
-
+    classified positive for all lower thresholds as well.
     Input arguments:
 
-        trh_arr: The binary REAL LABLES array, i.e. the real classes of the samples
-            has been given to the Classifier.
-            (*)Alternatively, given the flag is_truth_tbl == True the trh_arr can be the
-            TRUTH TABLE of predictions, i.e. that is the results of Expected Y == Predicted Y.
-            Valid values:  +1 for positive samples.
-                            0 or -1 for negative samples.
-            arr_type: (optional) user-defined arrays type. default numpy.flaot32
+        exp_y: A vector of the Multi-Class tags expected for each sample. Zero (0) is not permited
+            because it is used when unknon-class case is enabled in the seq_contingency_table()
+            function which is used for calculating the contigency table while the preidction
+            are given sequentialy.
 
-        scr_arr: The Classifier's returning scores/probabilities array for samples
-            being positive.
+        pre_y: A vector of Multi-Class tags predicted for each sample by the classifier.
+
+        scrz: A vector of scores (similarity, certainty, etc.) predicted for each sample
+            by the classifier.
+
+        unknown_class: Enabling the case a unknow-class predicion being a valid prediction.
+            *default value is: False
 
         full_curve: Expected values are {0,1} or {True, False}:
-            If its values is 1 or True it will return a point for every input score in scr_arr.
+            If its values is 1 or True it will return a point for every input score in scrz.
             If its values is 0 or False it will return a point for only the unique input scores,
-            i.e. numpy.unique(scr_arr) returning values.
-
-        is_truth_tbl: This flag indicates whether the positive sum will be the one given form the
-            Ground Truth or it will be equal to the length of the trh_arr (when this is a Truth
-            Table of precisions).
+            i.e. numpy.unique(scrz) returning values.
 
     Output:
 
-        precision: Precision values array.
-        recall: Recall values array (equivalent to the True positive rate) .
+        precision: Macro Precision values array.
+        recall: Macro Recall values array.
         tp_rate: False positive rate values array.
-        unique_scores: Unique Scores from scr_arr argument. These values are the thresholds
+        unique_scores: Unique Scores from scrz argument. These values are the thresholds
             where new points in PR curve where added.
 
     """
@@ -288,10 +281,9 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
 
     # Initialising last score and document counter.
     last_scr = -1
-    # doc_cnt = 0.0
 
-    # Getting the number of classes.
-    cls_num = len(np.unique(exp_y))
+    # Getting the number of expected classes.
+    exp_cls_num = np.unique(exp_y).shape[0]
 
     # Getting the number of samples per class. If unknown class case is permted then 0 bincount...
     # ...is taken into account!
@@ -305,19 +297,19 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
 
         # doc_cnt += 1.0
 
-        # Getting the class tags occured so far. The tags will be used as indeces for selecting...
-        # ...the classes participating in the Recall scores calculation, thus in must be aligned...
-        # ...based on the unknown_class option.
-        crnt_ctgs = np.array(np.unique(exp_y[:i+1]), dtype=np.int)
-        if not unknown_class:
-            crnt_ctgs = crnt_ctgs - 1
-        crnt_cls_num = len(crnt_ctgs)
+        # Getting the class tags predicted so far.
+        crnt_prtgs = np.array(np.unique(pre_y[:i+1]), dtype=np.int)
+        crnt_prcls_num = crnt_prtgs.shape[0]
 
         conf_mtrx = seq_contingency_table(
-            exp_y[:i+1], pre_y[:i+1], expd_cls_num=cls_num, unknown_class=unknown_class, arr_type=arr_type
+            exp_y[:i+1], pre_y[:i+1], expd_cls_num=exp_cls_num,
+            unknown_class=unknown_class, arr_type=arr_type
         )
 
         if scr != last_scr or full_curve:
+
+            # print conf_mtrx, np.sum(conf_mtrx, axis=1),
+            # print exp_cls_num, smpls_per_cls, crnt_prcls_num, crnt_prtgs
 
             # Calculating Macro-Precision.
             precision.append(
@@ -325,7 +317,7 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
                     [dg / float(pred_docs)
                         for dg, pred_docs in zip(np.diag(conf_mtrx), np.sum(conf_mtrx, axis=1))
                         if pred_docs > 0]
-                ) / crnt_cls_num
+                ) / crnt_prcls_num
             )
 
             # Calculating Macro-Recall.
@@ -335,7 +327,7 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
                         for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls)
                         if splpc > 0]
 
-                ) / cls_num
+                ) / exp_cls_num
             )
 
     # Appending last point if not already.
@@ -345,7 +337,7 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
             [dg / float(pred_docs)
                 for dg, pred_docs in zip(np.diag(conf_mtrx), np.sum(conf_mtrx, axis=1))
                 if pred_docs > 0]
-        ) / crnt_cls_num
+        ) / crnt_prcls_num
     )
 
     # Calculating Macro-Recall.
@@ -355,7 +347,7 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
                 for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls)
                 if splpc > 0]
 
-        ) / cls_num
+        ) / exp_cls_num
     )
 
     # Converting Precision and Recall lists to numpy.arrays
@@ -738,10 +730,12 @@ def contingency_table(expd_y, pred_y, unknown_class=False, arr_type=np.float32):
         pred_y: is the numpy.array or python list contains the instance prediction of the
             classifier.
 
-        unknown_class: (optional) defines whether 0 index in contingency table will be considered as
-            unknown class irrespectively of its occurrence into the expected tags list and any
-            class tag not given to the expected tag list will also be considered as unknown class
-            (0 index).
+        unknown_class: (optional) defines whether class tags not occuring in the Expected class tags
+            vector will be considdred as unknonw-class counts or treated as an invalid value of
+            a closed-set algorithm's prediction. In this case all the class tags are shifted
+            properly for letting the 0 row and 0 column to be the unknonw-class tag
+            counts position(s).
+            *Defauls value: False
 
         arr_type: (optional) user-defined arrays type. default numpy.flaot32
 
@@ -806,7 +800,22 @@ def contingency_table(expd_y, pred_y, unknown_class=False, arr_type=np.float32):
 def seq_contingency_table(expd_y, pred_y, expd_cls_num, unknown_class=False, arr_type=np.float32):
     """Sequential Contingency table building the function.
 
-    ??????????????????????????????
+    Input arguments:
+
+        expd_y: is the numpy.array or python list contains the expected prediction, i.e. the real
+            classes.
+
+        pred_y: is the numpy.array or python list contains the instance prediction of the
+            classifier.
+
+        unknown_class: (optional) defines whether class tags not occuring in the Expected class tags
+            vector will be considdred as unknonw-class counts or treated as an invalid value of
+            a closed-set algorithm's prediction. In this case all the class tags are shifted
+            properly for letting the 0 row and 0 column to be the unknonw-class tag
+            counts position(s).
+            *Defauls value: False
+
+        arr_type: (optional) user-defined arrays type. default numpy.flaot32
 
     Output:
 
@@ -822,21 +831,16 @@ def seq_contingency_table(expd_y, pred_y, expd_cls_num, unknown_class=False, arr
             "Input arguments length inconsistency: expd_y and pred_y must have the same length."
         )
 
-    if np.min(expd_y) == 0:
-        raise Exception(
-            "Zero Class Tag is not premited!"
-        )
-
     # If expected Y does not containing '0' as class tag and unknonw-class prediction...
     # ...are expected then one more line and row will be appeded by swiftig the class tags by 1...
     # ...and leting 0 represent the uknown_class.
     uncl = 0
     if unknown_class and np.min(expd_y):
         uncl = 1
+        # expd_cls_tags += 1
 
     # Creating the Expected class tags given the expected number of class form funciton arguments.
     expd_cls_tags = np.arange(expd_cls_num)
-    expd_cls_tags += 1
 
     # Redefing the class tagging in order this function to be able to accept any numerical...
     # ...tagging irrespectively of the matrix columns and raws order.
@@ -891,14 +895,24 @@ def precision_recall_scores(conting_tbl, arr_type=np.float32):
     if conting_tbl.shape[0] != conting_tbl.shape[1]:
         raise Exception("Contingency table must be a 2D square matrix.")
 
-    pred_sums = np.sum(conting_tbl, axis=1)
-    expd_sums = np.sum(conting_tbl, axis=0)
+    pred_cls_sums_lst = np.sum(conting_tbl, axis=1)
+    expd_cls_sums_lst = np.sum(conting_tbl, axis=0)
 
-    cls_tp = np.diagonal(conting_tbl)
+    cls_tp_lst = np.diagonal(conting_tbl)
 
-    prec_recl_scores = np.vstack((cls_tp / pred_sums, cls_tp / expd_sums)).T
+    prec_scores = np.array([
+        cls_tp / float(pred_cls_spls)
+        for cls_tp, pred_cls_spls in zip(cls_tp_lst, pred_cls_sums_lst)
+        if pred_cls_spls > 0
+    ])
 
-    return prec_recl_scores
+    recl_scores = np.array([
+        cls_tp / float(expd_cls_spls)
+        for cls_tp, expd_cls_spls in zip(cls_tp_lst, expd_cls_sums_lst)
+        if expd_cls_spls > 0
+    ])
+
+    return prec_scores, recl_scores
 
 
 def bcubed_pr_scores(clstrs_y, cats_y, arr_type=np.float32):
@@ -1069,24 +1083,3 @@ class purepy(object):
         h0.extend(h)
 
         return sum([dx * y for dx, y in zip(dx0, h0)]) / roc_curve[2]
-
-
-if __name__ == '__main__':
-
-    #ct = seq_contingency_table(
-    #    expd_y=np.array([1, 1, 1, 1, 1]), # 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4]),
-    #    pred_y=np.array([1, 1, 1, 2, 5]), # 1, 2, 2, 2, 2, 2, 3, 2, 3, 3, 3, 3, 1, 2, 2, 3, 3]),
-    #    expd_cls_num=2.,
-    #    unknown_class=True, arr_type=np.float32
-    #)
-
-    #print ct
-
-    a = pr_curve_macro(
-        exp_y=np.array([1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4]),
-        pre_y=np.array([1, 1, 1, 2, 4, 1, 2, 2, 2, 2, 2, 3, 4, 4, 2, 3, 3, 3, 3, 4, 4]),
-        scrz=np.array([.95, .9, .85, .83, .8, .75, .73, .7, .65, .6, .55, .5, .45,
-                       .4, .35, .3, .25, .2, .15, .13, .1]),
-        unknown_class=False, full_curve=False
-    )
-    print a
