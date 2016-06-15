@@ -831,16 +831,18 @@ def seq_contingency_table(expd_y, pred_y, expd_cls_num, unknown_class=False, arr
             "Input arguments length inconsistency: expd_y and pred_y must have the same length."
         )
 
+    # Creating the Expected class tags given the expected number of class form funciton arguments.
+    expd_cls_tags = np.arange(expd_cls_num)
+
     # If expected Y does not containing '0' as class tag and unknonw-class prediction...
     # ...are expected then one more line and row will be appeded by swiftig the class tags by 1...
     # ...and leting 0 represent the uknown_class.
     uncl = 0
     if unknown_class and np.min(expd_y):
         uncl = 1
-        # expd_cls_tags += 1
+        expd_cls_tags += 1
 
-    # Creating the Expected class tags given the expected number of class form funciton arguments.
-    expd_cls_tags = np.arange(expd_cls_num)
+    # print expd_cls_tags
 
     # Redefing the class tagging in order this function to be able to accept any numerical...
     # ...tagging irrespectively of the matrix columns and raws order.
@@ -1083,3 +1085,11 @@ class purepy(object):
         h0.extend(h)
 
         return sum([dx * y for dx, y in zip(dx0, h0)]) / roc_curve[2]
+
+if __name__ == '__main__':
+
+    expd_y = np.array([0, 1, 1, 2, 2, 2, 3, 3, 3])
+    pred_y = np.array([0, 2, 1, 2, 1, 2, 3, 1, 2])
+    expd_cls_num = 4
+
+    print seq_contingency_table(expd_y, pred_y, expd_cls_num, unknown_class=True)
