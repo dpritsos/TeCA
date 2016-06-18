@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     case_od = coll.OrderedDict([
         ('doc_rep', ['3Words', '1Words', '4Chars']),
-        ('corpus', ['7Genres']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('corpus', ['SANTINIS']),  # , 'SANTINIS', 'KI04', '7Genres'
         ('dist', ['', 'MinMax', 'MIX']),
         ('vocab_size', [5000, 10000, 50000, 100000]),
         ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),
@@ -167,7 +167,7 @@ if __name__ == '__main__':
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
         ('dist', ['', 'MinMax', 'MIX']),
-        ('corpus', ['7Genres']),  # , 'KI04', 'SANTINIS', 7Genres
+        ('corpus', ['SANTINIS']),  # , 'KI04', 'SANTINIS', 7Genres
         ('doc_rep', ['3Words', '1Words', '4Chars'])
     ])
 

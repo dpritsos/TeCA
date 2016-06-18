@@ -283,12 +283,21 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
     last_scr = -1
 
     # Getting the number of expected classes.
-    exp_cls_num = np.unique(exp_y).shape[0]
+    exp_known_cls_num = np.unique(exp_y).shape[0]
 
     # Getting the number of samples per class. If unknown class case is permted then 0 bincount...
     # ...is taken into account!
     if unknown_class:
         smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))
+
+        # Setting the unknown_class argument to False for the seq_contingency_table() function...
+        # ...when the data-set contains Unknown Class samples. In that case we the contigency...
+        # ...table is the same as in a closed-set predicition output.
+        if smpls_per_cls[0] > 0:
+            unknown_class = False
+        # ...On the other hand when we allow Unknown Class output however the data-set is only...
+        # ...containing knonw class samples then we let the unknown_class value as True.
+
     else:
         smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))[1::]
 
@@ -302,14 +311,14 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
         crnt_prcls_num = crnt_prtgs.shape[0]
 
         conf_mtrx = seq_contingency_table(
-            exp_y[:i+1], pre_y[:i+1], expd_cls_num=exp_cls_num,
+            exp_y[:i+1], pre_y[:i+1], expd_known_cls_num=exp_known_cls_num,
             unknown_class=unknown_class, arr_type=arr_type
         )
 
         if scr != last_scr or full_curve:
 
             # print conf_mtrx, np.sum(conf_mtrx, axis=1),
-            # print exp_cls_num, smpls_per_cls, crnt_prcls_num, crnt_prtgs
+            # print exp_known_cls_num, smpls_per_cls, crnt_prcls_num, crnt_prtgs
 
             # Calculating Macro-Precision.
             precision.append(
@@ -327,7 +336,7 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
                         for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls)
                         if splpc > 0]
 
-                ) / exp_cls_num
+                ) / exp_known_cls_num
             )
 
     # Appending last point if not already.
@@ -347,7 +356,7 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
                 for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls)
                 if splpc > 0]
 
-        ) / exp_cls_num
+        ) / exp_known_cls_num
     )
 
     # Converting Precision and Recall lists to numpy.arrays
@@ -797,8 +806,12 @@ def contingency_table(expd_y, pred_y, unknown_class=False, arr_type=np.float32):
     return conf_matrix
 
 
-def seq_contingency_table(expd_y, pred_y, expd_cls_num, unknown_class=False, arr_type=np.float32):
+def seq_contingency_table(expd_y, pred_y, expd_known_cls_num, unknown_class=False, arr_type=np.float32):
     """Sequential Contingency table building the function.
+
+    NOTE:
+        The sequential tagging should follow a specific order from 0 to X integer. In case the
+        class tags are random then the function will return a false Contingency Table.
 
     Input arguments:
 
@@ -808,11 +821,12 @@ def seq_contingency_table(expd_y, pred_y, expd_cls_num, unknown_class=False, arr
         pred_y: is the numpy.array or python list contains the instance prediction of the
             classifier.
 
+        expd_known_cls_num: The number of classes that is expected to be known. NOTE: the range
+            of class tags occuring is from 0 to the expd_known_cls_num value.
+
         unknown_class: (optional) defines whether class tags not occuring in the Expected class tags
             vector will be considdred as unknonw-class counts or treated as an invalid value of
-            a closed-set algorithm's prediction. In this case all the class tags are shifted
-            properly for letting the 0 row and 0 column to be the unknonw-class tag
-            counts position(s).
+            a closed-set algorithm's prediction.
             *Defauls value: False
 
         arr_type: (optional) user-defined arrays type. default numpy.flaot32
@@ -832,36 +846,29 @@ def seq_contingency_table(expd_y, pred_y, expd_cls_num, unknown_class=False, arr
         )
 
     # Creating the Expected class tags given the expected number of class form funciton arguments.
-    expd_cls_tags = np.arange(expd_cls_num)
+    expd_known_cls_tags = np.arange(expd_known_cls_num)
 
     # If expected Y does not containing '0' as class tag and unknonw-class prediction...
     # ...are expected then one more line and row will be appeded by swiftig the class tags by 1...
     # ...and leting 0 represent the uknown_class.
-    uncl = 0
-    if unknown_class and np.min(expd_y):
-        uncl = 1
-        expd_cls_tags += 1
+    if unknown_class:
+        expd_known_cls_tags += 1
 
-    # print expd_cls_tags
+    # Just preventing the confusion in output when unknown_class argument is Fasle but still the...
+    # ...expected_y input contains '0' value.
+    if np.min(expd_y) == 0 and unknown_class:
+        raise Exception(
+            "Zero class tag is not valid as Expected value" +
+            " when Unknon_Class argument is set to True"
+        )
 
-    # Redefing the class tagging in order this function to be able to accept any numerical...
-    # ...tagging irrespectively of the matrix columns and raws order.
-    new_expd_cls = list()
-    for i, exp_tg in enumerate(expd_cls_tags):
-
-        expd_y[expd_y == exp_tg] = i + uncl
-        pred_y[pred_y == exp_tg] = i + uncl
-        new_expd_cls.append(i + uncl)
-
-    expd_cls_tags = new_expd_cls
-
-    conf_dim = np.max(expd_cls_tags) + 1
+    conf_dim = np.max(expd_known_cls_tags) + 1
 
     conf_matrix = np.zeros((conf_dim, conf_dim), dtype=arr_type)
 
     for i, j in zip(pred_y, expd_y):
 
-        if i not in expd_cls_tags and unknown_class:
+        if i not in expd_known_cls_tags and unknown_class:
             # Counting the Unknown Class predicions.
             conf_matrix[0, j] += 1
 
@@ -870,8 +877,6 @@ def seq_contingency_table(expd_y, pred_y, expd_cls_num, unknown_class=False, arr
             conf_matrix[i, j] += 1
 
     return conf_matrix
-
-
 
 def precision_recall_scores(conting_tbl, arr_type=np.float32):
     """Precision and Recall scores. (it requires a contingency table as an input)
@@ -1088,8 +1093,8 @@ class purepy(object):
 
 if __name__ == '__main__':
 
-    expd_y = np.array([0, 1, 1, 2, 2, 2, 3, 3, 3])
-    pred_y = np.array([0, 2, 1, 2, 1, 2, 3, 1, 2])
-    expd_cls_num = 4
+    expd_y = np.array([0, 1, 1, 1, 2, 2, 2, 3, 3, 3])
+    pred_y = np.array([0, 1, 2, 1, 2, 1, 2, 3, 1, 2])
+    expd_cls_num = 3
 
     print seq_contingency_table(expd_y, pred_y, expd_cls_num, unknown_class=True)
