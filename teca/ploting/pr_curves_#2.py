@@ -10,15 +10,14 @@ import tables as tb
 import matplotlib.pyplot as plt
 import numpy as np
 
-from analytics.metrix import pr_curve, reclev11_max  #  , reclev11_averaging
-from data_retrieval.rfsedata import get_predictions
-from data_retrieval.rfsemixdata import get_predictions as get_predictions_mix
+from analytics.metrix import pr_curve, pr_curve_macro, reclev11_max
+from data_retrieval.rfsedata import multiclass_multimeasure_res, multiclass_res, onevsall_res, onevsall_multimeasure_res
 
 
 # Symbols for plosting.
-symbol = ['o', 'v', '^', '*', '<', 's', '+', 'x', '>', 'H', '1', '2', '3', '4', 'D', 'h',
+symbol = ['o', '*', '+', '^', '<', 's', '+', 'x', '>', 'H', '1', '2', '3', '4', 'D', 'h',
           '8', 'd', 'p', '.', ',']
-line_type = ['--', '--', '--', '-', '-', '-', '--', '--', '--', '-', '-', '-', '--.', '-',
+line_type = ['-', '--', '--', '-', '-', '-', '--', '--', '--', '-', '-', '-', '--.', '-',
              '-', '-', '-', '--', '--', '--', '--']
 
 
@@ -307,20 +306,19 @@ leg_pos = 3
 
 """
 # 7Genres
-fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC11AVG_RFSE_MIXvsMinMax_SANTINIS_F05.eps'
+# fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC11AVG_RFSE_MIXvsMinMax_SANTINIS_F05.eps'
+fig_save_file = '/home/dimitrios/MacroPRC11AVG_RFSE_SANTINIS_MacroAUC.eps'
 
 comb_lst = [
+    ['RFSE', '3Words', 'SANTINIS', 'Comb', [50000, 10000, 0.5, 100]],
     ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
-    ['RFSE', '4Chars', 'SANTINIS', 'Comb', [100000, 500, 0.5, 100]],
-    ['RFSE', '3Words', 'SANTINIS', 'Cosine', [100000, 5000, 0.9, 50]],
     # ['OCSVME', '3Words', 'SANTINIS', '', [100000, 50000, 0.07]],
 
 ]
 
 plt_dsp_attr = [
-    ['k' + line_type[0] + symbol[1], 2, 14, "3W - MinMax"],
-    ['k' + line_type[0] + symbol[2], 2, 14, "4C - Cos&MM"],
-    ['k' + line_type[3] , 2, 14, "Baseline: 3W - Cosine"],
+    ['k' + line_type[0] + symbol[0], 2, 14, "W3G - MIX - 50k 10k 0.5 100 - Max AUC"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "W3G - MinMax - 50k 5k 0.7 100 - Max F1"],
     # ['k' + line_type[3] + symbol[3], 2, 14, "Baseline"],
 ]
 
@@ -405,11 +403,12 @@ for i, comb_val in enumerate(comb_lst):
 
     elif comb_val[3] == 'MinMax':
         h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
-        h5d_fl2 = h5d_fl1
 
     elif comb_val[3] == 'Cosine' or comb_val[3] == '':
         h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
-        h5d_fl2 = h5d_fl1
+
+    else:
+        raise Exception("Option: " + comb_val[3] + " is not valid for Measure Option")
 
     # Getting the predictions
     if comb_val[3] == 'Comb':
@@ -417,9 +416,10 @@ for i, comb_val in enumerate(comb_lst):
         # Building the parapmeters path
         params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
 
-        pred_scores, expd_y, pred_y = get_predictions_mix(
-            h5d_fl1, h5d_fl2, kfolds, params_path, comb_val[4][2],
-            genre_tag=None, binary=True, strata=None
+        pred_scores, expd_y, pred_y = multiclass_multimeasure_res(
+            # h5d_fl1, h5d_fl2, kfolds, params_path, comb_val[4][2],
+            # genre_tag=None, binary=True, strata=None
+            h5d_fl1, h5d_fl2, kfolds, params_path, binary=False, strata=None  #  binary=False <- for Micro
         )
 
     else:
@@ -427,8 +427,8 @@ for i, comb_val in enumerate(comb_lst):
         # Building the parapmeters path
         params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
 
-        pred_scores, expd_y, pred_y = get_predictions(
-            h5d_fl1, kfolds, params_path, genre_tag=None, binary=True, strata=None
+        pred_scores, expd_y, pred_y = multiclass_res(
+            h5d_fl1, kfolds, params_path, binary=False, strata=None
         )
 
     # Closing the h5d files.
@@ -438,10 +438,16 @@ for i, comb_val in enumerate(comb_lst):
     else:
         h5d_fl1.close()
 
-    # Create the Actual PRC.
-    y, x, t = pr_curve(expd_y, pred_scores, full_curve=True, is_truth_tbl=True)
+    # Creating the Actual PRC.
+    # y, x, t = pr_curve(expd_y, pred_scores, full_curve=True, is_truth_tbl=True)
 
-    # Get the max 11 Recall Leves in TREC way.
+    # Creating the Actual MACRO PRC.
+    y, x, t = pr_curve_macro(
+        expd_y, pred_y, pred_scores, full_curve=True, unknown_class=True
+    )
+
+    # Getting the max 11 Recall Leves in TREC way.
+    #if i == 0:
     y, x = reclev11_max(y, x, trec=False)
 
     # Selecting array indices with non-zero cells.

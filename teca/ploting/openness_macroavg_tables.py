@@ -21,14 +21,16 @@ if __name__ == '__main__':
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     case_od = coll.OrderedDict([
-        ('doc_rep', ['3Words']),  # '3Words', '1Words',
-        ('corpus', ['SANTINIS']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('doc_rep', ['C4G']),
+        ('corpus', ['7Genres']),  # , 'SANTINIS', 'KI04', '7Genres'
         ('dist', ['MIX']),  # '', 'MinMax',
-        ('vocab_size', [50000]),  # 5000, 10000, 50000, 100000
-        ('features_size', [10000]),  # 500, 1000, 5000, 10000, 50000, 90000
-        # ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
-        ('Sigma', [0.5]),  # , 0.7, 0.9
-        ('Iterations', [100])  # 10, 50,
+        ('vocab_size', [10000]),
+        ('features_size', [1000]),
+        ('Sigma', [0.5]),
+        ('Iterations', [100]),
+        ('onlytest_gnrs_splts', [1, 2, 3, 4]),
+        ('onlytest_splt_itrs', [0, 1, 2]),
+        # ('kfolds', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
     ])
 
     # List of all macro averaging precision recall values.
@@ -46,15 +48,15 @@ if __name__ == '__main__':
             # Selecting filepath
             if case[1] == '7Genres':
                 # h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_'
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Openness_RFSE_4Chars_7Genres/Openness_RFSE_'
 
             elif case[1] == 'KI04':
                 # h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_'
 
             else:
                 # h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/Openness_RFSE_'
 
             h5d_fl = h5d_fl + case[0] + '_' + case[1]
 
@@ -80,12 +82,14 @@ if __name__ == '__main__':
                 ('features_size', [case[4]]),
                 # ('nu', [case[5]])
                 ('Sigma', [case[5]]),  #
-                ('Iterations', [case[6]])  #
+                ('Iterations', [case[6]]),  #
+                ('onlytest_gnrs_splts', [case[7]]),
+                ('onlytest_splt_itrs', [case[8]]),
             ])
 
             pr_aucz_var_table = params_prauc_tables(
                 h5d_fl1, h5d_fl2, 'multiclass_macro', kfolds, param_od, mix,
-                strata=None, trec=False, unknown_class=True
+                strata=None, trec=False, unknown_class=False
             )
 
             # ### Calculating Marco Averaging of Precision, Recall, F1, F0.5 ###
@@ -98,14 +102,12 @@ if __name__ == '__main__':
             # ...only calculated when there is at least one sample being counted for this Genre.
             pre_cls_vect, rcl_cls_vect = PRConf_table(
                 h5d_fl1, h5d_fl2, kfolds, params_path, mix,
-                strata=None, unknown_class=True, prereccon=1
+                strata=None, unknown_class=False, prereccon=1
             )
 
             # NOTE: The Precision and Recall vectors of scores per Genre might not have the same...
             # ...leght due to Unknown_Class tag expected or not expected case or just because...
             # ...for some Class we have NO Predicitons at all.
-            print pre_cls_vect
-            print rcl_cls_vect
             macro_p = np.mean(pre_cls_vect)
             macro_r = np.mean(rcl_cls_vect)
 
@@ -119,7 +121,7 @@ if __name__ == '__main__':
 
             # pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
 
-            pr_auc = pr_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
+            pr_auc = pr_aucz_var_table[0, 6]  # For RFSE is 4, for OCSVME 3
 
             # roc_auc = roc_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
 
@@ -167,12 +169,12 @@ if __name__ == '__main__':
     # # # Saving Resaults to the following file.
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
-        ('dist', ['MIX']),
-        ('corpus', ['SANTINIS']),  # , 'KI04', 'SANTINIS', 7Genres
-        ('doc_rep', ['3Words'])  # '3Words', '1Words',
+        ('dist', ['MIX']),  # '', 'MinMax',
+        ('corpus', ['7Genres']),  # , 'KI04', 'SANTINIS', 7Genres
+        ('doc_rep', ['C4G'])
     ])
 
-    with open('/home/dimitrios/MaxScore_Resaults_SANTINIS.txt', 'w') as score_sf:
+    with open('/home/dimitrios/Openess_Resaults_7Genres_C4G.txt', 'w') as score_sf:
 
         for idx, dm, cr, dr in param_comb.ParamGridIter(prnt_case_od, 'list'):
 

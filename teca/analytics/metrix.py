@@ -285,30 +285,32 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
     # Getting the number of expected classes.
     exp_known_cls_num = np.unique(exp_y).shape[0]
 
-    # Getting the number of samples per class. If unknown class case is permted then 0 bincount...
-    # ...is taken into account!
-    if unknown_class:
-        smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))
+    # Getting the number of samples per class. Zero tag is inlcuded.
+    smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))
 
+    if unknown_class and smpls_per_cls[0] > 0:
         # Setting the unknown_class argument to False for the seq_contingency_table() function...
-        # ...when the data-set contains Unknown Class samples. In that case we the contigency...
+        # ...when the data-set contains Unknown Class samples. In that case the contigency...
         # ...table is the same as in a closed-set predicition output.
-        if smpls_per_cls[0] > 0:
-            unknown_class = False
+        unknown_class = False
         # ...On the other hand when we allow Unknown Class output however the data-set is only...
         # ...containing knonw class samples then we let the unknown_class value as True.
 
+    elif smpls_per_cls[0] == 0:
+        # In case we are allowing (or not-allowing) uknown_class prediction and zero tags...
+        # ...have zero counts the use only above zero counts.
+        smpls_per_cls = smpls_per_cls[1::]
+
     else:
-        smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))[1::]
+        # Raise an Exception for any other case because we don't know it this will cause bad...
+        # ...counting thus incorrect Macor-PR curves.
+        raise Exception("Incorrect option for unknown and known class tags expected combination.")
 
     # Building the PR curve
     for i, scr in enumerate(scrz):
 
-        # doc_cnt += 1.0
-
         # Getting the class tags predicted so far.
-        crnt_prtgs = np.array(np.unique(pre_y[:i+1]), dtype=np.int)
-        crnt_prcls_num = crnt_prtgs.shape[0]
+        crnt_prcls_num = np.unique(pre_y[:i+1]).shape[0]
 
         conf_mtrx = seq_contingency_table(
             exp_y[:i+1], pre_y[:i+1], expd_known_cls_num=exp_known_cls_num,
@@ -806,7 +808,8 @@ def contingency_table(expd_y, pred_y, unknown_class=False, arr_type=np.float32):
     return conf_matrix
 
 
-def seq_contingency_table(expd_y, pred_y, expd_known_cls_num, unknown_class=False, arr_type=np.float32):
+def seq_contingency_table(expd_y, pred_y, expd_known_cls_num,
+                          unknown_class=False, arr_type=np.float32):
     """Sequential Contingency table building the function.
 
     NOTE:
@@ -877,6 +880,7 @@ def seq_contingency_table(expd_y, pred_y, expd_known_cls_num, unknown_class=Fals
             conf_matrix[i, j] += 1
 
     return conf_matrix
+
 
 def precision_recall_scores(conting_tbl, arr_type=np.float32):
     """Precision and Recall scores. (it requires a contingency table as an input)

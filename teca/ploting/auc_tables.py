@@ -52,6 +52,18 @@ def params_prauc_tables(h5d_fl1, h5d_fl2, curvetype, kfolds,
                     h5d_fl1, kfolds, params_path, binary=binary, strata=strata
                 )
 
+            # NOTE: Crossckecking and replacing the class-tags of the experiment to virtual...
+            # ...class tags refering to the index of the np.unique(expd_y) vector in order...
+            # ...to ease the calculations of the curves.
+            tags2idx_ref = np.unique(expd_y)
+            i_fix = 0
+            if tags2idx_ref[0] > 0:
+                i_fix = 1
+            for i, tg in enumerate(tags2idx_ref):
+                expd_y[np.where(expd_y == tg)] = i + i_fix
+                pred_y[np.where(pred_y == tg)] = i + i_fix
+
+            # Selecting the case and calculating the precision recall curves.
             if curvetype == 'multiclass':
 
                 # NOTE: Option 'is_truth_tbl' is critical to be selected correctly depending...
