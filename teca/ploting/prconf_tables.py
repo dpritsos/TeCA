@@ -7,7 +7,10 @@ sys.path.append('../../../DoGSWrapper/dogswrapper')
 import tables as tb
 import numpy as np
 import collections as coll
-from data_retrieval.rfsedata import multiclass_multimeasure_res, multiclass_res, onevsall_res, onevsall_multimeasure_res
+from data_retrieval.data import multiclass_res
+from data_retrieval.data import rfse_multiclass_multimeasure_res
+from data_retrieval.data import rfse_onevsall_res
+from data_retrieval.data import rfse_onevsall_multimeasure_res
 import base.param_combs as param_comb
 import analytics.metrix as mx
 
@@ -21,7 +24,7 @@ def PRConf_table(h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata, unknown_cla
 
     # Beginning Contingency table building
     if mix:
-        rfse_data = multiclass_multimeasure_res(
+        rfse_data = rfse_multiclass_multimeasure_res(
             h5d_fl1, h5d_fl2, kfolds, params_path, binary=False, strata=strata
         )
 

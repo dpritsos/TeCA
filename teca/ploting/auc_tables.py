@@ -8,7 +8,10 @@ import collections as coll
 sys.path.append('../../teca')
 sys.path.append('../../../DoGSWrapper/dogswrapper')
 
-from data_retrieval.rfsedata import multiclass_multimeasure_res, multiclass_res, onevsall_res, onevsall_multimeasure_res
+from data_retrieval.data import multiclass_res
+from data_retrieval.data import rfse_multiclass_multimeasure_res
+from data_retrieval.data import rfse_onevsall_res
+from data_retrieval.data import rfse_onevsall_multimeasure_res
 import base.param_combs as param_comb
 import analytics.metrix as mx
 

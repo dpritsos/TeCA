@@ -12,7 +12,7 @@ sys.path.append('../../src')
 
 
 def multiclass_res(res_h5file, kfolds, params_path, binary=None, strata=None):
-    """Retrieval functions for the date returned from the RFSE method.
+    """Retrieval functions for the date returned from the RFSE/OCSVME method.
 
     Returns the Predicted Scores and the Expected Values for the sample set has been given to the
     RSFE for evaluation. If genre_tag argument is a number other that None then it returns the
@@ -125,7 +125,7 @@ def multiclass_res(res_h5file, kfolds, params_path, binary=None, strata=None):
     return (PS, EY, PY)
 
 
-def onevsall_res(res_h5file, genre_tag, kfolds, params_path):
+def rfse_onevsall_res(res_h5file, genre_tag, kfolds, params_path):
 
     # Initializing.
     PS_lst = list()  # Ensemble Predicted Scores
@@ -195,7 +195,7 @@ def onevsall_res(res_h5file, genre_tag, kfolds, params_path):
     return (PS, EY, PY)
 
 
-def multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, binary=None, strata=None):
+def rfse_multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, binary=None, strata=None):
 
     # Initialising.
     PS_lst = list()
@@ -351,7 +351,7 @@ def multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, binary=No
     return (PS, EY, PY)
 
 
-def onevsall_multimeasure_res(hf5_fl1, hf5_fl2, genre_tag, kfolds, params_path):
+def rfse_onevsall_multimeasure_res(hf5_fl1, hf5_fl2, genre_tag, kfolds, params_path):
 
     # Initialising.
     PS_lst = list()
