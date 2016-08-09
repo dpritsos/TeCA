@@ -62,14 +62,14 @@ def multiclass_res(res_h5file, kfolds, params_path, binary=None, strata=None):
 
         # Loading predicted scores.
         pre_score = res_h5file.get_node(
-            params_path + '/KFold' + str(k), name='predicted_scores'
+            params_path + str(k), name='predicted_scores'
         ).read()
 
         # Getting the Expected genre tags.
-        exp_y = res_h5file.get_node(params_path + '/KFold' + str(k), name='expected_Y').read()
+        exp_y = res_h5file.get_node(params_path + str(k), name='expected_Y').read()
 
         # Getting the Expected genre tags.
-        pre_y = res_h5file.get_node(params_path + '/KFold' + str(k), name='predicted_Y').read()
+        pre_y = res_h5file.get_node(params_path + str(k), name='predicted_Y').read()
 
         # Making a stratified selection upon a specific group of the results.
         if strata:
@@ -140,7 +140,7 @@ def rfse_onevsall_res(res_h5file, genre_tag, kfolds, params_path):
 
         # Getting predicited classed per iteration.
         pc_per_iter = res_h5file.get_node(
-            params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
+            params_path + str(k), name='predicted_classes_per_iter'
         ).read()
 
         # Since it is a Binary case get the positive and negavtive scores. Then keeping...
@@ -177,7 +177,7 @@ def rfse_onevsall_res(res_h5file, genre_tag, kfolds, params_path):
         PS_lst.append(pre_score)
 
         # Collecting the excepted tag values by conventing them first in binary form.
-        exp_y = res_h5file.get_node(params_path + '/KFold' + str(k), name='expected_Y').read()
+        exp_y = res_h5file.get_node(params_path + str(k), name='expected_Y').read()
         EY_lst.append(np.where(exp_y == genre_tag, 1, 0))
 
     # Stacking the lists to Single arrays for PS and EY respectively
@@ -209,7 +209,7 @@ def rfse_multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, bina
     for k in kfolds:
 
         # Getting the Expected genre tags
-        exp_y = hf5_fl1.get_node(params_path+'/KFold'+str(k), name='expected_Y').read()
+        exp_y = hf5_fl1.get_node(params_path + str(k), name='expected_Y').read()
 
         # Getting the number of classes.
         cls_num = float(len(np.unique(exp_y)))
@@ -219,20 +219,20 @@ def rfse_multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, bina
 
         # File # 1
         pc_array_fl1 = hf5_fl1.get_node(
-            params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
+            params_path + str(k), name='predicted_classes_per_iter'
         ).read()
 
         ms_array_fl1 = hf5_fl1.get_node(
-            params_path+'/KFold'+str(k), name='max_sim_scores_per_iter'
+            params_path + str(k), name='max_sim_scores_per_iter'
         ).read()
 
         # File # 2
         pc_array_fl2 = hf5_fl2.get_node(
-            params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
+            params_path + str(k), name='predicted_classes_per_iter'
         ).read()
 
         ms_array_fl2 = hf5_fl2.get_node(
-            params_path+'/KFold'+str(k), name='max_sim_scores_per_iter'
+            params_path + str(k), name='max_sim_scores_per_iter'
         ).read()
 
         # Normalising max-similarity scores for being comparable irrespectively of the
@@ -369,20 +369,20 @@ def rfse_onevsall_multimeasure_res(hf5_fl1, hf5_fl2, genre_tag, kfolds, params_p
 
         # File # 1
         pc_array_fl1 = hf5_fl1.get_node(
-            params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
+            params_path + str(k), name='predicted_classes_per_iter'
         ).read()
 
         ms_array_fl1 = hf5_fl1.get_node(
-            params_path+'/KFold'+str(k), name='max_sim_scores_per_iter'
+            params_path + str(k), name='max_sim_scores_per_iter'
         ).read()
 
         # File # 2
         pc_array_fl2 = hf5_fl2.get_node(
-            params_path + '/KFold'+str(k), name='predicted_classes_per_iter'
+            params_path + str(k), name='predicted_classes_per_iter'
         ).read()
 
         ms_array_fl2 = hf5_fl2.get_node(
-            params_path+'/KFold'+str(k), name='max_sim_scores_per_iter'
+            params_path + str(k), name='max_sim_scores_per_iter'
         ).read()
 
         # Normalising max-similarity scores for being comparable irrespectively of the
@@ -469,7 +469,7 @@ def rfse_onevsall_multimeasure_res(hf5_fl1, hf5_fl2, genre_tag, kfolds, params_p
         PY_lst.append(pre_y)
 
         # Getting the Expected genre tags.
-        exp_y = hf5_fl1.get_node(params_path+'/KFold'+str(k), name='expected_Y').read()
+        exp_y = hf5_fl1.get_node(params_path + str(k), name='expected_Y').read()
         EY_lst.append(np.where(exp_y == genre_tag, 1, 0))
 
     # Stacking the lists to Single arrays for PS and EY respectively

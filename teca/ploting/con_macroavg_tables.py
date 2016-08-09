@@ -21,14 +21,15 @@ if __name__ == '__main__':
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     case_od = coll.OrderedDict([
-        ('doc_rep', ['3Words', '1Words', '4Chars']),  # '3Words', '1Words',
-        ('corpus', ['SANTINIS']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('doc_rep', ['4Chars']),  # '3Words', '1Words',
+        ('corpus', ['7Genres']),  # , 'SANTINIS', 'KI04', '7Genres'
         ('dist', ['']),  # '', 'MinMax', 'MIX'
-        ('vocab_size', [5000, 10000, 50000, 100000]),  # 5000, 10000, 50000, 100000
-        ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),  # 500, 1000, 5000, 10000, 50000, 90000
-        ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
+        ('vocab_size', [100000]),  # 5000, 10000, 50000, 100000
+        ('features_size', [50000]),  # 500, 1000, 5000, 10000, 50000, 90000
+        ('nu', [0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),  # 0.05, 0.07, 0.1,
         # ('Sigma', [0.5]),  # , 0.7, 0.9
         # ('Iterations', [100])  # 10, 50,
+        ('KFold', [''])
     ])
 
     # List of all macro averaging precision recall values.
@@ -80,9 +81,10 @@ if __name__ == '__main__':
             param_od = coll.OrderedDict([
                 ('vocab_size', [case[3]]),
                 ('features_size', [case[4]]),
-                ('nu', [case[5]])
+                ('nu', [case[5]]),
                 # ('Sigma', [case[5]]),  #
                 # ('Iterations', [case[6]])  #
+                ('KFold', [''])
             ])
 
             pr_aucz_var_table = params_prauc_tables(
@@ -170,11 +172,11 @@ if __name__ == '__main__':
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
         ('dist', ['']),
-        ('corpus', ['SANTINIS']),  # , 'KI04', 'SANTINIS', 7Genres
-        ('doc_rep', ['3Words', '1Words', '4Chars'])  # '3Words', '1Words',
+        ('corpus', ['7Genres']),  # , 'KI04', 'SANTINIS', 7Genres
+        ('doc_rep', ['4Chars'])  # '3Words', '1Words',
     ])
 
-    with open('/home/dimitrios/MaxScore_OCSVM_SANTINIS.txt', 'w') as score_sf:
+    with open('/home/dimitrios/MaxScore_OCSVM_7Genres.txt', 'w') as score_sf:
 
         for idx, dm, cr, dr in param_comb.ParamGridIter(prnt_case_od, 'list'):
 

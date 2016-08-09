@@ -701,6 +701,10 @@ def reclev11_max(P, R, rcl_tuple=(0.0, 1.1, 0.1), trec=True):
     # Padding Recall and precision with proper resolution.
     P, R = zero_padding_PRC(P, R)
 
+    # Fixing some numerical inconsistencies. DON'T remove it!
+    R = np.array(R, dtype=np.float32)
+    P = np.array(P, dtype=np.float32)
+
     # Init with zeros the array for saving the highest Precision for every R level.
     max_P = np.zeros_like(R_Levels, dtype=np.float)
 

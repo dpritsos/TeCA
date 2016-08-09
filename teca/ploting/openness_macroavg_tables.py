@@ -21,16 +21,16 @@ if __name__ == '__main__':
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     case_od = coll.OrderedDict([
-        ('doc_rep', ['C4G']),
-        ('corpus', ['7Genres']),  # , 'SANTINIS', 'KI04', '7Genres'
-        ('dist', ['MIX']),  # '', 'MinMax',
-        ('vocab_size', [10000]),
-        ('features_size', [1000]),
+        ('doc_rep', ['W3G']),
+        ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('dist', ['', 'MinMax', 'MIX']),  # '', 'MinMax',
+        ('vocab_size', [50000]),
+        ('features_size', [10000]),
         ('Sigma', [0.5]),
         ('Iterations', [100]),
-        ('onlytest_gnrs_splts', [1, 2, 3, 4]),
-        ('onlytest_splt_itrs', [0, 1, 2]),
-        # ('kfolds', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+        ('onlytest_gnrs_splts', [1, 2, 3, 4, 5, 6, 7]),
+        ('onlytest_splt_itrs', [0, 1, 2, 3]),
+        ('kfolds', [''])
     ])
 
     # List of all macro averaging precision recall values.
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
             elif case[1] == 'KI04':
                 # h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_W3G_KI04/Openness_RFSE_'
 
             else:
                 # h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
@@ -70,9 +70,11 @@ if __name__ == '__main__':
 
             elif case[2] == 'MinMax':
                 h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
+                h5d_fl2 = None
 
             else:
                 h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
+                h5d_fl2 = None
 
             # ### Calculating the PR Curves ###
 
@@ -85,24 +87,26 @@ if __name__ == '__main__':
                 ('Iterations', [case[6]]),  #
                 ('onlytest_gnrs_splts', [case[7]]),
                 ('onlytest_splt_itrs', [case[8]]),
+                ('kfolds', [''])
             ])
 
             pr_aucz_var_table = params_prauc_tables(
                 h5d_fl1, h5d_fl2, 'multiclass_macro', kfolds, param_od, mix,
-                strata=None, trec=False, unknown_class=False
+                strata=None, trec=False, unknown_class=True  # unknown_class=True/False!!!
             )
 
             # ### Calculating Marco Averaging of Precision, Recall, F1, F0.5 ###
 
             # Reformationg parametera path to be given properly to PRConf_table().
             params_path = '/' + '/'.join(case_path.split('/')[4::])
+
             # print pr_tabel_fname
 
             # Calculating the Precision and Recall Scores per Genre. Precision for a Genre is...
             # ...only calculated when there is at least one sample being counted for this Genre.
             pre_cls_vect, rcl_cls_vect = PRConf_table(
                 h5d_fl1, h5d_fl2, kfolds, params_path, mix,
-                strata=None, unknown_class=False, prereccon=1
+                strata=None, unknown_class=True, prereccon=1  # unknown_class=True/False!!!
             )
 
             # NOTE: The Precision and Recall vectors of scores per Genre might not have the same...
@@ -121,7 +125,7 @@ if __name__ == '__main__':
 
             # pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
 
-            pr_auc = pr_aucz_var_table[0, 6]  # For RFSE is 4, for OCSVME 3
+            pr_auc = pr_aucz_var_table[0, 7]  # For RFSE is 4, for OCSVME 3
 
             # roc_auc = roc_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
 
@@ -169,12 +173,12 @@ if __name__ == '__main__':
     # # # Saving Resaults to the following file.
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
-        ('dist', ['MIX']),  # '', 'MinMax',
-        ('corpus', ['7Genres']),  # , 'KI04', 'SANTINIS', 7Genres
-        ('doc_rep', ['C4G'])
+        ('dist', ['', 'MinMax', 'MIX']),  # '', 'MinMax',
+        ('corpus', ['KI04']),  # , 'KI04', 'SANTINIS', 7Genres
+        ('doc_rep', ['W3G'])
     ])
 
-    with open('/home/dimitrios/Openess_Resaults_7Genres_C4G.txt', 'w') as score_sf:
+    with open('/home/dimitrios/Openess_KI04_W3G.txt', 'w') as score_sf:
 
         for idx, dm, cr, dr in param_comb.ParamGridIter(prnt_case_od, 'list'):
 
@@ -194,7 +198,7 @@ if __name__ == '__main__':
             elif idx == -2:
                 score_sf.write("F0.5 ")
             elif idx == -3:
-                score_sf.write("PR AUC ")
+                score_sf.write("PR MACRO AUC ")
             elif idx == -4:
                 score_sf.write("ROC AUC ")
             elif idx == -5:
