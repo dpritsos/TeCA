@@ -284,6 +284,7 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
 
     # Getting the number of expected classes.
     exp_known_cls_num = np.unique(exp_y).shape[0]
+    print exp_known_cls_num
 
     # Getting the number of samples per class. Zero tag is inlcuded.
     smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))
@@ -360,10 +361,18 @@ def pr_curve_macro(exp_y, pre_y, scrz, unknown_class=False, full_curve=False, ar
 
         ) / exp_known_cls_num
     )
+    print 'DIAG', np.diag(conf_mtrx)
+    print 'SAMPLS', smpls_per_cls
+    print zip(np.diag(conf_mtrx), smpls_per_cls)
+    print 'RES', [dg / float(splpc)
+        for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls)
+        ]
 
     # Converting Precision and Recall lists to numpy.arrays
     precision = np.array(precision, dtype=arr_type)
+    #print recall
     recall = np.array(recall, dtype=arr_type)
+
 
     # Returning the ROC curve
     return precision, recall, np.unique(scrz)

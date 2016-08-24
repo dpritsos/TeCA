@@ -453,8 +453,8 @@ for i, comb_val in enumerate(comb_lst):
     )
 
     # Getting the max 11 Recall Leves in TREC way.
-    #if i == 0:
-    y, x = reclev11_max(y, x, trec=True)
+    # if i == 0:
+    # y, x = reclev11_max(y, x, trec=True)
 
     # Selecting array indices with non-zero cells.
     non_zero_idx = np.where(y > 0)
