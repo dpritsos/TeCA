@@ -21,12 +21,12 @@ if __name__ == '__main__':
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     case_od = coll.OrderedDict([
-        ('doc_rep', ['4Chars']),  # '3Words', '1Words',
+        ('doc_rep', ['3Words', '1Words', '4Chars']),  # '3Words', '1Words', '4Chars'
         ('corpus', ['7Genres']),  # , 'SANTINIS', 'KI04', '7Genres'
         ('dist', ['']),  # '', 'MinMax', 'MIX'
-        ('vocab_size', [100000]),  # 5000, 10000, 50000, 100000
-        ('features_size', [50000]),  # 500, 1000, 5000, 10000, 50000, 90000
-        ('nu', [0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),  # 0.05, 0.07, 0.1,
+        ('vocab_size', [5000, 10000, 50000, 100000]),  # 5000, 10000, 50000, 100000
+        ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),  # 500, 1000, 5000, 10000, 50000, 90000
+        ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),  # 0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9
         # ('Sigma', [0.5]),  # , 0.7, 0.9
         # ('Iterations', [100])  # 10, 50,
         ('KFold', [''])
@@ -108,8 +108,8 @@ if __name__ == '__main__':
             # NOTE: The Precision and Recall vectors of scores per Genre might not have the same...
             # ...leght due to Unknown_Class tag expected or not expected case or just because...
             # ...for some Class we have NO Predicitons at all.
-            print pre_cls_vect
-            print rcl_cls_vect
+            # print pre_cls_vect
+            # print rcl_cls_vect
             macro_p = np.mean(pre_cls_vect)
             macro_r = np.mean(rcl_cls_vect)
 
@@ -123,7 +123,7 @@ if __name__ == '__main__':
 
             # pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
 
-            pr_auc = pr_aucz_var_table[0, 3]  # For RFSE is 4, for OCSVME 3
+            pr_auc = pr_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
 
             # roc_auc = roc_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
 
@@ -173,7 +173,7 @@ if __name__ == '__main__':
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
         ('dist', ['']),
         ('corpus', ['7Genres']),  # , 'KI04', 'SANTINIS', 7Genres
-        ('doc_rep', ['4Chars'])  # '3Words', '1Words',
+        ('doc_rep', ['3Words', '1Words', '4Chars'])  # '3Words', '1Words', '4Chars'
     ])
 
     with open('/home/dimitrios/MaxScore_OCSVM_7Genres.txt', 'w') as score_sf:

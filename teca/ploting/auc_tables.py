@@ -45,7 +45,7 @@ def params_prauc_tables(h5d_fl1, h5d_fl2, curvetype, kfolds,
 
             if mix:
 
-                pred_scores, expd_y, pred_y = multiclass_multimeasure_res(
+                pred_scores, expd_y, pred_y = rfse_multiclass_multimeasure_res(
                     h5d_fl1, h5d_fl2, kfolds, params_path, binary=binary, strata=strata
                 )
 

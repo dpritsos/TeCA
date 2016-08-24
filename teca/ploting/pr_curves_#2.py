@@ -306,20 +306,26 @@ leg_pos = 3
 
 """
 # 7Genres
-# fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/PRC11AVG_RFSE_MIXvsMinMax_SANTINIS_F05.eps'
-fig_save_file = '/home/dimitrios/MacroPRC11AVG_RFSE_SANTINIS_MacroAUC.eps'
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/MacroPRC11AVG_RFSE_OCSVME_7Genres.eps'
+# fig_save_file = '/home/dimitrios/MacroPRC11AVG_RFSE_OCSVME_7Genres.eps'
 
 comb_lst = [
-    ['RFSE', '3Words', 'SANTINIS', 'Comb', [50000, 10000, 0.5, 100]],
-    ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100]],
-    # ['OCSVME', '3Words', 'SANTINIS', '', [100000, 50000, 0.07]],
+    ['RFSE', '4Chars', '7Genres', 'Comb', [10000, 1000, 0.5, 100]],
+    ['RFSE', '3Words', '7Genres', 'Cosine', [100000, 50000, 0.5, 50]],
+    ['RFSE', '3Words', '7Genres', 'Cosine', [100000, 50000, 0.7, 50]],
+    ['OCSVME', '3Words', '7Genres', '', [10000, 5000, 0.1]],
+    ['OCSVME', '4Chars', '7Genres', '', [100000, 50000, 0.1]],
+    ['OCSVME', '3Words', '7Genres', '', [100000, 50000, 0.07]],
 
 ]
 
 plt_dsp_attr = [
-    ['k' + line_type[0] + symbol[0], 2, 14, "W3G - MIX - 50k 10k 0.5 100 - Max AUC"],
-    ['k' + line_type[1] + symbol[1], 2, 14, "W3G - MinMax - 50k 5k 0.7 100 - Max F1"],
-    # ['k' + line_type[3] + symbol[3], 2, 14, "Baseline"],
+    ['k' + line_type[1] + symbol[0], 2, 14, "RFSE - C4G - Comb - AUC"],
+    ['k' + line_type[1] + symbol[1], 2, 14, "RFSE - W3G - Cos - $F_{1}$"],
+    ['k' + line_type[1] + symbol[2], 2, 14, "RFSE - W3G - Cos - $F_{0.5}$"],
+    ['k' + line_type[0] + symbol[0], 2, 14, "OCSVM - W3G - AUC"],
+    ['k' + line_type[0] + symbol[1], 2, 14, "OCSVM - C4G - $F_{1}$"],
+    ['k' + line_type[0] + symbol[2], 2, 14, "OCSVM - W3G - $F_{0.5}$"],
 ]
 
 leg_pos = 1
@@ -448,7 +454,7 @@ for i, comb_val in enumerate(comb_lst):
 
     # Getting the max 11 Recall Leves in TREC way.
     #if i == 0:
-    y, x = reclev11_max(y, x, trec=False)
+    y, x = reclev11_max(y, x, trec=True)
 
     # Selecting array indices with non-zero cells.
     non_zero_idx = np.where(y > 0)
