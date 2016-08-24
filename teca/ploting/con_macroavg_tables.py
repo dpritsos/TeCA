@@ -23,12 +23,12 @@ if __name__ == '__main__':
     case_od = coll.OrderedDict([
         ('doc_rep', ['3Words', '1Words', '4Chars']),  # '3Words', '1Words', '4Chars'
         ('corpus', ['7Genres']),  # , 'SANTINIS', 'KI04', '7Genres'
-        ('dist', ['']),  # '', 'MinMax', 'MIX'
+        ('dist', ['', 'MinMax', 'MIX']),  # '', 'MinMax', 'MIX'
         ('vocab_size', [5000, 10000, 50000, 100000]),  # 5000, 10000, 50000, 100000
         ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),  # 500, 1000, 5000, 10000, 50000, 90000
-        ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),  # 0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9
-        # ('Sigma', [0.5]),  # , 0.7, 0.9
-        # ('Iterations', [100])  # 10, 50,
+        # ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),  # 0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9
+        ('Sigma', [0.5, 0.7, 0.9]),  # , 0.7, 0.9
+        ('Iterations', [10, 50, 100])  # 10, 50,
         ('KFold', [''])
     ])
 
@@ -81,9 +81,9 @@ if __name__ == '__main__':
             param_od = coll.OrderedDict([
                 ('vocab_size', [case[3]]),
                 ('features_size', [case[4]]),
-                ('nu', [case[5]]),
-                # ('Sigma', [case[5]]),  #
-                # ('Iterations', [case[6]])  #
+                # ('nu', [case[5]]),
+                ('Sigma', [case[5]]),  #
+                ('Iterations', [case[6]])  #
                 ('KFold', [''])
             ])
 
@@ -123,12 +123,12 @@ if __name__ == '__main__':
 
             # pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
 
-            pr_auc = pr_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
+            pr_auc = pr_aucz_var_table[0, 4]  # For RFSE is 5, for OCSVME 4
 
-            # roc_auc = roc_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
+            # roc_auc = roc_aucz_var_table[0, 4]  # For RFSE is 5, for OCSVME 4
 
             # join_auc = 1
-            # for a in m_aucz_var_table[0, 4::]:  # For RFSE is 4, for OCSVME 3
+            # for a in m_aucz_var_table[0, 4::]:  # For RFSE is 5, for OCSVME 4
             #     join_auc *= a
 
             # maucs_num = len(m_aucz_var_table[0, 4::])  # For RFSE is 4, for OCSVME 3
@@ -176,7 +176,7 @@ if __name__ == '__main__':
         ('doc_rep', ['3Words', '1Words', '4Chars'])  # '3Words', '1Words', '4Chars'
     ])
 
-    with open('/home/dimitrios/MaxScore_OCSVM_7Genres.txt', 'w') as score_sf:
+    with open('/home/dimitrios/MaxScore_RFSE_7Genres.txt', 'w') as score_sf:
 
         for idx, dm, cr, dr in param_comb.ParamGridIter(prnt_case_od, 'list'):
 
