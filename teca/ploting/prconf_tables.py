@@ -42,14 +42,9 @@ def PRConf_table(h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata, prereccon=0
     # Getting the expected classes.
     exp_cls_tags_set = np.unique(exp_y)
 
-    # Getting the predected classes.
-    pre_cls_tags_set = np.unique(pred_y)
-
     # Calculating contigency table.
     conf_mtrx = mx.seq_contingency_table(
-        exp_y, pred_y,
-        exp_cls_tags_set=exp_cls_tags_set, pre_cls_tags_set=pre_cls_tags_set,
-        arr_type=np.int32
+        exp_y, pred_y, exp_cls_tags_set=exp_cls_tags_set, arr_type=np.int32
     )
 
     if prereccon in [0, 1]:

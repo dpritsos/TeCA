@@ -282,9 +282,6 @@ def pr_curve_macro(exp_y, pre_y, scrz, full_curve=False, arr_type=np.float32):
     # Getting the expected classes.
     exp_cls_tags_set = np.unique(exp_y)
 
-    # Getting the predected classes.
-    pre_cls_tags_set = np.unique(pre_y)
-
     # Getting the number of samples per class. Zero tag is inlcuded.
     smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))
 
@@ -304,9 +301,7 @@ def pr_curve_macro(exp_y, pre_y, scrz, full_curve=False, arr_type=np.float32):
         crnt_prcls_num = np.unique(pre_y[:i+1]).shape[0]
 
         conf_mtrx = seq_contingency_table(
-            exp_y[:i+1], pre_y[:i+1],
-            exp_cls_tags_set=exp_cls_tags_set, pre_cls_tags_set=pre_cls_tags_set,
-            arr_type=arr_type
+            exp_y[:i+1], pre_y[:i+1], exp_cls_tags_set=exp_cls_tags_set, arr_type=arr_type
         )
 
         if scr != last_scr or full_curve:
@@ -822,7 +817,7 @@ def contingency_table(expd_y, pred_y, unknown_class=False, arr_type=np.float32):
     return conf_matrix
 
 
-def seq_contingency_table(expd_y, pred_y, exp_cls_tags_set, pre_cls_tags_set, arr_type=np.float32):
+def seq_contingency_table(expd_y, pred_y, exp_cls_tags_set, arr_type=np.float32):
     """Sequential Contingency table building the function.
 
     NOTE:
@@ -857,20 +852,10 @@ def seq_contingency_table(expd_y, pred_y, exp_cls_tags_set, pre_cls_tags_set, ar
             "Input arguments length inconsistency: expd_y and pred_y must have the same length."
         )
 
-    if pre_cls_tags_set[0] > 0 and exp_cls_tags_set[0] == 0:
-        raise Exception(
-            "Expected class tags set is starting with Zero(0) and Predicted class tags set is not."
-        )
-
     # Selecting the proper size for the confusion matrix.
-    if pre_cls_tags_set[0] == 0:
-        conf_dim = len(pre_cls_tags_set)
-    elif pre_cls_tags_set[0] > 0:
-        conf_dim = len(pre_cls_tags_set) + 1
-    else:
-        raise Exception(
-            "Invalid Predicted class tags set."
-        )
+    # NOTE: The maximum class tag value form the expected class tag values is defining the size...
+    # ...of the confusion matrix.
+    conf_dim = np.max(exp_cls_tags_set)
 
     # Initializing the confusion matrix.
     conf_matrix = np.zeros((conf_dim, conf_dim), dtype=arr_type)
@@ -883,7 +868,7 @@ def seq_contingency_table(expd_y, pred_y, exp_cls_tags_set, pre_cls_tags_set, ar
     # Keeping only the confusion matrix part where only the Real/Expected class tags are included...
     # ...i.e. excluding the Unknon-class tags zero(0) when it is not includetd in the expected_y...
     # ...vector.
-    if pre_cls_tags_set[0] == 0 and exp_cls_tags_set[0] > 0:
+    if np.min(exp_cls_tags_set) > 0:
         conf_matrix = conf_matrix[1::, 1::]
 
     return conf_matrix
