@@ -853,9 +853,9 @@ def seq_contingency_table(expd_y, pred_y, exp_cls_tags_set, arr_type=np.float32)
         )
 
     # Selecting the proper size for the confusion matrix.
-    # NOTE: The maximum class tag value form the expected class tag values is defining the size...
-    # ...of the confusion matrix.
-    conf_dim = np.max(exp_cls_tags_set)
+    # NOTE: The maximum class tag value form the expected class tag values, plus one (+1)...
+    # ...is defining the size of the confusion matrix.
+    conf_dim = np.max(exp_cls_tags_set) + 1
 
     # Initializing the confusion matrix.
     conf_matrix = np.zeros((conf_dim, conf_dim), dtype=arr_type)
