@@ -291,8 +291,11 @@ def pr_curve_macro(exp_y, pre_y, scrz, full_curve=False, arr_type=np.float32):
     # Keeping from 1 to end array in case the expected class tags start with above zero values.
     if smpls_per_cls[0] == 0 and exp_cls_tags_set[0] > 0:
         smpls_per_cls = smpls_per_cls[1::]
+    elif smpls_per_cls[0] > 0 and exp_cls_tags_set[0] == 0:
+        pass  # same as --> smpls_per_cls = smpls_per_cls
+        # Anythig else should rase an Exception.
     else:
-        raise Exception("Samples count in zero bin is different to the expected class tag count!")
+        raise Exception("Samples count in zero bin is different to the expected class tag cnt!")
 
     # Building the PR curve
     for i, scr in enumerate(scrz):
