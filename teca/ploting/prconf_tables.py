@@ -15,7 +15,7 @@ import base.param_combs as param_comb
 import analytics.metrix as mx
 
 
-def PRConf_table(h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata, unknown_class, prereccon=0):
+def PRConf_table(h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata, prereccon=0):
     """Precision Recall Tables and Contigency tables from H5D files.
 
         ### Make proper Definition here ###
@@ -39,12 +39,49 @@ def PRConf_table(h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata, unknown_cla
     # 2rd element contain predicted y values list.
     exp_y = rfse_data[1]
 
+    # Getting the expected classes.
+    exp_cls_tags_set = np.unique(exp_y)
+
+    # Getting the predected classes.
+    pre_cls_tags_set = np.unique(pred_y)
+
     # Calculating contigency table.
-    conf_mtrx = mx.contingency_table(exp_y, pred_y, unknown_class=unknown_class, arr_type=np.int32)
+    conf_mtrx = mx.seq_contingency_table(
+        exp_y, pred_y,
+        exp_cls_tags_set=exp_cls_tags_set, pre_cls_tags_set=pre_cls_tags_set,
+        arr_type=np.int32
+    )
 
     if prereccon in [0, 1]:
         # Calculating precision recall scores.
-        pr_tbl = mx.precision_recall_scores(conf_mtrx)
+
+        # Getting the number of samples per class. Zero tag is inlcuded.
+        smpls_per_cls = np.bincount(np.array(exp_y, dtype=np.int))
+
+        # Keeping from 1 to end array in case the expected class tags start with above zero values.
+        if smpls_per_cls[0] == 0 and exp_cls_tags_set[0] > 0:
+            smpls_per_cls = smpls_per_cls[1::]
+        else:
+            raise Exception("Samples count in zero bin is different to the expected class tag cnt!")
+
+        # Calculating Precision per class.
+        precisions = [
+            dg / float(pred_docs)
+            for dg, pred_docs in zip(np.diag(conf_mtrx), np.sum(conf_mtrx, axis=1))
+            if pred_docs > 0
+        ]
+
+        # Calculating Recall per class.
+        recall = [
+            dg / float(splpc)
+            for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls)
+            if splpc > 0
+        ]
+
+        # This funciton works only for the mx.contingency_table() output.
+        # pr_tbl = mx.precision_recall_scores(conf_mtrx)
+
+        pr_tbl = [precisions, recall]
 
     if prereccon in [0, 2]:
         col_sums = conf_mtrx.sum(axis=0)
@@ -154,8 +191,7 @@ if __name__ == '__main__':
 
             # Calculating the tables
             pr_tabel, conf_mtrx = PRConf_table(
-                h5d_fl1, h5d_fl2, kfolds, params_path, case[5], mix, strata=None,
-                unknown_class=True, prereccon=0
+                h5d_fl1, h5d_fl2, kfolds, params_path, case[5], mix, strata=None, prereccon=0
             )
 
             # Saving tables

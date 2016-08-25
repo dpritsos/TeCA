@@ -101,15 +101,12 @@ if __name__ == '__main__':
             # Calculating the Precision and Recall Scores per Genre. Precision for a Genre is...
             # ...only calculated when there is at least one sample being counted for this Genre.
             pre_cls_vect, rcl_cls_vect = PRConf_table(
-                h5d_fl1, h5d_fl2, kfolds, params_path, mix,
-                strata=None, unknown_class=True, prereccon=1
+                h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata=None, prereccon=1
             )
 
             # NOTE: The Precision and Recall vectors of scores per Genre might not have the same...
             # ...leght due to Unknown_Class tag expected or not expected case or just because...
             # ...for some Class we have NO Predicitons at all.
-            print pre_cls_vect
-            print rcl_cls_vect
             macro_p = np.mean(pre_cls_vect)
             macro_r = np.mean(rcl_cls_vect)
 

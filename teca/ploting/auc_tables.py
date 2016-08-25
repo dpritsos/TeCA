@@ -83,7 +83,7 @@ def params_prauc_tables(h5d_fl1, h5d_fl2, curvetype, kfolds,
                 # NOTE: Option 'unknow_class' is critical to be selected correctly depending...
                 # ...on the input.
                 prec, recl, t = mx.pr_curve_macro(
-                    expd_y, pred_y, pred_scores, full_curve=True, unknown_class=unknown_class
+                    expd_y, pred_y, pred_scores, full_curve=True,
                 )
 
                 # Interpolated at 11-Recall-Levels.
