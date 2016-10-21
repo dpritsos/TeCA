@@ -22,13 +22,13 @@ if __name__ == '__main__':
 
     case_od = coll.OrderedDict([
         ('doc_rep', ['3Words', '1Words', '4Chars']),  # '3Words', '1Words', '4Chars'
-        ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('corpus', ['SANTINIS']),  # , 'SANTINIS', 'KI04', '7Genres'
         ('dist', ['']),  # '', 'MinMax', 'MIX'
         ('vocab_size', [5000, 10000, 50000, 100000]),  # 5000, 10000, 50000, 100000
         ('features_size', [500, 1000, 5000, 10000, 50000, 90000]),  # 500, 1000, 5000, 10000, 50000, 90000
-        ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),  # 0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9
-        # ('Sigma', [0.5, 0.7, 0.9]),  # , 0.7, 0.9
-        # ('Iterations', [10, 50, 100])  # 10, 50,
+        # ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),  # 0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9
+        ('Sigma', [0.5, 0.7, 0.9]),  # 0.5, 0.7, 0.9
+        ('Iterations', [10, 50, 100]),  # 10, 50, 100
         ('KFold', [''])
     ])
 
@@ -46,22 +46,21 @@ if __name__ == '__main__':
 
             # Selecting filepath
             if case[1] == '7Genres':
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_'
-                # h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_'
+                # h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_'
 
             elif case[1] == 'KI04':
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
-                # h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_'
+                # h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_'
 
             else:
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
-                # h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_'
+                # h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_'
 
             h5d_fl = h5d_fl + case[0] + '_' + case[1]
 
             #  Selecting files to open and setting the mix flag on/off
             mix = False
-
             if case[2] == 'MIX':
                 h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
                 h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
@@ -81,15 +80,14 @@ if __name__ == '__main__':
             param_od = coll.OrderedDict([
                 ('vocab_size', [case[3]]),
                 ('features_size', [case[4]]),
-                ('nu', [case[5]]),
-                # ('Sigma', [case[5]]),  #
-                # ('Iterations', [case[6]])  #
+                # ('nu', [case[5]]),
+                ('Sigma', [case[5]]),  #
+                ('Iterations', [case[6]]),  #
                 ('KFold', [''])
             ])
 
             pr_aucz_var_table = params_prauc_tables(
-                h5d_fl1, h5d_fl2, 'multiclass_macro', kfolds, param_od, mix,
-                strata=None, trec=False, unknown_class=True
+                h5d_fl1, h5d_fl2, 'multiclass_macro', kfolds, param_od, mix, strata=None, trec=False
             )
 
             # ### Calculating Marco Averaging of Precision, Recall, F1, F0.5 ###
@@ -107,6 +105,7 @@ if __name__ == '__main__':
             # NOTE: The Precision and Recall vectors of scores per Genre might not have the same...
             # ...leght due to Unknown_Class tag expected or not expected case or just because...
             # ...for some Class we have NO Predicitons at all.
+            print pre_cls_vect, rcl_cls_vect
             macro_p = np.mean(pre_cls_vect)
             macro_r = np.mean(rcl_cls_vect)
 
@@ -120,7 +119,7 @@ if __name__ == '__main__':
 
             # pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
 
-            pr_auc = pr_aucz_var_table[0, 4]  # For RFSE is 5, for OCSVME 4
+            pr_auc = pr_aucz_var_table[0, 5]  # For RFSE is 5, for OCSVME 4
 
             # roc_auc = roc_aucz_var_table[0, 4]  # For RFSE is 5, for OCSVME 4
 
@@ -169,11 +168,11 @@ if __name__ == '__main__':
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
         ('dist', ['']),
-        ('corpus', ['KI04']),  # , 'KI04', 'SANTINIS', 7Genres
+        ('corpus', ['7Genres']),  # , 'KI04', 'SANTINIS', 7Genres
         ('doc_rep', ['3Words', '1Words', '4Chars'])  # '3Words', '1Words', '4Chars'
     ])
 
-    with open('/home/dimitrios/MaxScore_OCSVME_KI04.txt', 'w') as score_sf:
+    with open('/home/dimitrios/MaxScore_RFSE_7Genres_2016_10_11.txt', 'w') as score_sf:
 
         for idx, dm, cr, dr in param_comb.ParamGridIter(prnt_case_od, 'list'):
 

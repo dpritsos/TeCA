@@ -70,7 +70,7 @@ def PRConf_table(h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata, prereccon=0
         ]
 
         # Calculating Recall per class.
-        recall = [
+        recalls = [
             dg / float(splpc)
             for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls)
             if splpc > 0
@@ -79,7 +79,7 @@ def PRConf_table(h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata, prereccon=0
         # This funciton works only for the mx.contingency_table() output.
         # pr_tbl = mx.precision_recall_scores(conf_mtrx)
 
-        pr_tbl = [precisions, recall]
+        pr_tbl = [precisions, recalls]
 
     if prereccon in [0, 2]:
         col_sums = conf_mtrx.sum(axis=0)

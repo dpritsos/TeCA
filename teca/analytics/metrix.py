@@ -348,23 +348,22 @@ def pr_curve_macro(exp_y, pre_y, scrz, full_curve=False, arr_type=np.float32):
         ) / exp_cls_tags_set.shape[0]
     )
 
-    """
-    print 'DIAG', np.diag(conf_mtrx)
-    print 'SAMPLS', smpls_per_cls
-    print zip(np.diag(conf_mtrx), smpls_per_cls)
-    print 'RES', [dg / float(splpc)
-        for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls)
-        if splpc > 0]
-    print 'RES', [dg / float(pred_docs)
-        for dg, pred_docs in zip(np.diag(conf_mtrx), np.sum(conf_mtrx, axis=1))
-        if pred_docs > 0]
-    print 'RES', np.mean([dg / float(splpc)
-        for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls)
-        if splpc > 0])
-    print 'RES', np.mean([dg / float(pred_docs)
-        for dg, pred_docs in zip(np.diag(conf_mtrx), np.sum(conf_mtrx, axis=1))
-        if pred_docs > 0])
-    """
+
+    # print 'DIAG', np.diag(conf_mtrx)
+    # print 'SAMPLS', smpls_per_cls
+    # print zip(np.diag(conf_mtrx), smpls_per_cls)
+    # print 'RES', [dg / float(splpc)
+    #    for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls) if splpc > 0]
+    # print 'RES', [dg / float(pred_docs)
+    #    for dg, pred_docs in zip(np.diag(conf_mtrx), np.sum(conf_mtrx, axis=1)) if pred_docs > 0]
+    rr = [dg / float(splpc)
+        for dg, splpc in zip(np.diag(conf_mtrx), smpls_per_cls) if splpc > 0]
+    pp = [dg / float(pred_docs)
+        for dg, pred_docs in zip(np.diag(conf_mtrx), np.sum(conf_mtrx, axis=1)) if pred_docs > 0]
+    print 'Rd', exp_cls_tags_set.shape[0], 'Rd mean', len(rr)
+    print 'Pd', crnt_prcls_num, 'Pd m', len(pp)
+    print 'RES', np.mean(rr)
+    print 'RES', np.mean(pp)
 
     # Converting Precision and Recall lists to numpy.arrays
     precision = np.array(precision, dtype=arr_type)

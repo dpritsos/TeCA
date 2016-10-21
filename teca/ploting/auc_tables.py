@@ -16,8 +16,7 @@ import base.param_combs as param_comb
 import analytics.metrix as mx
 
 
-def params_prauc_tables(h5d_fl1, h5d_fl2, curvetype, kfolds,
-                        params_od, mix, strata, trec, unknown_class=True):
+def params_prauc_tables(h5d_fl1, h5d_fl2, curvetype, kfolds, params_od, mix, strata, trec):
     """Area Under the Curve(AUC) paired with table of parameters for PR curve.
 
         # # #  Make proper Definition here # # #

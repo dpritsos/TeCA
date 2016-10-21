@@ -2,16 +2,18 @@
 
 # !/usr/bin/env python
 
+import tables as tb
+import matplotlib.pyplot as plt
+import numpy as np
 import sys
 sys.path.append('../../teca')
 sys.path.append('../../../DoGSWrapper/dogswrapper')
 
-import tables as tb
-import matplotlib.pyplot as plt
-import numpy as np
-
 from analytics.metrix import pr_curve, pr_curve_macro, reclev11_max
-from data_retrieval.rfsedata import multiclass_multimeasure_res, multiclass_res, onevsall_res, onevsall_multimeasure_res
+from data_retrieval.data import multiclass_res
+from data_retrieval.data import rfse_multiclass_multimeasure_res
+from data_retrieval.data import rfse_onevsall_res
+from data_retrieval.data import rfse_onevsall_multimeasure_res
 
 
 # Symbols for plosting.
@@ -28,13 +30,13 @@ def plist2ppath(params_lst, ensbl='RFSE'):
 
     if ensbl == 'RFSE':
 
-        pnames = ['vocab_size', 'features_size', 'Sigma', 'Iterations']
+        pnames = ['vocab_size', 'features_size', 'Sigma', 'Iterations', 'KFold']
 
         return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
 
     elif ensbl == 'OCSVME':
 
-        pnames = ['vocab_size', 'features_size', 'nu']
+        pnames = ['vocab_size', 'features_size', 'nu', 'KFold']
 
         return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
 
@@ -306,29 +308,29 @@ leg_pos = 3
 
 """
 # 7Genres
-fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/MacroPRC11AVG_RFSE_OCSVME_7Genres.eps'
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/MacroPRC11AVG_RFSE_OCSVME_SANTINIS.eps'
 # fig_save_file = '/home/dimitrios/MacroPRC11AVG_RFSE_OCSVME_7Genres.eps'
 
 comb_lst = [
-    ['RFSE', '4Chars', '7Genres', 'Comb', [10000, 1000, 0.5, 100]],
-    ['RFSE', '3Words', '7Genres', 'Cosine', [100000, 50000, 0.5, 50]],
-    ['RFSE', '3Words', '7Genres', 'Cosine', [100000, 50000, 0.7, 50]],
-    ['OCSVME', '3Words', '7Genres', '', [10000, 5000, 0.1]],
-    ['OCSVME', '4Chars', '7Genres', '', [100000, 50000, 0.1]],
-    ['OCSVME', '3Words', '7Genres', '', [100000, 50000, 0.07]],
+    # ['RFSE', '3Words', 'SANTINIS', 'Comb', [50000, 10000, 0.5, 100, '']],
+    # ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100, '']],
+    # ['RFSE', '3Words', 'SANTINIS', 'MinMax', [100000, 5000, 0.9, 100, '']],
+    # ['OCSVME', '3Words', 'SANTINIS', '', [50000, 10000, 0.07, '']],
+    # ['OCSVME', '3Words', 'SANTINIS', '', [50000, 10000, 0.1, '']],
+    ['OCSVME', '3Words', 'SANTINIS', '', [100000, 50000, 0.07, '']],
 
 ]
 
 plt_dsp_attr = [
-    ['k' + line_type[1] + symbol[0], 2, 14, "RFSE - C4G - Comb - AUC"],
-    ['k' + line_type[1] + symbol[1], 2, 14, "RFSE - W3G - Cos - $F_{1}$"],
-    ['k' + line_type[1] + symbol[2], 2, 14, "RFSE - W3G - Cos - $F_{0.5}$"],
-    ['k' + line_type[0] + symbol[0], 2, 14, "OCSVM - W3G - AUC"],
-    ['k' + line_type[0] + symbol[1], 2, 14, "OCSVM - C4G - $F_{1}$"],
+    # ['k' + line_type[1] + symbol[0], 2, 14, "RFSE - Comb - $AUC$"],
+    # ['k' + line_type[1] + symbol[1], 2, 14, "RFSE - Cos - $F_{1}$"],
+    # ['k' + line_type[1] + symbol[2], 2, 14, "RFSE - W3G - Cos - $F_{0.5}$"],
+    # ['k' + line_type[0] + symbol[0], 2, 14, "OCSVM - $AUC$"],
+    # ['k' + line_type[0] + symbol[1], 2, 14, "OCSVM - $F_{1}$"],
     ['k' + line_type[0] + symbol[2], 2, 14, "OCSVM - W3G - $F_{0.5}$"],
 ]
 
-leg_pos = 1
+leg_pos = 4
 
 """
 
@@ -400,12 +402,9 @@ for i, comb_val in enumerate(comb_lst):
     h5d_fl = h5d_fl + comb_val[1] + '_' + comb_val[2]
 
     #  Selecting files to open and setting the mix flag on/off
-    mix = False
-
     if comb_val[3] == 'Comb':
         h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
         h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
-        mix = True
 
     elif comb_val[3] == 'MinMax':
         h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
@@ -422,7 +421,7 @@ for i, comb_val in enumerate(comb_lst):
         # Building the parapmeters path
         params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
 
-        pred_scores, expd_y, pred_y = multiclass_multimeasure_res(
+        pred_scores, expd_y, pred_y = rfse_multiclass_multimeasure_res(
             # h5d_fl1, h5d_fl2, kfolds, params_path, comb_val[4][2],
             # genre_tag=None, binary=True, strata=None
             h5d_fl1, h5d_fl2, kfolds, params_path, binary=False, strata=None  #  binary=False <- for Micro
@@ -449,12 +448,12 @@ for i, comb_val in enumerate(comb_lst):
 
     # Creating the Actual MACRO PRC.
     y, x, t = pr_curve_macro(
-        expd_y, pred_y, pred_scores, full_curve=True, unknown_class=True
+        expd_y, pred_y, pred_scores, full_curve=True
     )
 
     # Getting the max 11 Recall Leves in TREC way.
     # if i == 0:
-    # y, x = reclev11_max(y, x, trec=True)
+    y, x = reclev11_max(y, x, trec=False)
 
     # Selecting array indices with non-zero cells.
     non_zero_idx = np.where(y > 0)
@@ -504,12 +503,12 @@ plt.grid(True)
 # plt.legend(
 #   loc='upper left', bbox_to_anchor=(0.62, 0.4), ncol=1, fancybox=True, shadow=True, fontsize=16
 # )
-plt.legend(loc=leg_pos, fancybox=True, shadow=True, fontsize=16)
+plt.legend(loc=3, fancybox=True, shadow=True, fontsize=16)
 plt.yticks(fontsize=18)
 plt.xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], fontsize=18)
-plt.tight_layout()
+# plt.tight_layout()
 
 # Saving the ploting to File
-plt.savefig(fig_save_file, bbox_inches='tight')
+# plt.savefig(fig_save_file, bbox_inches='tight')
 
 plt.show()

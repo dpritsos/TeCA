@@ -21,13 +21,14 @@ if __name__ == '__main__':
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     case_od = coll.OrderedDict([
-        ('doc_rep', ['W3G']),
+        ('doc_rep', ['W1G']),
         ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
-        ('dist', ['', 'MinMax', 'MIX']),  # '', 'MinMax',
+        ('dist', ['']),  # '', 'MinMax', 'MIX'
         ('vocab_size', [50000]),
         ('features_size', [10000]),
-        ('Sigma', [0.5]),
-        ('Iterations', [100]),
+        ('nu', [0.07,  0.1]),
+        # ('Sigma', [0.5]),
+        # ('Iterations', [100]),
         ('onlytest_gnrs_splts', [1, 2, 3, 4, 5, 6, 7]),
         ('onlytest_splt_itrs', [0, 1, 2, 3]),
         ('kfolds', [''])
@@ -45,6 +46,7 @@ if __name__ == '__main__':
             # Starting timing for this loop for monitoring the cosuption of the socre calculations.
             start_tm = tm.time()
 
+            """
             # Selecting filepath
             if case[1] == '7Genres':
                 # h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_'
@@ -52,28 +54,34 @@ if __name__ == '__main__':
 
             elif case[1] == 'KI04':
                 # h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_W3G_KI04/Openness_RFSE_'
+                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W3G_KI04/Openness_RFSE_'
 
             else:
                 # h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
                 h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/Openness_RFSE_'
 
-            h5d_fl = h5d_fl + case[0] + '_' + case[1]
-
+            h5d_fl = h5d_fl + case[0] + '_' + case[1] +
+            Openness_RFSE_COS_W3G_KI04_2016_10_14.h5
+            """
             #  Selecting files to open and setting the mix flag on/off
             mix = False
 
             if case[2] == 'MIX':
-                h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
-                h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
+                # h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
+                # h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
+                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W1G_KI04/Openness_RFSE_COS_W1G_KI04_2016_10_19.h5', 'r')
+                h5d_fl2 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_W1G_KI04_FOR_MIX_ONLY/Openness_RFSE_MinMax_W1G_KI04_2016_10_19.h5', 'r')
                 mix = True
 
             elif case[2] == 'MinMax':
-                h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
+                # h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
+                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_W3G_KI04/Openness_RFSE_MinMax_W3G_KI04_2016_10_16.h5', 'r')
                 h5d_fl2 = None
 
             else:
-                h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
+                # h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
+                # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W3G_KI04/Openness_RFSE_COS_W3G_KI04_2016_10_14.h5', 'r')
+                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_OCSVME_W1G_KI04/Openness_OCSVME_W1G_KI04_2016_10_19.h5', 'r')
                 h5d_fl2 = None
 
             # ### Calculating the PR Curves ###
@@ -82,17 +90,16 @@ if __name__ == '__main__':
             param_od = coll.OrderedDict([
                 ('vocab_size', [case[3]]),
                 ('features_size', [case[4]]),
-                # ('nu', [case[5]])
-                ('Sigma', [case[5]]),  #
-                ('Iterations', [case[6]]),  #
-                ('onlytest_gnrs_splts', [case[7]]),
-                ('onlytest_splt_itrs', [case[8]]),
+                ('nu', [case[5]]),
+                # ('Sigma', [case[5]]),  #
+                # ('Iterations', [case[6]]),  #
+                ('onlytest_gnrs_splts', [case[6]]),
+                ('onlytest_splt_itrs', [case[7]]),
                 ('kfolds', [''])
             ])
 
             pr_aucz_var_table = params_prauc_tables(
-                h5d_fl1, h5d_fl2, 'multiclass_macro', kfolds, param_od, mix,
-                strata=None, trec=False, unknown_class=True  # unknown_class=True/False!!!
+                h5d_fl1, h5d_fl2, 'multiclass_macro', kfolds, param_od, mix, strata=None, trec=False
             )
 
             # ### Calculating Marco Averaging of Precision, Recall, F1, F0.5 ###
@@ -105,8 +112,7 @@ if __name__ == '__main__':
             # Calculating the Precision and Recall Scores per Genre. Precision for a Genre is...
             # ...only calculated when there is at least one sample being counted for this Genre.
             pre_cls_vect, rcl_cls_vect = PRConf_table(
-                h5d_fl1, h5d_fl2, kfolds, params_path, mix,
-                strata=None, unknown_class=True, prereccon=1  # unknown_class=True/False!!!
+                h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata=None, prereccon=1
             )
 
             # NOTE: The Precision and Recall vectors of scores per Genre might not have the same...
@@ -125,13 +131,7 @@ if __name__ == '__main__':
 
             # pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
 
-            pr_auc = pr_aucz_var_table[0, 7]  # For RFSE is 4, for OCSVME 3
-
-            # roc_auc = roc_aucz_var_table[0, 4]  # For RFSE is 4, for OCSVME 3
-
-            # join_auc = 1
-            # for a in m_aucz_var_table[0, 4::]:  # For RFSE is 4, for OCSVME 3
-            #     join_auc *= a
+            pr_auc = pr_aucz_var_table[0, 6]  # For RFSE is 7, for OCSVME 6
 
             # maucs_num = len(m_aucz_var_table[0, 4::])  # For RFSE is 4, for OCSVME 3
             # m_auc_f1 = maucs_num / np.sum([1.0/mauc for mauc in m_aucz_var_table[0, 3::]])
@@ -170,6 +170,7 @@ if __name__ == '__main__':
     # Getting the macro averaged P, R, F1, F05
     pr_macroavgs = np.vstack(pr_macro_lst)
 
+    """
     # # # Saving Resaults to the following file.
     prnt_case_od = coll.OrderedDict([
         ('critirion_idx', [-1, -2, -3]),  # -5, -6, -8
@@ -177,9 +178,13 @@ if __name__ == '__main__':
         ('corpus', ['KI04']),  # , 'KI04', 'SANTINIS', 7Genres
         ('doc_rep', ['W3G'])
     ])
+    """
 
-    with open('/home/dimitrios/Openess_KI04_W3G.txt', 'w') as score_sf:
+    with open('/home/dimitrios/Openness_OCSVME_W1G_KI04_2016_10_21.txt', 'w') as score_sf:
 
+        json.dump(fp=score_sf, obj=pr_macroavgs[:, :].tolist())
+
+        """
         for idx, dm, cr, dr in param_comb.ParamGridIter(prnt_case_od, 'list'):
 
             # Getting Combination.
@@ -219,3 +224,4 @@ if __name__ == '__main__':
             except:
                 score_sf.write("Empty Array\n")
                 print "Empty Array"
+        """

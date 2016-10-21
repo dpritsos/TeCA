@@ -207,7 +207,7 @@ def rfse_multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, bina
 
     # Collecting Scores for and Expected Values for every fold given in kfold list.
     for k in kfolds:
-
+        print  params_path, k
         # Getting the Expected genre tags
         exp_y = hf5_fl1.get_node(params_path + str(k), name='expected_Y').read()
 
@@ -265,7 +265,9 @@ def rfse_multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, bina
 
         docs_num = ms_array_fl1.shape[1]
         itrs = np.arange(ms_array_fl1.shape[0])
+        print ms_array_fl1.shape, docs_num
         ms_arr1_cls = np.hsplit(ms_array_fl1, docs_num)
+        print ms_array_fl2.shape, docs_num
         ms_arr2_cls = np.hsplit(ms_array_fl2, docs_num)
         pc_arr1_cls = np.hsplit(pc_array_fl1, docs_num)
         pc_arr2_cls = np.hsplit(pc_array_fl2, docs_num)
@@ -485,3 +487,50 @@ def rfse_onevsall_multimeasure_res(hf5_fl1, hf5_fl2, genre_tag, kfolds, params_p
 
     # Retunring Predicted Scores and Expected Values
     return (PS, EY, PY)
+
+
+def svm_onevsall_scores(res_h5file, genres, kfolds, params_path):
+    """Retrieval functions for the date returned from 1-VS-Set SVM
+    """
+    # Initializing.
+    tp_cnt_per_gnr = np.zeros(len(genres))
+    pos_cnt_per_gnr = np.zeros(len(genres))
+    epos_cnt_per_gnr = np.zeros(len(genres))
+
+    # Collecting Scores for and Expected Values for every fold given in kfold list.
+    for k in kfolds:
+
+        # Getting the Expected genre tags.
+        ey = res_h5file.get_node(params_path + str(k), name='expected_Y').read()
+
+        # Getting the Prediction vector per genre per sample.
+        py_per_grn = res_h5file.get_node(params_path + str(k), name='predicted_Y_per_gnr').read()
+
+        # Getting Genres Class Indecies.
+        gnr_cls_indecies = res_h5file.get_node(params_path + str(k), name='gnr_cls_idx').read()
+
+        for row_i, gc_idxs in enumerate(gnr_cls_indecies):
+
+            # Converting the Expected Y into 1-vs-All binary form.
+            ey_bin = np.where((ey == gc_idxs), 1., -1.)
+
+            # print py_per_grn[row_i] == ey_bin
+
+            # Counting True Postives for this fold and add the to the genre's total postives count.
+            tp_cnt_per_gnr[gc_idxs-1] += np.sum(
+                np.where(((py_per_grn[row_i] == ey_bin) & (py_per_grn[row_i] == 1.)), 1., 0.)
+            )
+
+            # Counting postives for this fold and add the to the genre's total postives count.
+            pos_cnt_per_gnr[gc_idxs-1] += np.sum(np.where((py_per_grn[row_i] == 1.), 1., 0.))
+
+            # Countinsg TP+FN (Expected Positive) for this fold and add the to the genre's.
+            epos_cnt_per_gnr[gc_idxs-1] += np.sum(np.where((ey_bin == 1.), 1., 0.))
+
+    print tp_cnt_per_gnr
+    print pos_cnt_per_gnr
+    P_per_gnr = tp_cnt_per_gnr / pos_cnt_per_gnr
+    R_per_gnr = tp_cnt_per_gnr / epos_cnt_per_gnr
+    F1_per_gnr = 2 * np.multiply(P_per_gnr, R_per_gnr) / np.add(P_per_gnr, R_per_gnr)
+
+    return P_per_gnr, R_per_gnr, F1_per_gnr
