@@ -21,16 +21,16 @@ if __name__ == '__main__':
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     case_od = coll.OrderedDict([
-        ('doc_rep', ['W1G']),
+        ('doc_rep', ['C4G']),
         ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
         ('dist', ['']),  # '', 'MinMax', 'MIX'
         ('vocab_size', [50000]),
         ('features_size', [10000]),
         ('nu', [0.07,  0.1]),
-        # ('Sigma', [0.5]),
+        # ('Sigma', [0.7]),
         # ('Iterations', [100]),
-        ('onlytest_gnrs_splts', [1, 2, 3, 4, 5, 6, 7]),
-        ('onlytest_splt_itrs', [0, 1, 2, 3]),
+        ('onlytest_gnrs_splts', [1, 2, 3, 4, 5, 6, 7]),  # 1, 2, 3, 4, 5, 6,
+        ('onlytest_splt_itrs', [0, 1, 2, 3]),  # 1, 2, 3
         ('kfolds', [''])
     ])
 
@@ -69,19 +69,27 @@ if __name__ == '__main__':
             if case[2] == 'MIX':
                 # h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
                 # h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
-                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W1G_KI04/Openness_RFSE_COS_W1G_KI04_2016_10_19.h5', 'r')
-                h5d_fl2 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_W1G_KI04_FOR_MIX_ONLY/Openness_RFSE_MinMax_W1G_KI04_2016_10_19.h5', 'r')
+                # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W1G_KI04/Openness_RFSE_COS_W1G_KI04_2016_10_19.h5', 'r')
+                # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_W1G_KI04_ONLY_7/Openness_RFSE_MinMax_W1G_ONLY_7_KI04_2016_10_23.h5', 'r')
+                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_C4G_KI04/Openness_RFSE_COS_C4G_KI04_2016_10_24.h5', 'r')
+
+                # h5d_fl2 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_W1G_KI04_FOR_MIX_ONLY/Openness_RFSE_MinMax_W1G_KI04_2016_10_21.h5', 'r')
+                # h5d_fl2 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W1G_KI04_ONLY_7/Openness_RFSE_COS_W1G_ONLY_7_KI04_2016_10_22.h5', 'r')
+                h5d_fl2 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_C4G_KI04_FOR_MIX_ONLY/Openness_RFSE_MinMax_C4G_KI04_2016_10_25.h5', 'r')
+
                 mix = True
 
             elif case[2] == 'MinMax':
                 # h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
-                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_W3G_KI04/Openness_RFSE_MinMax_W3G_KI04_2016_10_16.h5', 'r')
+                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_C4G_KI04/Openness_RFSE_MinMax_C4G_KI04_2016_10_25.h5', 'r')
                 h5d_fl2 = None
 
             else:
                 # h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
                 # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W3G_KI04/Openness_RFSE_COS_W3G_KI04_2016_10_14.h5', 'r')
-                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_OCSVME_W1G_KI04/Openness_OCSVME_W1G_KI04_2016_10_19.h5', 'r')
+                # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_OCSVME_W1G_KI04/Openness_OCSVME_W1G_KI04_2016_10_19.h5', 'r')
+                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_OCSVME_C4G_KI04/Openness_OCSVME_C4G_KI04_2016_10_19.h5', 'r')
+
                 h5d_fl2 = None
 
             # ### Calculating the PR Curves ###
@@ -180,7 +188,7 @@ if __name__ == '__main__':
     ])
     """
 
-    with open('/home/dimitrios/Openness_OCSVME_W1G_KI04_2016_10_21.txt', 'w') as score_sf:
+    with open('/home/dimitrios/Openness_OCSVME_C4G_KI04_2016_10_25.txt', 'w') as score_sf:
 
         json.dump(fp=score_sf, obj=pr_macroavgs[:, :].tolist())
 

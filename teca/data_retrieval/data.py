@@ -207,7 +207,7 @@ def rfse_multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, bina
 
     # Collecting Scores for and Expected Values for every fold given in kfold list.
     for k in kfolds:
-        print  params_path, k
+        # print  params_path, k
         # Getting the Expected genre tags
         exp_y = hf5_fl1.get_node(params_path + str(k), name='expected_Y').read()
 
@@ -265,9 +265,9 @@ def rfse_multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, bina
 
         docs_num = ms_array_fl1.shape[1]
         itrs = np.arange(ms_array_fl1.shape[0])
-        print ms_array_fl1.shape, docs_num
+        # print ms_array_fl1.shape, docs_num
         ms_arr1_cls = np.hsplit(ms_array_fl1, docs_num)
-        print ms_array_fl2.shape, docs_num
+        # print ms_array_fl2.shape, docs_num
         ms_arr2_cls = np.hsplit(ms_array_fl2, docs_num)
         pc_arr1_cls = np.hsplit(pc_array_fl1, docs_num)
         pc_arr2_cls = np.hsplit(pc_array_fl2, docs_num)

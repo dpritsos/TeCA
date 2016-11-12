@@ -5,5 +5,10 @@ import numpy as np
 sys.path.append('../../teca')
 from analytics.metrix import openness
 
-for tn in range(7, 0, -1):
-    print openness(tn, 8, tn)
+
+# openness(tn, ts, tg)
+# print openness(12, 88, 88)
+
+#for tn in range(7, 0, -1):
+    # print openness(tn, 8, tn)
+print openness(11, 12, 11)

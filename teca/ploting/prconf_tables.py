@@ -199,7 +199,7 @@ if __name__ == '__main__':
             # np.savetxt(pr_tabel_fname, pr_tabel)
 
             np.set_printoptions(precision=3, threshold=10000, suppress=True, linewidth=100)
-            print pr_tabel
+            # print pr_tabel
             # print conf_mtrx
             # print pr_scores[:, :]"""
 
