@@ -489,19 +489,20 @@ def rfse_onevsall_multimeasure_res(hf5_fl1, hf5_fl2, genre_tag, kfolds, params_p
     return (PS, EY, PY)
 
 
-def svm_onevsall_scores(res_h5file, genres, kfolds, params_path):
+def svm_onevsall_scores(res_h5file, params_path, kfolds, trd=np.Inf):
     """Retrieval functions for the date returned from 1-VS-Set SVM
     """
     # Initializing.
-    tp_cnt_per_gnr = np.zeros(len(genres))
-    pos_cnt_per_gnr = np.zeros(len(genres))
-    epos_cnt_per_gnr = np.zeros(len(genres))
+    PY_lst = list()
+    EY_lst = list()
+    PS_lst = list()
 
     # Collecting Scores for and Expected Values for every fold given in kfold list.
     for k in kfolds:
 
         # Getting the Expected genre tags.
         ey = res_h5file.get_node(params_path + str(k), name='expected_Y').read()
+        EY_lst.append(ey)
 
         # Getting the Prediction vector per genre per sample.
         py_per_grn = res_h5file.get_node(params_path + str(k), name='predicted_Y_per_gnr').read()
@@ -509,28 +510,66 @@ def svm_onevsall_scores(res_h5file, genres, kfolds, params_path):
         # Getting Genres Class Indecies.
         gnr_cls_indecies = res_h5file.get_node(params_path + str(k), name='gnr_cls_idx').read()
 
-        for row_i, gc_idxs in enumerate(gnr_cls_indecies):
+        # Getting Near-Plane Scores and Far-Plane Scores
+        near_scores = res_h5file.get_node(params_path + str(k), name='predicted_Ns_per_gnr').read()
+        far_scores = res_h5file.get_node(params_path + str(k), name='predicted_Fs_per_gnr').read()
 
-            # Converting the Expected Y into 1-vs-All binary form.
-            ey_bin = np.where((ey == gc_idxs), 1., -1.)
+        # Reforming the results by adding some decision tolerance to the 1-vs-Set algorithm...
+        # ...maybe a threshold can be used in some cases.
+        for col_i in np.arange(py_per_grn.shape[1]):
 
-            # print py_per_grn[row_i] == ey_bin
+            # In case postives are more than one.
+            if sum(py_per_grn[:, col_i] == 1) > 1:
 
-            # Counting True Postives for this fold and add the to the genre's total postives count.
-            tp_cnt_per_gnr[gc_idxs-1] += np.sum(
-                np.where(((py_per_grn[row_i] == ey_bin) & (py_per_grn[row_i] == 1.)), 1., 0.)
-            )
+                # Getting the minimum distances form both planes and keeping the smallest...
+                # ...Then set as positive the answare of the enselbme where the ABSOLUTE distace...
+                # ...is the smallest to one of the hyperplanes. All the other are set to -1.
+                nmin_abs_d = np.min(np.abs(near_scores[:, col_i]))
+                fmin_abs_d = np.min(np.abs(far_scores[:, col_i]))
 
-            # Counting postives for this fold and add the to the genre's total postives count.
-            pos_cnt_per_gnr[gc_idxs-1] += np.sum(np.where((py_per_grn[row_i] == 1.), 1., 0.))
+                # Setting all answares to negative.
+                py_per_grn[:, col_i] = -1
 
-            # Countinsg TP+FN (Expected Positive) for this fold and add the to the genre's.
-            epos_cnt_per_gnr[gc_idxs-1] += np.sum(np.where((ey_bin == 1.), 1., 0.))
+                # Setting the proper one as postive IF any has a smaller than the threshold...
+                # ...absolute distanace value.
+                if nmin_abs_d <= fmin_abs_d and nmin_abs_d <= trd:
+                    py_per_grn[np.argmin(np.abs(near_scores[:, col_i])), col_i] = 1
+                elif fmin_abs_d <= trd:
+                    py_per_grn[np.argmin(np.abs(far_scores[:, col_i])), col_i] = 1
 
-    print tp_cnt_per_gnr
-    print pos_cnt_per_gnr
-    P_per_gnr = tp_cnt_per_gnr / pos_cnt_per_gnr
-    R_per_gnr = tp_cnt_per_gnr / epos_cnt_per_gnr
-    F1_per_gnr = 2 * np.multiply(P_per_gnr, R_per_gnr) / np.add(P_per_gnr, R_per_gnr)
+        # Creating the Predicted-Y and Predicted-Scores arrays.
+        py = list()
+        ps = list()
 
-    return P_per_gnr, R_per_gnr, F1_per_gnr
+        #
+        hypls_ds_diffs = np.abs(far_scores - near_scores)
+
+        for col_i in np.arange(py_per_grn.shape[1]):
+
+            # Getting the index for the class was postive and mapping it to the...
+            # ...Class-tags-idx array.
+            py.append(gnr_cls_indecies[np.argmax(py_per_grn[:, col_i])])
+
+            # Calculating the decision score. Which is the absolute differece between the...
+            # ...distances from the hyperplanes reverced, because the closer to the center...
+            # ...between the hyperplanes the more certain we are for the decision. Thus, the...
+            # ...score should be reversed and nomralised by the max value.
+            norm_reverced_diffz = (1 - (hypls_ds_diffs[:, col_i] / float(np.max(hypls_ds_diffs))))
+            ps.append(np.max(norm_reverced_diffz))
+
+        PY_lst.append(np.array(py))
+        PS_lst.append(np.array(ps))
+
+    # Stacking the lists to Single arrays for PS and EY respectively
+    PS = np.hstack(PS_lst)
+    EY = np.hstack(EY_lst)
+    PY = np.hstack(PY_lst)
+
+    # Shorting Results by Predicted Scores
+    inv_srd_idx = np.argsort(PS)[::-1]
+    PS = PS[inv_srd_idx]
+    EY = EY[inv_srd_idx]
+    PY = PY[inv_srd_idx]
+
+    # Retunring Predicted Scores and Expected Values
+    return (PS, EY, PY)

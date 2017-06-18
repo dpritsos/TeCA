@@ -1,176 +1,205 @@
-#!/usr/bin/env python
 
-import sys
-sys.path.append('../../src')
-sys.path.append('../../../DoGSWrapper/src')
+
+# !/usr/bin/env python
 
 import tables as tb
+import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
-
-from analytics.metrix import pr_curve, reclev11_averaging, \
-    roc_curve, reclev11_max, reclev11_nearest, smooth_linear
-from data_retrieval.rfsedata import get_predictions
-from data_retrieval.rfsemixdata import get_predictions as get_predictions_mix
-import base.param_combs as param_comb
-import collections as coll
 import numpy as np
+import sys
+sys.path.append('../../teca')
+sys.path.append('../../../DoGSWrapper/dogswrapper')
 
-import sklearn.metrics as skm
-#from data_retrieval.ocsvmedata import get_predictions as get_ocsvme
-#from sklearn import grid_search
-#from sklearn.metrics import roc_curve as roc
-#from sklearn.metrics import precision_recall_curve
+from analytics.metrix import pr_curve, pr_curve_macro, reclev11_max
+from data_retrieval.data import multiclass_res
+from data_retrieval.data import rfse_multiclass_multimeasure_res
+from data_retrieval.data import rfse_onevsall_res
+from data_retrieval.data import rfse_onevsall_multimeasure_res
+
+# Funciton for creating the parameter paths requred for get_predicitons()
+def plist2ppath(params_lst, ensbl='RFSE'):
+
+    if ensbl == 'RFSE':
+
+        pnames = ['vocab_size', 'features_size', 'Sigma', 'Iterations', 'KFold']
+
+        return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
+
+    elif ensbl == 'OCSVME':
+
+        pnames = ['vocab_size', 'features_size', 'nu', 'KFold']
+
+        return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
+
+    else:
+        raise Exception('Invalid Ensebmle Name')
+
 
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-params_od = coll.OrderedDict([
-    ('vocab_size', [100000]),  #[5000, 10000, 50000, 100000]),
-    ('features_size', [50000]),  # 1000, 5000, 10000, 50000, 90000]
-    #'3.Bagging', [0.66],
-    #('nu', [0.9]) #, 0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9])
-    ('Sigma', [0.5]),  # [0.5, 0.7, 0.9])
-    ('Iterations', [50])  # [10, 50, 100]
-])
+# 7Genres
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/MacroPRC11AVG_RFSE_OCSVME_SANTINIS.eps'
+# fig_save_file = '/home/dimitrios/MacroPRC11AVG_RFSE_OCSVME_7Genres.eps'
 
-h5d_fl = str(
-    #'/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_3Words_7Genres'
-    #'/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_3Words_7Genres'
-    #'/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_3Words_SANTINIS'
-    #'/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_3Words_SANTINIS'
-    '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_1Words_KI04'
-    #'/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_3Words_KI04'
-)
-
-h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
-#h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
+comb_lst = [
+    # ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100, '']],
+    ['RFSE', '1Words', 'SANTINIS', 'Cosine', [50000, 5000, 0.5, 100, '']],
+    ['RFSE', '1Words', 'SANTINIS', 'Cosine', [5000, 1000, 0.5, 100, '']],
+    ['OCSVME', '1Words', 'SANTINIS', '', [50000, 5000, 0.1, '']],
+    ['OCSVME', '1Words', 'SANTINIS', '', [50000, 500, 0.1, '']],
 
 
-symbol = ['o', 'v', '^', '+', 'x', 's', '*', '<', '>', 'H',
-          '1', '2', '3', '4', 'D', 'h', '8', 'd', 'p', '.', ',']
+]
 
-line_type = ['--', '--', '--', '--', '-', '-', '-', '-', '-', '--',
-             '--', '--', '--.', '-', '-', '-', '-', '--', '--', '--', '--']
+plt_dsp_attr = [
+    ['black', '-', 'o', "W1G - RFSE - F1"],
+    ['orange', '-', 'o', "W1G - RFSE - AUC"],
+    ['purple', '--', 'o', "W1G - OCSVM - F1"],
+    ['lime', '--', 'o', "W1G - OCSVM - AUC"],
+]
 
-color = ['k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k',
-         'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k', 'k']
+# # # #  The Ploting Process Starts Here # # # #
+fig = plt.figure(num=1, figsize=(12, 8), facecolor='w', edgecolor='k')  # dpi=300,
+ax = fig.add_subplot(111)
 
-color2 = ['r', 'g', 'b', 'k', 'c', 'y', 'm', 'r', 'g', 'b', 'k', 'c', 'y', 'm']
+annots_lst = list()
+labels_lst = list()
 
-fg1 = plt.figure(num=1, figsize=(12, 8), dpi=80, facecolor='w', edgecolor='k')
-ax1 = fg1.add_subplot(111)
-#fg2 = plt.figure(num=2, figsize=(30, 8), dpi=80, facecolor='w', edgecolor='k')
-#ax2 = fg2.add_subplot(111)
+for i, comb_val in enumerate(comb_lst):
 
-i = 0
-bar_width = 0.15
+    # Selecting filepath
+    if comb_val[0] == 'RFSE':
 
-for params_lst, params_path in \
-    zip(param_comb.ParamGridIter(params_od, 'list'),
-        param_comb.ParamGridIter(params_od, 'path')):
+        if comb_val[2] == '7Genres':
+            h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_'
 
-    if params_lst[0] > params_lst[1]:
+        elif comb_val[2] == 'KI04':
+            h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_'
 
-        pred_scores, expd_y, pred_y = get_predictions(
-        h5d_fl1, kfolds, params_path, genre_tag=None, binary=True, strata=None
-            #(10, 1000)
+        elif comb_val[2] == 'SANTINIS':
+            h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_'
+
+    elif comb_val[0] == 'OCSVME':
+
+        if comb_val[2] == '7Genres':
+            h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_'
+
+        elif comb_val[2] == 'KI04':
+            h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
+
+        elif comb_val[2] == 'SANTINIS':
+            h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
+
+    h5d_fl = h5d_fl + comb_val[1] + '_' + comb_val[2]
+
+    #  Selecting files to open and setting the mix flag on/off
+    if comb_val[3] == 'Comb':
+        h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
+        h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
+
+    elif comb_val[3] == 'MinMax':
+        h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
+
+    elif comb_val[3] == 'Cosine' or comb_val[3] == '':
+        h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
+
+    else:
+        raise Exception("Option: " + comb_val[3] + " is not valid for Measure Option")
+
+    # Getting the predictions
+    if comb_val[3] == 'Comb':
+
+        # Building the parapmeters path
+        params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
+
+        pred_scores, expd_y, pred_y = rfse_multiclass_multimeasure_res(
+            # h5d_fl1, h5d_fl2, kfolds, params_path, comb_val[4][2],
+            # genre_tag=None, binary=True, strata=None
+            h5d_fl1, h5d_fl2, kfolds, params_path, binary=False, strata=None
+            #  binary=False <- for Micro
         )
 
-        """
+    else:
 
-        pred_scores, expd_y, pred_y = get_predictions_mix(
-            h5d_fl1, h5d_fl2, kfolds, params_path, params_lst[2],
-            genre_tag=None, binary=True, strata=None
-            #(10, 1000)
+        # Building the parapmeters path
+        params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
+
+        pred_scores, expd_y, pred_y = multiclass_res(
+            h5d_fl1, kfolds, params_path, binary=False, strata=None
         )
 
-        """
+    # Closing the h5d files.
+    if comb_val[3] == 'Comb':
+        h5d_fl1.close()
+        h5d_fl2.close()
+    else:
+        h5d_fl1.close()
 
-        #pred_scores, expd_y, pred_y = get_ocsvme(res_h5file, kfolds, params_path, genre_tag=None)
+    # Creating the Actual PRC.
+    # y, x, t = pr_curve(expd_y, pred_scores, full_curve=True, is_truth_tbl=True)
 
-        #y, x, t = roc_curve(expd_y, pred_scores, full_curve=False)
-        y1, x1, t = pr_curve(expd_y, pred_scores, full_curve=True, is_truth_tbl=True)
-
-        #Experimental ToDO
-        #y, x, t = PTPR_curve(expd_y, pred_scores, full_curve=False)
-
-        #y, x, t = skm.precision_recall_curve(expd_y, pred_scores)
-
-        # Smoothing out the Precision (y axis) of the P-R Curve.
-        # CRITICAL: The P sould be inverted from the lowest to
-        # the highest values*.
-        # *( it suppose the higest values to be normally fist in order )
-        #y = smooth_linear(y[::-1])
-
-        # Inverting the y (i.e. Precition) axis values after has been smoothed out.
-        #y = y[::-1]
-
-        # OR
-
-        #y, x = smooth_linear(y[::-1], x[::-1]); y, x = y[::-1], x[::-1]
-
-        #y, x = reclev11_averaging(y, x)
-
-        #y, x = reclev11_nearest(y, x)
-
-        y, x = reclev11_max(y1, x1)
-
-        # plt.locator_params(nbins=4)
-        ax1.plot(
-            x, y,
-            color[i] + line_type[i] + symbol[i], linewidth=1,
-            markeredgewidth=1,
-            #label="KI04 - 3Words"
-            #"(" + str(i) + ") Feat " + str(params_lst[2]) + \
-            #" - " + str(params_lst[3])
-        )
-
-        #ax1.plot(
-        #    x1, y1,
-        #    color[i] + line_type[i] + symbol[i], linewidth=1,
-        #    markeredgewidth=1,
-        #    #label="KI04 - 3Words"
-            #"(" + str(i) + ") Feat " + str(params_lst[2]) + \
-            #" - " + str(params_lst[3])
-        #)
-
-        # ax1.title("SANTINIS")
-        # ax1.yticks([ .50, .55, .60, .65, .70, .75, .80, .85, .90, .95, 1.00])
-        # .10, .15, .20, .25, .30, .35, .40, .45,
-        ax1.grid(True)
-        ax1.legend(loc=4, fancybox=True, shadow=True)
-        #ax1.legend(loc=3, bbox_to_anchor=(0.08, -0.4), ncol=2, fancybox=True, shadow=True)
-
-        hist, bins = np.histogram(pred_y, 12)
-
-        # print len(pred_y[pred_y == 0]), hist, bins
-
-        #tmp = np.zeros(len(bins+1))
-        #tmp[0:-1] = hist[::]
-        #hist = tmp
-
-        # ax2.bar(bins[0:12] + bar_width , hist, width=0.1, color=color2[i])
-        # i, zdir='y', alpha=0.8, align='center', width=bins[1]-bins[0])
-        i += 1
-        bar_width += 0.1
-
-"""
-plt.xticks(
-    bins[0:12] + bar_width,
-    (
-        'Dont Know', "blog", "eshop", "faq", "frontpage", "listing", "php", "spage",
-        "diy_mini", "editorial", "feat_articles", "short_bio"
+    # Creating the Actual MACRO PRC.
+    y, x, t = pr_curve_macro(
+        expd_y, pred_y, pred_scores, full_curve=True
     )
-)
-"""
 
-print 'Y', ', '.join([str(i) for i in y])
-print
-print 'X', ', '.join([str(i) for i in x])
-plt.xticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.02])
-plt.yticks([0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.02])
+    # Getting the max 11 Recall Leves in TREC way.
+    # if i == 0:
+    y, x = reclev11_max(y, x, trec=False)
 
+    # Selecting array indices with non-zero cells.
+    non_zero_idx = np.where(y > 0)
+
+    # # # Do the Plotting
+    linestyle = {
+        "color": plt_dsp_attr[i][0],
+        "linestyle": plt_dsp_attr[i][1],
+        "marker": plt_dsp_attr[i][2],
+        "linewidth": 2,
+        "markeredgewidth": 2,
+        'markeredgecolor': 'white',
+    }
+
+    ax.plot(x[non_zero_idx], y[non_zero_idx], **linestyle)
+
+    annots_lst.append(mlines.Line2D([], [], markersize=0, linewidth=3, color=plt_dsp_attr[i][0]))
+    labels_lst.append(plt_dsp_attr[i][3])
+
+    # lndump = mlines.Line2D([], [], markersize=0, linewidth=0)
+
+    """
+    ax.annotate(
+    'F1=0.782, AUC=0.843',
+    xy=(0.12, 0.98), xytext=(0.2, 0.85), fontsize=16,
+    arrowprops={'arrowstyle':'->', 'connectionstyle':'arc3,rad=-0.3', 'facecolor':'black'},
+    bbox={'boxstyle':'round,pad=0.5','facecolor':'lightgray', 'alpha':0.9}
+    )
+    """
+
+# Give the poper attributes for better ploting
+ax.yaxis.grid()
+
+lndump = mlines.Line2D([], [], markersize=0, linewidth=0)
+annots_lst.append(lndump)
+annots_lst.append(lndump)
+labels_lst.append("")
+labels_lst.append("")
+
+plt.legend(
+    annots_lst,
+    labels_lst,
+    bbox_to_anchor=(0.0, 1.01, 1.0, 0.101),
+    loc=3, ncol=3, mode="expand", borderaxespad=0.0,
+    fancybox=False, shadow=False, fontsize=14
+).get_frame().set_linewidth(0.0)
+
+plt.yticks(fontsize=12)
+plt.xticks(np.arange(0.0, 1.1, 0.1), fontsize=12)
+plt.ylabel('Precision', fontsize=14)
+plt.xlabel('Recall', fontsize=14)
+# plt.tight_layout()
+
+# Saving the ploting to File
+# plt.savefig(fig_save_file, bbox_inches='tight')
 
 plt.show()
-
-h5d_fl1.close()
-h5d_fl2.close()

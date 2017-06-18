@@ -30,7 +30,7 @@ if __name__ == '__main__':
         # ('Sigma', [0.7]),
         # ('Iterations', [100]),
         ('onlytest_gnrs_splts', [1, 2, 3, 4, 5, 6, 7]),  # 1, 2, 3, 4, 5, 6,
-        ('onlytest_splt_itrs', [0, 1, 2, 3]),  # 1, 2, 3
+        ('onlytest_splt_itrs', [0, 1, 2, 3, 4, 5, 6, 7]),  # 1, 2, 3
         ('kfolds', [''])
     ])
 
@@ -46,23 +46,6 @@ if __name__ == '__main__':
             # Starting timing for this loop for monitoring the cosuption of the socre calculations.
             start_tm = tm.time()
 
-            """
-            # Selecting filepath
-            if case[1] == '7Genres':
-                # h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_'
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/Openness_RFSE_4Chars_7Genres/Openness_RFSE_'
-
-            elif case[1] == 'KI04':
-                # h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W3G_KI04/Openness_RFSE_'
-
-            else:
-                # h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
-                h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/Openness_RFSE_'
-
-            h5d_fl = h5d_fl + case[0] + '_' + case[1] +
-            Openness_RFSE_COS_W3G_KI04_2016_10_14.h5
-            """
             #  Selecting files to open and setting the mix flag on/off
             mix = False
 
@@ -71,25 +54,24 @@ if __name__ == '__main__':
                 # h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
                 # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W1G_KI04/Openness_RFSE_COS_W1G_KI04_2016_10_19.h5', 'r')
                 # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_W1G_KI04_ONLY_7/Openness_RFSE_MinMax_W1G_ONLY_7_KI04_2016_10_23.h5', 'r')
-                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_C4G_KI04/Openness_RFSE_COS_C4G_KI04_2016_10_24.h5', 'r')
+                h5d_fl1 = tb.open_file('/media/dimitrios/TurnstoneDisk/KI-04/Openness_RFSE_COS_and_MinMax_C4G_KI04_8Iter_MaxNorm/Openness_RFSE_COS_C4G_KI04_8Iter_2016_12_04.h5', 'r')
 
                 # h5d_fl2 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_W1G_KI04_FOR_MIX_ONLY/Openness_RFSE_MinMax_W1G_KI04_2016_10_21.h5', 'r')
                 # h5d_fl2 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W1G_KI04_ONLY_7/Openness_RFSE_COS_W1G_ONLY_7_KI04_2016_10_22.h5', 'r')
-                h5d_fl2 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_C4G_KI04_FOR_MIX_ONLY/Openness_RFSE_MinMax_C4G_KI04_2016_10_25.h5', 'r')
+                h5d_fl2 = tb.open_file('/media/dimitrios/TurnstoneDisk/KI-04/Openness_RFSE_COS_and_MinMax_C4G_KI04_8Iter_MaxNorm/Openness_RFSE_MinMax_C4G_KI04_8Iter_2016_12_07.h5', 'r')
 
                 mix = True
 
             elif case[2] == 'MinMax':
                 # h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
-                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_MinMax_C4G_KI04/Openness_RFSE_MinMax_C4G_KI04_2016_10_25.h5', 'r')
+                h5d_fl1 = tb.open_file('/media/dimitrios/TurnstoneDisk/KI-04/Openness_RFSE_COS_and_MinMax_C4G_KI04_8Iter_MaxNorm/Openness_RFSE_MinMaxOnly_C4G_KI04_8Iter_2016_12_07.h5', 'r')
                 h5d_fl2 = None
 
             else:
                 # h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
                 # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W3G_KI04/Openness_RFSE_COS_W3G_KI04_2016_10_14.h5', 'r')
                 # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_OCSVME_W1G_KI04/Openness_OCSVME_W1G_KI04_2016_10_19.h5', 'r')
-                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_OCSVME_C4G_KI04/Openness_OCSVME_C4G_KI04_2016_10_19.h5', 'r')
-
+                h5d_fl1 = tb.open_file('/media/dimitrios/TurnstoneDisk/KI-04/Openness_OCSVME_C4G_KI04_8Iter_MaxNorm/Openness_OCSVME_C4G_KI04_8Iter_2016_02_04.h5', 'r')
                 h5d_fl2 = None
 
             # ### Calculating the PR Curves ###
@@ -188,7 +170,7 @@ if __name__ == '__main__':
     ])
     """
 
-    with open('/home/dimitrios/Openness_OCSVME_C4G_KI04_2016_10_25.txt', 'w') as score_sf:
+    with open('/home/dimitrios/Openness_OCSVME_C4G_KI04_2016_12_09.txt', 'w') as score_sf:
 
         json.dump(fp=score_sf, obj=pr_macroavgs[:, :].tolist())
 

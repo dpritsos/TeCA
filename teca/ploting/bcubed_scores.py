@@ -22,18 +22,19 @@ params_range = coll.OrderedDict([
    #  ('kfolds', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
    ('train_split_step_method', [
       # [0.3, 0.1, 'rndred_trn_rest4_test'],
-      [0.10, 0.10, 'rndred_trn_fixed_test'],
+      [0.50, 0.10, 'rndred_trn_fixed_test'],
    ]),
-   ('vocab_size', [50000]),  # 10, 50, 500, 5000, 10000,
-   ('max_iter', [100]),  # 30, 100, 300
+  ('vocab_size', [100000]),  # 10, 50, 500, 5000, 10000,
+   ('max_iter', [12]),  # 30, 100, 300
    ('converg_diff', [0.001]),  # 0.0005, 0.005, 0.01, 0.05, 0.1, 0.5
-   ('learing_rate', [0.003]),  # 0.3, ,0.03, , 0.001
-   ('#', [0])
+   ('learing_rate', [0.0001]),  # 0.3, ,0.03, , 0.001
+   # [0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3])
+   ('#', [0, 1, 2, 3, 4])
 ])
 
 h5df_str = str(
-    '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/SemiSupClust_3W_7Genres_text/' +
-    'HMRFKmeans_3W_7Genres_10%_50k_text_cy.h5'
+    '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/SemiSupClust_W1G_7Genres/' +
+    'HMRFKmeans_W1G_7Genres_LSI30.h5'
     # '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/
     # '/home/dimitrios/Synergy-Crawler/SANTINIS/
     # '/home/dimitrios/Synergy-Crawler/SANTINIS/
