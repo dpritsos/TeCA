@@ -62,7 +62,7 @@ def multiclass_res(res_h5file, kfolds, params_path, binary=None, strata=None):
 
         # Loading predicted scores.
         pre_score = res_h5file.get_node(
-            params_path + str(k), name='predicted_scores'
+            params_path + str(k), name='predicted_scores'  # 'predicted_scores' predicted_R
         ).read()
 
         # Getting the Expected genre tags.
@@ -568,6 +568,46 @@ def svm_onevsall_scores(res_h5file, params_path, kfolds, trd=np.Inf):
     # Shorting Results by Predicted Scores
     inv_srd_idx = np.argsort(PS)[::-1]
     PS = PS[inv_srd_idx]
+    EY = EY[inv_srd_idx]
+    PY = PY[inv_srd_idx]
+
+    # Retunring Predicted Scores and Expected Values
+    return (PS, EY, PY)
+
+
+def opennnrd_onevsall_scores(res_h5file, params_path, kfolds, trd=np.Inf):
+    """Retrieval functions for the date returned from 1-VS-Set SVM
+    """
+    # Initializing.
+    PY_lst = list()
+    EY_lst = list()
+    PS_lst = list()
+
+    # Collecting Scores for and Expected Values for every fold given in kfold list.
+    for k in kfolds:
+
+        # Getting the Expected genre tags.
+        ey = res_h5file.get_node(params_path + str(k), name='expected_Y').read()
+        EY_lst.append(np.array(ey))
+
+        # Getting the Prediction vector per genre per sample.
+        py = res_h5file.get_node(params_path + str(k), name='predicted_Y').read()
+        PY_lst.append(np.array(py))
+
+        # Getting Genres Class Indecies.
+        rt = res_h5file.get_node(params_path + str(k), name='predicted_R').read()
+        PS_lst.append(np.array(rt))
+
+    # Stacking the lists to Single arrays for PS and EY respectively
+
+    PS = np.hstack(PS_lst)
+    EY = np.hstack(EY_lst)
+    PY = np.hstack(PY_lst)
+
+    # Shorting Results by Predicted Scores
+    inv_srd_idx = np.argsort(PS)  # Min to max order is required here
+    PS = PS[inv_srd_idx]
+    print PS
     EY = EY[inv_srd_idx]
     PY = PY[inv_srd_idx]
 

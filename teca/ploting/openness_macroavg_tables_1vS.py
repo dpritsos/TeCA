@@ -12,7 +12,7 @@ sys.path.append('../../../DoGSWrapper/dogswrapper')
 import base.param_combs as param_comb
 from prconf_tables import PRConf_table
 from auc_tables import params_prauc_tables
-from data_retrieval.data import svm_onevsall_scores
+from data_retrieval.data import svm_onevsall_scores, opennnrd_onevsall_scores
 import analytics.metrix as mx
 
 
@@ -22,6 +22,7 @@ if __name__ == '__main__':
     # Parameters used for the experiments required for selecting specific or group of results
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+    """
     case_od = coll.OrderedDict([
         ('svm_type', ['oneclass']),
         ('vocab_size', [100000]),
@@ -37,9 +38,30 @@ if __name__ == '__main__':
         # ('kfolds', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
         ('kfolds', ['']),
     ])
+    """
+
+    case_od = coll.OrderedDict([
+        ('vocab_size', [100000]),
+        # ('features_size', [10000]),
+        ('split_ptg', [0.5]),
+        ('ukwn_slt_ptg', [0.5]),
+        ('rt_lims_stp', [[0.9, 1.0, 0.1]]),
+        ('lmda', [0.5]),
+        ('uknw_ctgs_num', [1]),
+        ('uknw_ctgs_num_splt_itrs', [0]),
+        # ('kfolds', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+        ('kfolds', ['']),
+    ])
 
     # Openning the Results HD5 file.
-    h5d_fl = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/LOPSVM_Openness_W1G_KI04_OCSVM_MyWay/LOPSVM_W1G_KI04_minmax_F1.h5', 'r')
+    h5d_fl = tb.open_file(
+        "/media/dimitrios/TurnstoneDisk/KI-04/" +
+        "Openness_NNRD_W1G_KI04/Openness_NNRD_W1G_KI04_2017_07_31_TESTING_DROP_IT.h5",
+        'r'
+    )
+
+    #  /home/dimitrios/Synergy-Crawler/KI-04/LOPSVM_Openness_W1G_KI04_OCSVM_MyWay'
+    # +'/LOPSVM_W1G_KI04_minmax_F1.h5', 'r')
 
     # List of all macro averaging precision recall values.
     pr_macro_lst = list()
@@ -51,7 +73,8 @@ if __name__ == '__main__':
         start_tm = tm.time()
 
         # ######## Calculating the PR Curves ########
-        pscores, expd_y, pred_y = svm_onevsall_scores(h5d_fl, case_path, kfolds, trd=np.Inf)
+        # pscores, expd_y, pred_y = svm_onevsall_scores(h5d_fl, case_path, kfolds, trd=np.Inf)
+        pscores, expd_y, pred_y = opennnrd_onevsall_scores(h5d_fl, case_path, kfolds, trd=np.Inf)
 
         # NOTE: Option 'unknow_class' is critical to be selected correctly depending...
         # ...on the input.
@@ -142,7 +165,7 @@ if __name__ == '__main__':
         # print pr_scores[:, :]"""
 
         # Saving table
-        with open('/home/dimitrios/Openness_1vsSet_OCSVM_MyWay_2016_11_21.txt', 'w') as score_sf:
+        with open('/home/dimitrios/TEST.txt', 'w') as score_sf:
             json.dump(fp=score_sf, obj=np.array(case).tolist())
 
     # Closing HDF5 files

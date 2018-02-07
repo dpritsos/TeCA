@@ -11,7 +11,7 @@ from data_retrieval.data import multiclass_res
 from data_retrieval.data import rfse_multiclass_multimeasure_res
 from data_retrieval.data import rfse_onevsall_res
 from data_retrieval.data import rfse_onevsall_multimeasure_res
-import base.param_combs as param_comb
+import tools.paramcombs as param_comb
 import analytics.metrix as mx
 
 

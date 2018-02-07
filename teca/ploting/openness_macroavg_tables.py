@@ -9,7 +9,7 @@ import json
 sys.path.append('../../teca')
 sys.path.append('../../../DoGSWrapper/dogswrapper')
 
-import base.param_combs as param_comb
+import tools.paramcombs as param_comb
 from prconf_tables import PRConf_table
 from auc_tables import params_prauc_tables
 
@@ -20,6 +20,20 @@ if __name__ == '__main__':
     # Parameters used for the experiments required for selecting specific or group of results
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+    case_od = coll.OrderedDict([
+        ('doc_rep', ['POS1G']),
+        ('corpus', ['SANTINIS']),
+        ('vocab_size', [43]),
+        ('features_size', [4, 10, 20, 40]),
+        ('sim_func', ['cosine_sim', 'minmax_sim']),
+        ('Sigma', [0.5, 0.7, 0.9]),
+        ('Iterations', [10, 50, 100, 200, 300, 500]),
+        ('marked_uknw_ctg_lst', [12]),
+        ('kfolds', ['']),
+    ])
+
+
+    """
     case_od = coll.OrderedDict([
         ('doc_rep', ['C4G']),
         ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
@@ -34,14 +48,103 @@ if __name__ == '__main__':
         ('kfolds', [''])
     ])
 
+
+    case_od = coll.OrderedDict([
+        ('doc_rep', ['W1G']),
+        ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('dist', ['']),  # '', 'MinMax', 'MIX'
+        ('vocab_size', [100000]),
+        ('features_size', [100000]),
+        ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),
+        ('uknw_ctgs_num', [1]),  # [1, 2, 3, 4, 5, 6, 7]),
+        ('uknw_ctgs_num_splt_itrs', [0, 1, 2, 3, 4, 5, 6, 7]),
+        ('kfolds', ['']),
+    ])
+
+
+
+    case_od = coll.OrderedDict([
+        ('doc_rep', ['W1G']),
+        ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('dist', ['']),  # '', 'MinMax', 'MIX'
+        ('vocab_size', [0]),
+        ('features_size', [25, 50, 100]),
+        ('sim_func', ['cosine_sim']),
+        ('Sigma', [0.5, 0.7, 0.9]),
+        ('Iterations', [10, 50, 100]),
+        # ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),
+        ('dims', [50, 100, 250, 500, 1000]),
+        ('min_trm_fq', [3, 10]),
+        ('win_size', [3, 8, 20]),
+        ('algo', ['PV-DBOW']),
+        ('alpha', [0.025]),
+        ('min_alpha', [0.025]),
+        ('epochs', [1, 3, 10]),
+        ('decay', [0.002, 0.02]),
+        ('uknw_ctgs_num', [1, 2, 3, 4, 5, 6, 7]),
+        ('uknw_ctgs_num_splt_itrs', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]),
+        ('kfolds', ['']),
+    ])
+
+
+
+    case_od = coll.OrderedDict([
+        ('doc_rep', ['C4G']),
+        ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('dist', ['']),  # '', 'MinMax', 'MIX'
+        ('vocab_size', [0]),
+        ('features_size', [25, 50, 100]),
+        ('sim_func', ['cosine_sim']),
+        # ('Sigma', [0.5, 0.7, 0.9]),
+        # ('Iterations', [10, 50, 100]),
+        ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),
+        ('dims', [50, 100, 250, 500, 1000]),
+        ('min_trm_fq', [3, 10]),
+        ('win_size', [3, 8, 20]),
+        ('algo', ['PV-DBOW']),
+        ('alpha', [0.025]),
+        ('min_alpha', [0.025]),
+        ('epochs', [1, 3, 10]),
+        ('decay', [0.002, 0.02]),
+        ('uknw_ctgs_num', [1, 2, 3, 4, 5, 6, 7]),
+        ('uknw_ctgs_num_splt_itrs', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]),
+        ('kfolds', ['']),
+    ])
+
+
+    case_od = coll.OrderedDict([
+        ('doc_rep', ['C4G']),
+        ('corpus', ['KI04']),  # , 'SANTINIS', 'KI04', '7Genres'
+        ('dist', ['']),  # '', 'MinMax', 'MIX'
+        ('vocab_size', [500]),
+        ('features_size', [0]),
+        ('split_ptg', [0.7]),
+        ('ukwn_slt_ptg', [0.3]),
+        ('rt_lims_stp', [[0.5, 1.0, 0.2]]),
+        ('lmda', [0.2, 0.5, 0.7]),
+        ('dims', [50, 100, 250]),
+        ('min_trm_fq', [3]),
+        ('win_size', [8]),
+        ('algo', ['PV-DBOW']),
+        ('alpha', [0.025]),
+        ('min_alpha', [0.025]),
+        ('epochs', [3]),
+        ('decay', [0.002]),
+        ('uknw_ctgs_num', [1, 4]),
+        ('uknw_ctgs_num_splt_itrs', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]),
+        ('kfolds', ['']),
+    ])
+    """
     # List of all macro averaging precision recall values.
     pr_macro_lst = list()
+
 
     # Creating tables for tall the above cases.
     for case, case_path in zip(param_comb.ParamGridIter(case_od, 'list'),
                                param_comb.ParamGridIter(case_od, 'path')):
 
-        if case[3] > case[4]:
+        if case[2] >= case[3]:
+        # if case[8] >= case[4]:
 
             # Starting timing for this loop for monitoring the cosuption of the socre calculations.
             start_tm = tm.time()
@@ -71,20 +174,36 @@ if __name__ == '__main__':
                 # h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
                 # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W3G_KI04/Openness_RFSE_COS_W3G_KI04_2016_10_14.h5', 'r')
                 # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_OCSVME_W1G_KI04/Openness_OCSVME_W1G_KI04_2016_10_19.h5', 'r')
-                h5d_fl1 = tb.open_file('/media/dimitrios/TurnstoneDisk/KI-04/Openness_OCSVME_C4G_KI04_8Iter_MaxNorm/Openness_OCSVME_C4G_KI04_8Iter_2016_02_04.h5', 'r')
+                #h5d_fl1 = tb.open_file('/media/dimitrios/TurnstoneDisk/KI-04/Openness_OCSVME_C4G_KI04_8Iter_MaxNorm/Openness_OCSVME_C4G_KI04_8Iter_2016_02_04.h5', 'r')
+                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/POS_SANTINIS/RFSE_POS_SANTINIS_2018_02_04.h5', 'r')
                 h5d_fl2 = None
 
             # ### Calculating the PR Curves ###
-
             # Preparing input for params_prauc_tables().
             param_od = coll.OrderedDict([
-                ('vocab_size', [case[3]]),
-                ('features_size', [case[4]]),
-                ('nu', [case[5]]),
-                # ('Sigma', [case[5]]),  #
-                # ('Iterations', [case[6]]),  #
-                ('onlytest_gnrs_splts', [case[6]]),
-                ('onlytest_splt_itrs', [case[7]]),
+                ('vocab_size', [case[2]]),
+                # ('split_ptg', [case[4]]),
+                # ('ukwn_slt_ptg', [case[5]]),
+                # ('rt_lims_stp', [case[6]]),
+                # ('lmda', [case[7]]),
+                ('features_size', [case[3]]),
+                # ('nu', [case[5]]),
+                ('sim_func', [case[4]]),
+                ('Sigma', [case[5]]),  #
+                ('Iterations', [case[6]]),  #
+                ('marked_uknw_ctg_lst', [case[7]]),
+                # ('dims', [case[7]]),
+                # ('min_trm_fq', [case[8]]),
+                # ('win_size', [case[9]]),
+                # ('algo', [case[10]]),
+                # ('alpha', [case[11]]),
+                # ('min_alpha', [case[12]]),
+                # ('epochs', [case[13]]),
+                # ('decay', [case[14]]),
+                # ('uknw_ctgs_num', [case[15]]),
+                # ('uknw_ctgs_num_splt_itrs', [case[16]]),
+                # ('onlytest_gnrs_splts', [case[6]]),
+                # ('onlytest_splt_itrs', [case[7]]),
                 ('kfolds', [''])
             ])
 
@@ -95,7 +214,7 @@ if __name__ == '__main__':
             # ### Calculating Marco Averaging of Precision, Recall, F1, F0.5 ###
 
             # Reformationg parametera path to be given properly to PRConf_table().
-            params_path = '/' + '/'.join(case_path.split('/')[4::])
+            params_path = '/' + '/'.join(case_path.split('/')[3::])
 
             # print pr_tabel_fname
 
@@ -121,7 +240,7 @@ if __name__ == '__main__':
 
             # pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
 
-            pr_auc = pr_aucz_var_table[0, 6]  # For RFSE is 7, for OCSVME 6
+            pr_auc = pr_aucz_var_table[0, 7]  # For RFSE is 7, for OCSVME 6
 
             # maucs_num = len(m_aucz_var_table[0, 4::])  # For RFSE is 4, for OCSVME 3
             # m_auc_f1 = maucs_num / np.sum([1.0/mauc for mauc in m_aucz_var_table[0, 3::]])
@@ -130,11 +249,15 @@ if __name__ == '__main__':
 
             # Macro Averaging AUCs per Genre.
             case.extend([macro_p, macro_r, pr_auc, f05, f1])
+            # case.extend([macro_p, macro_r, f05, f1])
             # m_auc_f1, join_auc, auc, pr_mean, f05, f1
+
+            # Patch for NNDR ONLY
+            # case[7] = str(case[7])
             pr_macro_lst.append(case)
 
             # Printing the case and the time cosumed for calculation.
-            print case
+            print "append", case
             timel = tm.gmtime(tm.time() - start_tm)[3:6] + ((tm.time() - int(start_tm))*1000,)
             print "Time elapsed : %d:%d:%d:%d" % timel
 
@@ -158,6 +281,7 @@ if __name__ == '__main__':
                 h5d_fl1.close()
 
     # Getting the macro averaged P, R, F1, F05
+    print pr_macro_lst
     pr_macroavgs = np.vstack(pr_macro_lst)
 
     """
@@ -170,7 +294,7 @@ if __name__ == '__main__':
     ])
     """
 
-    with open('/home/dimitrios/Openness_OCSVME_C4G_KI04_2016_12_09.txt', 'w') as score_sf:
+    with open('/home/dimitrios/OpenSet_MUCTGs_RFSE_POS1G_SANTINIS_2018_02_07.txt', 'w') as score_sf:
 
         json.dump(fp=score_sf, obj=pr_macroavgs[:, :].tolist())
 

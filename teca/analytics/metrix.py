@@ -263,8 +263,8 @@ def pr_curve_macro(exp_y, pre_y, scrz, full_curve=False, arr_type=np.float32):
         raise Exception("full_curve argument expected values are: Only {0,1} or {True,False}.")
 
     # In place conversion of numerical type in case the input is in integer.
-    exp_y = exp_y.astype(arr_type, copy=False)
-    pre_y = pre_y.astype(arr_type, copy=False)
+    exp_y = exp_y.astype(np.int, copy=False)
+    pre_y = pre_y.astype(np.int, copy=False)
     scrz = scrz.astype(arr_type, copy=False)
 
     # Initialising True Positive and False Positive rates.
@@ -843,8 +843,8 @@ def seq_contingency_table(expd_y, pred_y, exp_cls_tags_set, arr_type=np.float32)
 
     """
 
-    expd_y = np.array(expd_y, dtype=arr_type)
-    pred_y = np.array(pred_y, dtype=arr_type)
+    expd_y = np.array(expd_y, dtype=np.int)
+    pred_y = np.array(pred_y, dtype=np.int)
 
     if expd_y.shape[0] != pred_y.shape[0]:
         raise Exception(
@@ -862,7 +862,7 @@ def seq_contingency_table(expd_y, pred_y, exp_cls_tags_set, arr_type=np.float32)
     # Filling in the confusion matrix.
     for i, j in zip(pred_y, expd_y):
         # Counting true and false predicions.
-        conf_matrix[i, j] += 1
+        conf_matrix[i, j] += 1.0
 
     # Keeping only the confusion matrix part where only the Real/Expected class tags are included...
     # ...i.e. excluding the Unknon-class tags zero(0) when it is not includetd in the expected_y...
