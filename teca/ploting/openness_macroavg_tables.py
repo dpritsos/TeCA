@@ -21,17 +21,24 @@ if __name__ == '__main__':
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     case_od = coll.OrderedDict([
-        ('doc_rep', ['POS1G']),
+        ('terms_type', ['POS3G']),
         ('corpus', ['SANTINIS']),
-        ('vocab_size', [43]),
-        ('features_size', [4, 10, 20, 40]),
+        ('vocab_size', [16200]),  # 16200, 1330
+        ('features_size', [4, 10, 20, 40, 100, 500, 1000, 5000, 10000, 15000]),  # , 5000, 10000, 15000 , 100, 500, 1000
         ('sim_func', ['cosine_sim', 'minmax_sim']),
         ('Sigma', [0.5, 0.7, 0.9]),
-        ('Iterations', [10, 50, 100, 200, 300, 500]),
+        ('Iterations', [1000]),
+        # ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),
         ('marked_uknw_ctg_lst', [12]),
         ('kfolds', ['']),
     ])
 
+    # ('terms_type', ['POS2G']),
+    # ('vocab_size', [43]),  # 1330,
+    # ('features_size', [4, 10, 20, 40]),  # , 5000, 10000, 15000 , 100, 500, 1000
+    # ('sim_func', ['cosine_sim', 'minmax_sim']),
+    # ('Sigma', [0.5, 0.7, 0.9]),
+    # ('Iterations', [10, 50, 100, 200, 300, 500]),
 
     """
     case_od = coll.OrderedDict([
@@ -175,19 +182,20 @@ if __name__ == '__main__':
                 # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_RFSE_COS_W3G_KI04/Openness_RFSE_COS_W3G_KI04_2016_10_14.h5', 'r')
                 # h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/KI-04/Openness_OCSVME_W1G_KI04/Openness_OCSVME_W1G_KI04_2016_10_19.h5', 'r')
                 #h5d_fl1 = tb.open_file('/media/dimitrios/TurnstoneDisk/KI-04/Openness_OCSVME_C4G_KI04_8Iter_MaxNorm/Openness_OCSVME_C4G_KI04_8Iter_2016_02_04.h5', 'r')
-                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/POS_SANTINIS/RFSE_POS_SANTINIS_2018_02_04.h5', 'r')
+                h5d_fl1 = tb.open_file('/home/dimitrios/Synergy-Crawler/SANTINIS/POS_SANTINIS/RFSE_POS3G_SANTINIS_2018_02_18_ITR1000_#3.h5', 'r')
                 h5d_fl2 = None
 
             # ### Calculating the PR Curves ###
             # Preparing input for params_prauc_tables().
             param_od = coll.OrderedDict([
+                ('terms_type', [case[0]]),
                 ('vocab_size', [case[2]]),
                 # ('split_ptg', [case[4]]),
                 # ('ukwn_slt_ptg', [case[5]]),
                 # ('rt_lims_stp', [case[6]]),
                 # ('lmda', [case[7]]),
                 ('features_size', [case[3]]),
-                # ('nu', [case[5]]),
+                # ('nu', [case[4]]),
                 ('sim_func', [case[4]]),
                 ('Sigma', [case[5]]),  #
                 ('Iterations', [case[6]]),  #
@@ -214,7 +222,9 @@ if __name__ == '__main__':
             # ### Calculating Marco Averaging of Precision, Recall, F1, F0.5 ###
 
             # Reformationg parametera path to be given properly to PRConf_table().
-            params_path = '/' + '/'.join(case_path.split('/')[3::])
+            print str(case_path.split('/')[1])
+            params_path = '/' + str(case_path.split('/')[1]) + '/' +\
+                '/'.join(case_path.split('/')[3::])
 
             # print pr_tabel_fname
 
@@ -240,7 +250,7 @@ if __name__ == '__main__':
 
             # pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
 
-            pr_auc = pr_aucz_var_table[0, 7]  # For RFSE is 7, for OCSVME 6
+            pr_auc = pr_aucz_var_table[0, 8]  # For RFSE is 8, for OCSVME 6
 
             # maucs_num = len(m_aucz_var_table[0, 4::])  # For RFSE is 4, for OCSVME 3
             # m_auc_f1 = maucs_num / np.sum([1.0/mauc for mauc in m_aucz_var_table[0, 3::]])
@@ -294,7 +304,7 @@ if __name__ == '__main__':
     ])
     """
 
-    with open('/home/dimitrios/OpenSet_MUCTGs_RFSE_POS1G_SANTINIS_2018_02_07.txt', 'w') as score_sf:
+    with open('/home/dimitrios/OpenSet_MUCTGs_RFES_POS1G_V16200_SANTINIS_2018_02_18_ITR1000.txt', 'w') as score_sf:
 
         json.dump(fp=score_sf, obj=pr_macroavgs[:, :].tolist())
 
