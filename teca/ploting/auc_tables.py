@@ -10,6 +10,7 @@ sys.path.append('../../../DoGSWrapper/dogswrapper')
 
 from data_retrieval.data import multiclass_res
 from data_retrieval.data import rfse_multiclass_multimeasure_res
+from data_retrieval.data import rfse_multiclass_multimeasure_res2
 from data_retrieval.data import rfse_onevsall_res
 from data_retrieval.data import rfse_onevsall_multimeasure_res
 import tools.paramcombs as param_comb
@@ -40,12 +41,14 @@ def params_prauc_tables(h5d_fl1, h5d_fl2, curvetype, kfolds, params_od, mix, str
         # Defining list for AUC values storage. For this loop.
         auc_values = list()
 
-        if params_lst[0] >= params_lst[1]:
+        if True:
+        # if params_lst[0] >= params_lst[1]:
 
             if mix:
 
-                pred_scores, expd_y, pred_y = rfse_multiclass_multimeasure_res(
-                    h5d_fl1, h5d_fl2, kfolds, params_path, binary=binary, strata=strata
+                pred_scores, expd_y, pred_y = rfse_multiclass_multimeasure_res2(
+                    h5d_fl1, ['cosine_sim', 'minmax_sim'],
+                    kfolds, params_path, binary=binary, strata=strata
                 )
 
             else:

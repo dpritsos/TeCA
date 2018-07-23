@@ -9,6 +9,7 @@ import numpy as np
 import collections as coll
 from data_retrieval.data import multiclass_res
 from data_retrieval.data import rfse_multiclass_multimeasure_res
+from data_retrieval.data import rfse_multiclass_multimeasure_res2
 from data_retrieval.data import rfse_onevsall_res
 from data_retrieval.data import rfse_onevsall_multimeasure_res
 import tools.paramcombs as param_comb
@@ -24,9 +25,15 @@ def PRConf_table(h5d_fl1, h5d_fl2, kfolds, params_path, mix, strata, prereccon=0
 
     # Beginning Contingency table building
     if mix:
-        rfse_data = rfse_multiclass_multimeasure_res(
-            h5d_fl1, h5d_fl2, kfolds, params_path, binary=False, strata=strata
+
+        rfse_data = rfse_multiclass_multimeasure_res2(
+            h5d_fl1, ['cosine_sim', 'minmax_sim'],
+            kfolds, params_path, binary=False, strata=strata
         )
+
+        # rfse_data = rfse_multiclass_multimeasure_res(
+        #     h5d_fl1, h5d_fl2, kfolds, params_path, binary=False, strata=strata
+        # )
 
     else:
         rfse_data = multiclass_res(

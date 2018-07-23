@@ -3,7 +3,117 @@ import numpy as np
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
-fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/MacroPRC11AVG_RFSE_OCSVME_SANTINIS.eps'
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/' +\
+                'Journal_LRE-Springer/diagrams/AppendCurve.eps'
+
+
+# OCSVME POS3G F1
+ypos11 = np.array([
+    0.111946227,
+    0.103466243,
+    0.093288063,
+    0.144124496,
+    0.165139515,
+    0.162549406,
+    0.663093067,
+])
+
+ypos11_err = np.array([
+    0.022005482,
+    0.023240323,
+    0.042041221,
+    0.076438511,
+    0.096911501,
+    0.101824599,
+    0.000706231,
+])
+
+# OCSVME POS3G P
+yppos11 = np.array([
+    0.136253545,
+    0.148251913,
+    0.175395913,
+    0.237388111,
+    0.314620014,
+    0.481990494,
+    0.984095168,
+])
+
+yppos11_err = np.array([
+    0.030884455,
+    0.018118618,
+    0.01616486,
+    0.010740251,
+    0.00823304,
+    0.005433687,
+    0.003108972,
+])
+
+# RFSE MIX POS3G F1
+ypos1 = np.array([
+    0.391762151,
+    0.377475462,
+    0.382317003,
+    0.351581386,
+    0.375960963,
+    0.4186463,
+    0.030797774,
+])
+
+ypos1_err = np.array([
+    0.050038728,
+    0.059648325,
+    0.066774975,
+    0.072348805,
+    0.022702475,
+    0.020253737,
+    0.005830204,
+])
+
+
+# RFSE MIX POS3G PRECISION
+yppos1 = np.array([
+    0.706423306,
+    0.505836943,
+    0.424545337,
+    0.321176179,
+    0.302326677,
+    0.341360128,
+    0.015904832,
+])
+
+yppos1_err = np.array([
+    0.055824637,
+    0.104155047,
+    0.089163515,
+    0.078989582,
+    0.018618676,
+    0.020331161,
+    0.003108972,
+])
+
+
+
+# RFSE COS POS3G PRECISION
+ypcospos1 = np.array([
+    0.740003048,
+    0.531881841,
+    0.445222261,
+    0.315987663,
+    0.308367262,
+    0.346077534,
+    0.015904832,
+])
+
+ypcospos1_err = np.array([
+    0.076444638,
+    0.128460585,
+    0.100436285,
+    0.090215497,
+    0.02422654,
+    0.015325961,
+    0.003108972,
+])
 
 # RFSE MIX W3G
 y1 = np.array([
@@ -408,6 +518,87 @@ yp6_error = np.array([
     0.081971222020018,
 ])
 
+# OCSVME PRECISION (MAXIMISED ON F1)
+yoc_c4g = np.array([
+    0.4718017135,
+    0.4137781312,
+    0.3817257058,
+    0.3602697651,
+    0.3482842427,
+    0.3887905448,
+    0.5056982254,
+])
+
+yoc_c4g_err = np.array([
+    0.0150532359,
+    0.0143289119,
+    0.0220950667,
+    0.022654217,
+    0.0183774823,
+    0.0159193298,
+    0.0012082494,
+])
+
+yoc_w1g = np.array([
+    0.4590142391,
+    0.4024640577,
+    0.3734586979,
+    0.332791776,
+    0.2973069676,
+    0.3736761828,
+    0.5022490393,
+])
+
+yoc_w1g_err = np.array([
+    0.0171249691,
+    0.0221618156,
+    0.0158187368,
+    0.0298306331,
+    0.0079612367,
+    0.0077986305,
+    0.001763036,
+])
+
+yoc_w3g = np.array([
+    0.4211219837,
+    0.352651258,
+    0.3147730406,
+    0.3115236737,
+    0.3284651998,
+    0.3718830305,
+    0.5123464477,
+])
+
+yoc_w3g_err = np.array([
+    0.0167314837,
+    0.0107543312,
+    0.0065339686,
+    0.0048525511,
+    0.0083734486,
+    0.0048980928,
+    0.0047370191,
+])
+
+yoc_pos3g = np.array([
+    0.136253545,
+    0.148251913,
+    0.175395913,
+    0.237388111,
+    0.314620014,
+    0.481990494,
+    0.984095168,
+])
+
+yoc_pos3g_err = np.array([
+    0.030884455,
+    0.018118618,
+    0.01616486,
+    0.010740251,
+    0.00823304,
+    0.005433687,
+    0.003108972,
+])
+
 
 fig = plt.figure(num=1, figsize=(12, 7), facecolor='w', edgecolor='k')  # dpi=300,
 ax = fig.add_subplot(111)
@@ -423,20 +614,20 @@ linestyle = {
 }
 
 
-linestyle['color'] = 'orange'
-ax.errorbar(x_openness_leves, y1, yerr=y1_error, **linestyle)
+linestyle['color'] = 'black'
+ax.errorbar(x_openness_leves, yoc_w3g, yerr=yoc_w3g_err, **linestyle)
+
+linestyle['color'] = 'blue'
+linestyle['linestyle'] = "--"
+ax.errorbar(x_openness_leves, yoc_pos3g, yerr=yoc_pos3g_err, **linestyle)
+
+linestyle['color'] = 'red'
+linestyle['linestyle'] = "-."
+ax.errorbar(x_openness_leves, yoc_w1g, yerr=yoc_w1g_err, **linestyle)
 
 linestyle['color'] = 'green'
-linestyle['linestyle'] = "--"
-ax.errorbar(x_openness_leves, y2, yerr=y2_error, **linestyle)
-
-linestyle['color'] = 'purple'
-linestyle['linestyle'] = "-."
-ax.errorbar(x_openness_leves, y4, yerr=y4_error, **linestyle)
-
-linestyle['color'] = 'black'
 linestyle['linestyle'] = "-"
-ax.errorbar(x_openness_leves, y5, yerr=y5_error, **linestyle)
+ax.errorbar(x_openness_leves, yoc_c4g, yerr=yoc_c4g_err, **linestyle)
 
 """
 linestyle['color'] = 'lime'
@@ -448,36 +639,38 @@ ax.errorbar(x_openness_leves, yp6, yerr=yp6_error, **linestyle)
 ax.yaxis.grid()
 
 ln1 = mlines.Line2D(
-    [], [], markersize=0, linewidth=3, color='orange', linestyle='-'
-)
-ln2 = mlines.Line2D(
-    [], [], markersize=0, linewidth=3, color='green', linestyle='--'
-)
-ln3 = mlines.Line2D(
-    [], [], markersize=0, linewidth=3, color='purple', linestyle='-.'
-)
-ln4 = mlines.Line2D(
     [], [], markersize=0, linewidth=3, color='black', linestyle='-'
 )
-ln5 = mlines.Line2D(
-    [], [], markersize=0, linewidth=3, color='lime', linestyle='-'
+ln2 = mlines.Line2D(
+    [], [], markersize=0, linewidth=3, color='blue', linestyle='--'
 )
-ln6 = mlines.Line2D(
-    [], [], markersize=0, linewidth=3, color='red', linestyle='-'
+ln3 = mlines.Line2D(
+    [], [], markersize=0, linewidth=3, color='red', linestyle='-.'
 )
+ln4 = mlines.Line2D(
+    [], [], markersize=0, linewidth=3, color='green', linestyle='-'
+)
+# ln5 = mlines.Line2D(
+#     [], [], markersize=0, linewidth=3, color='lime', linestyle='-'
+# )
+# ln6 = mlines.Line2D(
+#     [], [], markersize=0, linewidth=3, color='red', linestyle='-'
+# )
 # lndump = mlines.Line2D([], [], markersize=0, linewidth=0)
 
 plt.legend(
     [
-        ln1, ln2,
-        ln3, ln4,
+        ln1,
+        ln2,
+        ln3,
+        ln4,
         # ln5, ln6
     ],
     [
-        "W3G - Comb",
-        "C4G - Comb",
-        "W3G - MinMax",
-        "C4G - MinMax",
+        "W3G",
+        "POS3G",
+        "W1G",
+        "C4G",
         # "RFSE - Combination of Cosine & MinMax",
         # "RFSE - MinMax",
         # "OCSVM",
@@ -493,11 +686,11 @@ plt.legend(
 plt.yticks(fontsize=12)
 plt.xticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], fontsize=12)
 # plt.xticks(x_openness_leves, fontsize=12)
-plt.ylabel('F1-measure', fontsize=14)
+plt.ylabel('Precision', fontsize=14)
 plt.xlabel('Openness Level', fontsize=14)
 # plt.tight_layout()
 
 # Saving the ploting to File
-# plt.savefig(fig_save_file, bbox_inches='tight')
+plt.savefig(fig_save_file, bbox_inches='tight')
 
 plt.show()

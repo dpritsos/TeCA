@@ -13,6 +13,7 @@ sys.path.append('../../../DoGSWrapper/dogswrapper')
 from analytics.metrix import pr_curve, pr_curve_macro, reclev11_max
 from data_retrieval.data import multiclass_res
 from data_retrieval.data import rfse_multiclass_multimeasure_res
+from data_retrieval.data import rfse_multiclass_multimeasure_res2
 from data_retrieval.data import rfse_onevsall_res
 from data_retrieval.data import rfse_onevsall_multimeasure_res
 
@@ -21,13 +22,18 @@ def plist2ppath(params_lst, ensbl='RFSE'):
 
     if ensbl == 'RFSE':
 
-        pnames = ['vocab_size', 'features_size', 'Sigma', 'Iterations', 'KFold']
+        pnames = [
+            'terms_type', 'vocab_size', 'features_size', 'sim_func',
+            'Sigma', 'Iterations', 'marked_uknw_ctg_lst', 'kfolds'
+        ]
 
         return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
 
     elif ensbl == 'OCSVME':
 
-        pnames = ['vocab_size', 'features_size', 'nu', 'KFold']
+        pnames = [
+            'terms_type', 'vocab_size', 'features_size', 'nu', 'marked_uknw_ctg_lst', 'kfolds'
+        ]
 
         return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
 
@@ -38,24 +44,31 @@ def plist2ppath(params_lst, ensbl='RFSE'):
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 # 7Genres
-fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/Journal_IPM-Elsevier/diagrams/MacroPRC11AVG_RFSE_OCSVME_SANTINIS.eps'
-# fig_save_file = '/home/dimitrios/MacroPRC11AVG_RFSE_OCSVME_7Genres.eps'
+fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/' +\
+                'Journal_LRE-Springer/diagrams/AppendCurve.eps'
 
 comb_lst = [
-    # ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100, '']],
-    ['RFSE', '1Words', 'SANTINIS', 'Cosine', [50000, 5000, 0.5, 100, '']],
-    ['RFSE', '1Words', 'SANTINIS', 'Cosine', [5000, 1000, 0.5, 100, '']],
-    ['OCSVME', '1Words', 'SANTINIS', '', [50000, 5000, 0.1, '']],
-    ['OCSVME', '1Words', 'SANTINIS', '', [50000, 500, 0.1, '']],
-
+    # **OLD STYLE** ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100, '']],
+    # **OLD STYLE** ['OCSVME', '1Words', 'SANTINIS', '', [50000, 5000, 0.1, '']],
+    [
+        'RFSE',
+        '/media/dimitrios/TurnstoneDisk/KI-04/Openness_POS3G_KI04/' +\
+        'Openness_RFSE_POS3G_KI04_2018_03_23.h5',
+        ['POS3G', 16200, 5000, 'combo', 0.5, 1000, 12, '']
+    ],
+    # [
+    #    'OCSVME',
+    #    '/home/dimitrios/Synergy-Crawler/SANTINIS/POS_SANTINIS/OCSVME_POS3G_SANTINIS_2018_02_10.h5',
+    #    ['POS3G', 43, 4, 0.05, 12, '']
+    # ],
 
 ]
 
 plt_dsp_attr = [
-    ['black', '-', 'o', "W1G - RFSE - F1"],
-    ['orange', '-', 'o', "W1G - RFSE - AUC"],
-    ['purple', '--', 'o', "W1G - OCSVM - F1"],
-    ['lime', '--', 'o', "W1G - OCSVM - AUC"],
+    ['blue', '--', 'o', "POS3G - RFSE - F1"],
+    # ['blue', '-', 'o', "POS3G - RFSE - F1"],
+    # ['purple', '--', 'o', "W1G - OCSVM - F1"],
+    # ['lime', '--', 'o', "W1G - OCSVM - AUC"],
 ]
 
 # # # #  The Ploting Process Starts Here # # # #
@@ -67,73 +80,42 @@ labels_lst = list()
 
 for i, comb_val in enumerate(comb_lst):
 
-    # Selecting filepath
-    if comb_val[0] == 'RFSE':
-
-        if comb_val[2] == '7Genres':
-            h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/RFSE_'
-
-        elif comb_val[2] == 'KI04':
-            h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/RFSE_'
-
-        elif comb_val[2] == 'SANTINIS':
-            h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/RFSE_'
-
-    elif comb_val[0] == 'OCSVME':
-
-        if comb_val[2] == '7Genres':
-            h5d_fl = '/home/dimitrios/Synergy-Crawler/Santinis_7-web_genre/OCSVM_'
-
-        elif comb_val[2] == 'KI04':
-            h5d_fl = '/home/dimitrios/Synergy-Crawler/KI-04/OCSVM_'
-
-        elif comb_val[2] == 'SANTINIS':
-            h5d_fl = '/home/dimitrios/Synergy-Crawler/SANTINIS/OCSVM_'
-
-    h5d_fl = h5d_fl + comb_val[1] + '_' + comb_val[2]
-
-    #  Selecting files to open and setting the mix flag on/off
-    if comb_val[3] == 'Comb':
-        h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
-        h5d_fl2 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
-
-    elif comb_val[3] == 'MinMax':
-        h5d_fl1 = tb.open_file(h5d_fl + '_minmax.h5', 'r')
-
-    elif comb_val[3] == 'Cosine' or comb_val[3] == '':
-        h5d_fl1 = tb.open_file(h5d_fl + '.h5', 'r')
-
-    else:
-        raise Exception("Option: " + comb_val[3] + " is not valid for Measure Option")
+    h5d_fname = comb_val[1]
+    h5d_fl = tb.open_file(h5d_fname, 'r')
 
     # Getting the predictions
-    if comb_val[3] == 'Comb':
+    if comb_val[2][3] == 'combo':
 
         # Building the parapmeters path
-        params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
+        params_path = plist2ppath(comb_val[2], ensbl=comb_val[0])
+        print params_path
 
+        pred_scores, expd_y, pred_y = rfse_multiclass_multimeasure_res2(
+            h5d_fl, ['cosine_sim', 'minmax_sim'],
+            kfolds, params_path, binary=False, strata=None
+        )
+
+        """
         pred_scores, expd_y, pred_y = rfse_multiclass_multimeasure_res(
-            # h5d_fl1, h5d_fl2, kfolds, params_path, comb_val[4][2],
+            # h5d_fl, h5d_fl2, kfolds, params_path, comb_val[4][2],
             # genre_tag=None, binary=True, strata=None
-            h5d_fl1, h5d_fl2, kfolds, params_path, binary=False, strata=None
+            h5d_fl, h5d_fl2, kfolds, params_path, binary=False, strata=None
             #  binary=False <- for Micro
         )
+        """
 
     else:
 
         # Building the parapmeters path
-        params_path = plist2ppath(comb_val[4], ensbl=comb_val[0])
+        params_path = plist2ppath(comb_val[2], ensbl=comb_val[0])
+        print params_path
 
         pred_scores, expd_y, pred_y = multiclass_res(
-            h5d_fl1, kfolds, params_path, binary=False, strata=None
+            h5d_fl, kfolds, params_path, binary=False, strata=None
         )
 
     # Closing the h5d files.
-    if comb_val[3] == 'Comb':
-        h5d_fl1.close()
-        h5d_fl2.close()
-    else:
-        h5d_fl1.close()
+    h5d_fl.close()
 
     # Creating the Actual PRC.
     # y, x, t = pr_curve(expd_y, pred_scores, full_curve=True, is_truth_tbl=True)
@@ -200,6 +182,6 @@ plt.xlabel('Recall', fontsize=14)
 # plt.tight_layout()
 
 # Saving the ploting to File
-# plt.savefig(fig_save_file, bbox_inches='tight')
+plt.savefig(fig_save_file, bbox_inches='tight')
 
 plt.show()

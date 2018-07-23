@@ -353,6 +353,174 @@ def rfse_multiclass_multimeasure_res(hf5_fl1, hf5_fl2, kfolds, params_path, bina
     return (PS, EY, PY)
 
 
+def rfse_multiclass_multimeasure_res2(
+        hf5_fl1, msur_lst, kfolds, params_path, binary=None, strata=None):
+
+    # Initialising.
+    PS_lst = list()
+    EY_lst = list()
+    PY_lst = list()
+
+    # Getting simga threshold.
+    sigma = float('.' + params_path.split('/')[5].split('a')[1][1::])
+
+    # Collecting Scores for and Expected Values for every fold given in kfold list.
+    for k in kfolds:
+        # print  params_path, k
+        # Getting the Expected genre tags
+        ppath = params_path.replace('combo', msur_lst[0])
+        exp_y = hf5_fl1.get_node(ppath + str(k), name='expected_Y').read()
+
+        # Getting the number of classes.
+        cls_num = float(len(np.unique(exp_y)))
+
+        # Calulating Prediction Scores for the given Gerne i.e. assuming that the rest genres
+        # being Negative examples
+
+        # Measure #1
+        ppath = params_path.replace('combo', msur_lst[0])
+
+        pc_array_msur1 = hf5_fl1.get_node(
+            ppath + str(k), name='predicted_classes_per_iter'
+        ).read()
+
+        ms_array_msur1 = hf5_fl1.get_node(
+            ppath + str(k), name='max_sim_scores_per_iter'
+        ).read()
+
+        # Measure #1
+        ppath = params_path.replace('combo', msur_lst[1])
+
+        pc_array_msur2 = hf5_fl1.get_node(
+            ppath + str(k), name='predicted_classes_per_iter'
+        ).read()
+
+        ms_array_msur2 = hf5_fl1.get_node(
+            ppath + str(k), name='max_sim_scores_per_iter'
+        ).read()
+
+        # Normalising max-similarity scores for being comparable irrespectively of the
+        # measure has been used.
+        max_ms = np.max(ms_array_msur1, axis=0)
+        min_ms = np.min(ms_array_msur2, axis=0)
+
+        if (max_ms - min_ms).all() != 0:
+            # EXPLAIN HERE...
+            ms_array_msur1 = (ms_array_msur1 - min_ms) / (max_ms - min_ms)
+
+        else:
+            # EXPLAIN HERE...
+            mm = (max_ms - min_ms)
+            mm[np.where((mm == 0))] = 0.00000000000001
+            ms_array_msur1 = (ms_array_msur1 - min_ms) / mm
+
+        max_ms = np.max(ms_array_msur2, axis=0)
+        min_ms = np.min(ms_array_msur2, axis=0)
+
+        if (max_ms - min_ms).all() != 0:
+            # EXPLAIN HERE...
+            ms_array_msur2 = (ms_array_msur2 - min_ms) / (max_ms - min_ms)
+
+        else:
+            # EXPLAIN HERE...
+            mm = (max_ms - min_ms)
+            mm[np.where((mm == 0))] = 0.00000000000001
+            ms_array_msur2 = (ms_array_msur2 - min_ms) / mm
+
+        docs_num = ms_array_msur1.shape[1]
+        itrs = np.arange(ms_array_msur1.shape[0])
+        # print ms_array_fl1.shape, docs_num
+        ms_arr1_cls = np.hsplit(ms_array_msur1, docs_num)
+        # print ms_array_fl2.shape, docs_num
+        ms_arr2_cls = np.hsplit(ms_array_msur2, docs_num)
+        pc_arr1_cls = np.hsplit(pc_array_msur1, docs_num)
+        pc_arr2_cls = np.hsplit(pc_array_msur2, docs_num)
+
+        # print pc_arr2_cls
+
+        new_pc_col_lst = list()
+
+        for i, (ms_c1, ms_c2, pc_c1, pc_c2) in enumerate(zip(
+                ms_arr1_cls, ms_arr2_cls, pc_arr1_cls, pc_arr2_cls)):
+
+            i_max_ms_col = np.argmax(np.hstack((ms_c1, ms_c2)), axis=1)
+
+            # EXPLAIN THIS IN DETAIL...
+            pc4max_ms = np.hstack((pc_c1, pc_c2))[itrs, i_max_ms_col]
+
+            new_pc_col_lst.append(pc4max_ms)
+
+        # Calculating the Predicted Class and the Sigma scores for each document.
+        pre_y = np.zeros(docs_num)
+        pre_score = np.zeros(docs_num)
+
+        for i, pc_col in enumerate(new_pc_col_lst):
+
+            # NOTE: Check out the 'minlength' param value.
+            if np.sum(np.where(pc_col < 0)):
+                print pc_col
+                pc_col = np.array([np.abs(i) for i in pc_col])
+
+            max_gnr_scr = np.bincount(pc_col.astype(np.int), minlength=int(cls_num)+1) / float(len(itrs))
+
+            if sigma < np.max(max_gnr_scr):
+                pre_y[i] = np.argmax(max_gnr_scr)
+                pre_score[i] = np.max(max_gnr_scr)
+
+        # Making a statified selection upon a specific group of the results.
+        if strata:
+
+            gpr_idx = -strata[1]
+
+            pre_score_grp1 = pre_score[0:gpr_idx]
+            pre_score_grp2 = pre_score[gpr_idx::]
+
+            pre_y_grp1 = pre_y[0:gpr_idx]
+            pre_y_grp2 = pre_y[gpr_idx::]
+
+            exp_y_grp1 = exp_y[0:gpr_idx]
+            exp_y_grp2 = exp_y[gpr_idx::]
+
+            # Perfroming Stratified selection.
+            unq_pred_tgs = np.unique(pre_y_grp2)
+
+            strata_idxs = np.hstack(
+                [idx_arr[0:int(np.rint(idx_arr.shape[0]/strata[0]))] for idx_arr
+                    in [np.where((pre_y_grp2 == tg))[0] for tg in unq_pred_tgs]]
+            )
+
+            pre_score = np.hstack((pre_score_grp1, pre_score_grp2[strata_idxs]))
+            pre_y = np.hstack((pre_y_grp1, pre_y_grp2[strata_idxs]))
+            exp_y = np.hstack((exp_y_grp1, exp_y_grp2[strata_idxs]))
+
+        # Saving the Ensemble Prediction Scores.
+        PS_lst.append(pre_score)
+
+        # Saving the Class predictions.
+        PY_lst.append(pre_y)
+
+        # Collecting and the Truth Table of expected and predicted values.
+        EY_lst.append(exp_y)
+
+    # Stacking the lists to Single arrays for PS and EY respectively
+    PS = np.hstack(PS_lst)
+    EY = np.hstack(EY_lst)
+    PY = np.hstack(PY_lst)
+
+    # Converting in to binary case under binary variable condition.
+    if binary:
+        EY = np.where(EY == PY, 1, 0)
+
+    # Shorting Results by Predicted Scores
+    inv_srd_idx = np.argsort(PS)[::-1]
+    PS = PS[inv_srd_idx]
+    EY = EY[inv_srd_idx]
+    PY = PY[inv_srd_idx]
+
+    # Retunring Predicted Scores and Expected Values
+    return (PS, EY, PY)
+
+
 def rfse_onevsall_multimeasure_res(hf5_fl1, hf5_fl2, genre_tag, kfolds, params_path):
 
     # Initialising.
