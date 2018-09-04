@@ -62,7 +62,7 @@ def multiclass_res(res_h5file, kfolds, params_path, binary=None, strata=None):
 
         # Loading predicted scores.
         pre_score = res_h5file.get_node(
-            params_path + str(k), name='predicted_scores'  # 'predicted_scores' predicted_R
+            params_path + str(k), name='predicted_R'  # 'predicted_scores' predicted_R
         ).read()
 
         # Getting the Expected genre tags.
