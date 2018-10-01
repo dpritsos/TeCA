@@ -18,14 +18,14 @@ if __name__ == '__main__':
     # ...calculations-file.
     rpath = '/home/dimitrios/'
     wpath = '/home/dimitrios/'
-    fname = 'OpenSet_MarkedUknown_NNRD_W1G_V5000_SANTINIS_2018_09_22'
+    fname = 'OpenSet_MarkedUknown_NNRD_C4G_V50-100k_SANTINIS_2018_09_30'
 
     # Parameters used for the experiments required for selecting specific or group of results
     kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     case_od = coll.OrderedDict([
-        ('terms_type', ['W1G']),
-        ('vocab_size', ['5000']),
+        ('terms_type', ['C4G']),
+        ('vocab_size', ['50000']),
         # ('dims', [50, 100, 250, 500, 1000]),
         # ('min_trm_fq', [3, 10]),
         # ('win_size', [3, 8, 20]),
@@ -38,17 +38,17 @@ if __name__ == '__main__':
         # ('uknw_ctgs_num', [1, 2, 3, 4, 5, 6, 7]),
         # ('uknw_ctgs_num_splt_itrs', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]),
         # RFSE
-        ('features_size', [1000]),
+        # ('features_size', [1000]),
         # ('sim_func', ['minmax_sim']),
         # ('Sigma', [0.5, 0.7, 0.9]),
         # ('Iterations', [10, 50, 100]),
         # OCSVME
         # ('nu', [0.05, 0.07, 0.1, 0.15, 0.17, 0.3, 0.5, 0.7, 0.9]),
         # NNRD
-        ('split_ptg', [0.7,05]),  # 0.7, 0.5
-        ('ukwn_slt_ptg', [0.3]),  # 0.3, 0.5
-        ('rt_lims_stp', [[0.8, 1.0, 0.2]]),
-        ('lmda', [0.2, 0.5, 0.7]),
+        ('split_ptg', [0.5]),  # 0.7, 0.5
+        ('ukwn_slt_ptg', [0.5]),  # 0.3, 0.5
+        ('rt_lims_stp', [[0.6, 1.0, 0.2]]),
+        ('lmda', [0.5]),
         # SVMRO
         # ('svm_type', ['oneclass']),
         # ('svm_type', ['binary']),
@@ -129,17 +129,17 @@ if __name__ == '__main__':
                 # ('uknw_ctgs_num', [case[11]]),
                 # ('uknw_ctgs_num_splt_itrs', [case[12]]),
                 # RFSE
-                ('features_size', [case[2]]),
+                # ('features_size', [case[2]]),
                 # ('sim_func', [case[12]]),
                 # ('Sigma', [case[13]]),
                 # ('Iterations', [case[14]]),
                 # OCSVME
                 # ('nu', [case[11]]),
                 # NNRD
-                ('split_ptg', [case[3]]),
-                ('ukwn_slt_ptg', [case[4]]),
-                ('rt_lims_stp', [case[5]]),
-                ('lmda', [case[6]]),
+                ('split_ptg', [case[2]]),
+                ('ukwn_slt_ptg', [case[3]]),
+                ('rt_lims_stp', [case[4]]),
+                ('lmda', [case[5]]),
                 # SVMRO
                 # ('svm_type', [case[11]]),
                 # ('svm_type', [case[12]]),
@@ -150,7 +150,7 @@ if __name__ == '__main__':
                 # ('mrgn_fw', [case[17]]),
                 # SVMRO oneclass
                 # ('nu', [case[18]]),
-                ('marked_uknw_ctg_lst', [case[7]]),
+                ('marked_uknw_ctg_lst', [case[6]]),
                 ('kfolds', ['']),
             ])
 
@@ -190,7 +190,7 @@ if __name__ == '__main__':
             # pr_mean = (macro_pr[0]+macro_pr[1]) / 2.0
             print pr_aucz_var_table
 
-            pr_auc = pr_aucz_var_table[0, 9]  # For RFSE is 8, for OCSVME 6, ECCE 5
+            pr_auc = pr_aucz_var_table[0, 8]  # For RFSE is 8, for OCSVME 6, ECCE 5
                                                # Gensim For OCSVME 12, for RFSE 16
                                                # NNRD 16
 
