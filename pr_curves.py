@@ -27,10 +27,47 @@ def plist2ppath(params_lst, ensbl='RFSE'):
 
         return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
 
+    if ensbl == 'RFSE-COS-OLD':
+
+        pnames = [
+            'vocab_size', 'features_size', 'Sigma', 'Iterations', 'KFold'
+        ]
+
+        return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
+
+    elif ensbl == 'OCSVME-OLD':
+
+        pnames = [
+            'vocab_size', 'features_size', 'nu', 'KFold'
+        ]
+
+        return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
+
     elif ensbl == 'OCSVME':
 
         pnames = [
             'terms_type', 'vocab_size', 'features_size', 'nu', 'marked_uknw_ctg_lst', 'kfolds'
+        ]
+
+        return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
+
+    elif ensbl == 'NNDR-GENS':
+
+        pnames = [
+            'terms_type', 'vocab_size',
+            'dims', 'min_trm_fq', 'win_size', 'algo', 'alpha', 'min_alpha', 'epochs', 'decay',
+            'split_ptg', 'ukwn_slt_ptg', 'rt_lims_stp', 'lmda',
+            'marked_uknw_ctg_lst', 'kfolds'
+        ]
+
+        return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
+
+
+    elif ensbl == 'NNDR-TF':
+
+        pnames = [
+            'terms_type', 'vocab_size', 'split_ptg', 'ukwn_slt_ptg',
+            'rt_lims_stp', 'lmda', 'marked_uknw_ctg_lst', 'kfolds'
         ]
 
         return ''.join(['/' + n + str(v).replace('.', '') for n, v in zip(pnames, params_lst)])
@@ -42,32 +79,141 @@ def plist2ppath(params_lst, ensbl='RFSE'):
 kfolds = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 # 7Genres
-fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/' +\
-                'Journal_LRE-Springer/diagrams/AppendCurve.eps'
+fig_save_file = '/home/dimitrios/RESULTS/' +\
+                'NNDR_W3G_Best_RFSE-OCSVME-Baselines_Short.eps'
 
 comb_lst = [
-    # **OLD STYLE** ['RFSE', '3Words', 'SANTINIS', 'MinMax', [50000, 5000, 0.7, 100, '']],
-    # **OLD STYLE** ['OCSVME', '1Words', 'SANTINIS', '', [50000, 5000, 0.1, '']],
+
+    [
+        'OCSVME-OLD',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/' +\
+        'OCSVM_3Words_SANTINIS.h5',
+        [50000, 10000, 0.1, '']
+    ],
+    [
+        'RFSE-COS-OLD',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/' +\
+        'RFSE_3Words_SANTINIS.h5',
+        [100000, 10000, 0.5, 100, '']
+    ],
+    [
+        'NNDR-TF',
+        '/home/dimitrios/RESULTS/NNDR_TF_RAW/' +\
+        'OpenSet_MU_NNDR_W3G_TF_15-2-3_V5-50-100k_SANTINIS_2018_10_07.h5',
+        ['W3G', 10000, 0.5, 0.5, '[0.4, 1.0, 0.2]', 1.5, 12, '']
+    ],
+    [
+        'NNDR-GENS',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/Open_W3G_SANTINIS/' +\
+        'OpenSet_MarkedUknown_NNRD_W3G_Gensim_SANTINIS_2018_08_17.h5',
+        ['W3G', 'NA', 100, 3, 3, 'PV-DBOW', 0.025, 0.025, 10, 0.02, 0.5, 0.5,
+            '[0.8, 1.0, 0.2]', 0.5, 12, '']
+    ],
+
+]
+
+
+
+
+"""
+    [
+        'OCSVME-OLD',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/' +\
+        'OCSVM_4Chars_SANTINIS.h5',
+        [10000, 5000, 0.5, '']
+    ],
+    [
+        'RFSE-COS-OLD',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/' +\
+        'RFSE_4Chars_SANTINIS.h5',
+        [50000, 1000, 0.5, 100, '']
+    ],
+    [
+        'NNDR-TF',
+        '/home/dimitrios/RESULTS/NNDR_TF_RAW/' +\
+        'OpenSet_MarkedUknown_NNRD_C4G_V5000_SANTINIS_2018_09_22.h5',
+        ['C4G', 5000, 0.7, 0.3, '[0.8, 1.0, 0.2]', 0.5, 12, '']
+    ],
+    [
+        'NNDR-GENS',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/Open_C4G_SANTINIS/' +\
+        'OpenSet_MarkedUknown_NNRD_C4G_Gensim_SANTINIS_2018_08_17.h5',
+        ['C4G', 'NA', 50, 3, 8, 'PV-DBOW', 0.025, 0.025, 10, 0.002, 0.5, 0.5, '[0.8, 1.0, 0.2]', 0.5, 12, '']
+    ]
+
+"""
+
+
+"""
+
+    [
+        'OCSVME-OLD',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/' +\
+        'OCSVM_1Words_SANTINIS.h5',
+        [50000, 5000, 0.1, '']
+    ],
     [
         'RFSE',
-        '/media/dimitrios/TurnstoneDisk/KI-04/Openness_POS3G_KI04/' +\
-        'Openness_RFSE_POS3G_KI04_2018_03_23.h5',
-        ['POS3G', 16200, 5000, 'combo', 0.5, 1000, 12, '']
+        '/mnt/turnstone/SANTINIS/TF_W1G_SANTINIS/' +\
+        'RFSE_W1G_V50000_SANTINIS_2018_02_22_Moreiters_FIXED.h5',
+        ['W3G', 50000, 10000, 'cosine_sim', 0.5, 1000, 12, '']
     ],
-    # [
-    #    'OCSVME',
-    #    '/home/dimitrios/Synergy-Crawler/SANTINIS/POS_SANTINIS/OCSVME_POS3G_SANTINIS_2018_02_10.h5',
-    #    ['POS3G', 43, 4, 0.05, 12, '']
-    # ],
 
-]
+    [
+        'NNDR-TF',
+        '/home/dimitrios/RESULTS/NNDR_TF_RAW/' +\
+        'OpenSet_MarkedUknown_NNRD_W1G_V5000_SANTINIS_2018_09_22.h5',
+        ['W1G', 5000, 0.7, 0.5, '[0.8, 1.0, 0.2]', 0.2, 12, '']
+    ],
+
+    [
+        'NNDR-GENS',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/Open_W1G_SANTINIS/' +\
+        'OpenSet_MarkedUknown_NNRD_W1G_Gensim_SANTINIS_2018_08_17.h5',
+        ['W1G', 'NA', 50, 3, 3, 'PV-DBOW', 0.025, 0.025, 10, 0.02, 0.5, 0.5, '[0.8, 1.0, 0.2]', 0.5, 12, '']
+    ]
+
+"""
+
+"""
+
+    [
+        'OCSVME-OLD',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/' +\
+        'OCSVM_3Words_SANTINIS.h5',
+        [50000, 10000, 0.1, '']
+    ],
+    [
+        'RFSE-COS-OLD',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/' +\
+        'RFSE_3Words_SANTINIS.h5',
+        [100000, 10000, 0.5, 100, '']
+    ],
+    [
+        'NNDR-TF',
+        '/home/dimitrios/RESULTS/NNDR_TF_RAW/' +\
+        'OpenSet_MU_NNDR_W3G_TF_15-2-3_V5-50-100k_SANTINIS_2018_10_07.h5',
+        ['W3G', 10000, 0.5, 0.5, '[0.4, 1.0, 0.2]', 1.5, 12, '']
+    ],
+    [
+        'NNDR-GENS',
+        '/home/dimitrios/Synergy-Crawler/SANTINIS/Open_W3G_SANTINIS/' +\
+        'OpenSet_MarkedUknown_NNRD_W3G_Gensim_SANTINIS_2018_08_17.h5',
+        ['W3G', 'NA', 100, 3, 3, 'PV-DBOW', 0.025, 0.025, 10, 0.02, 0.5, 0.5,
+            '[0.8, 1.0, 0.2]', 0.5, 12, '']
+    ],
+
+"""
+
+
 
 plt_dsp_attr = [
-    ['blue', '--', 'o', "POS3G - RFSE - F1"],
-    # ['blue', '-', 'o', "POS3G - RFSE - F1"],
-    # ['purple', '--', 'o', "W1G - OCSVM - F1"],
-    # ['lime', '--', 'o', "W1G - OCSVM - AUC"],
+    ['grey', '--', '+', "OCSVM - TF"],
+    ['black', '--', '^', "RFSE - TF"],
+    ['blue', '-', 'o', "NNDR - TF"],
+    ['red', '-', '*', "NNDR - DF"],
 ]
+
 
 # # # #  The Ploting Process Starts Here # # # #
 fig = plt.figure(num=1, figsize=(12, 8), facecolor='w', edgecolor='k')  # dpi=300,
@@ -119,13 +265,22 @@ for i, comb_val in enumerate(comb_lst):
     # y, x, t = pr_curve(expd_y, pred_scores, full_curve=True, is_truth_tbl=True)
 
     # Creating the Actual MACRO PRC.
-    y, x, t = pr_curve_macro(
+    y, x, t, srz = pr_curve_macro(
         expd_y, pred_y, pred_scores, full_curve=True
     )
+
+    # y, x, srz = y[4::], x[4::], srz[4::]
+
+    # print y, x,
+
+    # for ii, ss in enumerate(srz):
+    #    print ii, ss
 
     # Getting the max 11 Recall Leves in TREC way.
     # if i == 0:
     y, x = reclev11_max(y, x, trec=False)
+    # print
+    # print y, x
 
     # Selecting array indices with non-zero cells.
     non_zero_idx = np.where(y > 0)
@@ -136,8 +291,8 @@ for i, comb_val in enumerate(comb_lst):
         "linestyle": plt_dsp_attr[i][1],
         "marker": plt_dsp_attr[i][2],
         "linewidth": 2,
-        "markeredgewidth": 2,
-        'markeredgecolor': 'white',
+        # "markeredgewidth": 6,
+        'markeredgecolor': plt_dsp_attr[i][0],
     }
 
     ax.plot(x[non_zero_idx], y[non_zero_idx], **linestyle)
@@ -174,7 +329,8 @@ plt.legend(
 ).get_frame().set_linewidth(0.0)
 
 plt.yticks(fontsize=12)
-plt.xticks(np.arange(0.0, 1.1, 0.1), fontsize=12)
+plt.xticks(np.arange(0.0, 1.0, 0.1), fontsize=12)
+plt.yticks(np.arange(0.60, 1.05, 0.05), fontsize=12)
 plt.ylabel('Precision', fontsize=14)
 plt.xlabel('Recall', fontsize=14)
 # plt.tight_layout()

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import sys
-sys.path.append('../../src')
-sys.path.append('../../../DoGSWrapper/src')
+# sys.path.append('../../src')
+# sys.path.append('../../../DoGSWrapper/src')
 
 import tables as tb
 import numpy as np
@@ -94,11 +94,11 @@ for params_lst, params_path in zip(param_comb.ParamGridIter(params_od, 'list'), 
             params_lst.extend([auc_value])
 
             res_lst.append(params_lst)
-        
+
         except:
-            
+
             print params_path
-            
+
 
 #Stack the data collected in a 2D array. Last column contain the AUC for every parameters values possible combination.
 res = np.vstack(res_lst)
@@ -109,14 +109,14 @@ plt.figure(num=None, figsize=(12, 8), dpi=100, facecolor='w', edgecolor='k')
 i = 0;
 
 #Variance Implementation.
-for param_1 in params_od['Sigma']: 
-    
+for param_1 in params_od['Sigma']:
+
     i += 1
     x = list()
     y = list()
     yerr = list()
 
-    for param_2 in params_od['Iterations']: 
+    for param_2 in params_od['Iterations']:
 
         #if param_2 > 10000: continue;
 
@@ -124,7 +124,7 @@ for param_1 in params_od['Sigma']:
 
         if auc_per_sigma.shape[0]:
             #print auc_per_sigma[:,-1]
-            x.append(param_2)    
+            x.append(param_2)
             y.append( np.mean(auc_per_sigma[:,-1]) )
             yerr.append( np.var(auc_per_sigma[:,-1]) )
 
@@ -151,5 +151,5 @@ plt.tight_layout()
 plt.savefig(fig_save_file, bbox_inches='tight')
 
 plt.show()
-                                                                        
-res_h5file.close()   
+
+res_h5file.close()

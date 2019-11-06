@@ -60,10 +60,21 @@ def multiclass_res(res_h5file, kfolds, params_path, binary=None, strata=None):
     # Collecting Scores for and Expected Values for every fold given in kfold list.
     for k in kfolds:
 
+
         # Loading predicted scores.
-        pre_score = res_h5file.get_node(
-            params_path + str(k), name='predicted_R'  # 'predicted_scores' predicted_R
-        ).read()
+        try:
+            pre_score = res_h5file.get_node(
+                params_path + str(k), name='predicted_R'  # 'predicted_scores' predicted_R
+            ).read()
+            print "NNDR"
+            NNDR_flg = True
+
+        except:
+            pre_score = res_h5file.get_node(
+                params_path + str(k), name='predicted_scores'
+            ).read()
+
+            NNDR_flg = False
 
         # Getting the Expected genre tags.
         exp_y = res_h5file.get_node(params_path + str(k), name='expected_Y').read()
@@ -116,6 +127,14 @@ def multiclass_res(res_h5file, kfolds, params_path, binary=None, strata=None):
         EY = np.where(EY == PY, 1, 0)
 
     # Shorting results by Predicted Scores
+    if NNDR_flg:
+
+        # PS = PS[np.where((PS > 0.9) & (PS < 1.0) ) ]
+
+        PS = 1.0 - PS
+
+        # inv_srd_idx = np.argsort(PS)
+
     inv_srd_idx = np.argsort(PS)[::-1]
     PS = PS[inv_srd_idx]
     EY = EY[inv_srd_idx]

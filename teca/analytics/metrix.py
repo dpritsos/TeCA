@@ -370,7 +370,7 @@ def pr_curve_macro(exp_y, pre_y, scrz, full_curve=False, arr_type=np.float32):
     recall = np.array(recall, dtype=arr_type)
 
     # Returning the ROC curve
-    return precision, recall, np.unique(scrz)
+    return precision, recall, np.unique(scrz), scrz
 
 
 def auc(x, y, is_zcc=True, arr_type=np.float32):
@@ -732,7 +732,7 @@ def reclev11_max(P, R, rcl_tuple=(0.0, 1.1, 0.1), trec=True):
     return max_P, R_Levels
 
 
-def contingency_table(expd_y, pred_y, unknown_class=False, arr_type=np.float32):
+def contingency_table(expd_y, pred_y, unknown_class=False, arr_type=np.int32):
     """Contingency table building the function.
 
     It takes the expected Y and the predicted Y values of a Classifier and it is returning the

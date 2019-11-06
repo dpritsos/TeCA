@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
-fig_save_file = '/home/dimitrios/Documents/MyPublications:Journals-Conferences/' +\
-                'Journal_LRE-Springer/diagrams/AppendCurve.eps'
+fig_save_file = '/home/dimitrios/Desktop/' +\
+                'openness_example.eps'
 
 
 # OCSVME POS3G F1
@@ -378,6 +378,16 @@ x_openness_leves = np.array([
     0.646,
 ])
 
+x_openness_leves = np.array([
+    0.07,
+    0.13,
+    0.21,
+    0.29,
+    0.39,
+    0.50,
+    0.65,
+])
+
 # Original Opennes Levels with Target variable in the equation.
 #    0.069,
 #    0.152,
@@ -599,6 +609,15 @@ yoc_pos3g_err = np.array([
     0.003108972,
 ])
 
+err_zero = np.array([
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+])
 
 fig = plt.figure(num=1, figsize=(12, 7), facecolor='w', edgecolor='k')  # dpi=300,
 ax = fig.add_subplot(111)
@@ -615,19 +634,19 @@ linestyle = {
 
 
 linestyle['color'] = 'black'
-ax.errorbar(x_openness_leves, yoc_w3g, yerr=yoc_w3g_err, **linestyle)
+ax.errorbar(x_openness_leves, yoc_w3g, yerr=err_zero, **linestyle)
 
-linestyle['color'] = 'blue'
-linestyle['linestyle'] = "--"
-ax.errorbar(x_openness_leves, yoc_pos3g, yerr=yoc_pos3g_err, **linestyle)
+# linestyle['color'] = 'blue'
+# linestyle['linestyle'] = "--"
+# ax.errorbar(x_openness_leves, yoc_pos3g, yerr=err_zero, **linestyle)
 
 linestyle['color'] = 'red'
 linestyle['linestyle'] = "-."
-ax.errorbar(x_openness_leves, yoc_w1g, yerr=yoc_w1g_err, **linestyle)
+ax.errorbar(x_openness_leves, yoc_w1g, yerr=err_zero, **linestyle)
 
 linestyle['color'] = 'green'
 linestyle['linestyle'] = "-"
-ax.errorbar(x_openness_leves, yoc_c4g, yerr=yoc_c4g_err, **linestyle)
+ax.errorbar(x_openness_leves, yoc_c4g, yerr=err_zero, **linestyle)
 
 """
 linestyle['color'] = 'lime'
@@ -641,9 +660,9 @@ ax.yaxis.grid()
 ln1 = mlines.Line2D(
     [], [], markersize=0, linewidth=3, color='black', linestyle='-'
 )
-ln2 = mlines.Line2D(
-    [], [], markersize=0, linewidth=3, color='blue', linestyle='--'
-)
+# ln2 = mlines.Line2D(
+#     [], [], markersize=0, linewidth=3, color='blue', linestyle='--'
+# )
 ln3 = mlines.Line2D(
     [], [], markersize=0, linewidth=3, color='red', linestyle='-.'
 )
@@ -661,16 +680,16 @@ ln4 = mlines.Line2D(
 plt.legend(
     [
         ln1,
-        ln2,
+        # ln2,
         ln3,
         ln4,
         # ln5, ln6
     ],
     [
-        "W3G",
-        "POS3G",
-        "W1G",
-        "C4G",
+        "Alg #1",
+        # "POS3G",
+        "Alg #2",
+        "Alg #3",
         # "RFSE - Combination of Cosine & MinMax",
         # "RFSE - MinMax",
         # "OCSVM",
@@ -683,11 +702,19 @@ plt.legend(
     fancybox=False, shadow=False, fontsize=14
 ).get_frame().set_linewidth(0.0)
 
-plt.yticks(fontsize=12)
-plt.xticks([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7], fontsize=12)
+plt.yticks(fontsize=16)
+plt.xticks([
+    0.07,
+    0.13,
+    0.21,
+    0.29,
+    0.39,
+    0.50,
+    0.65,
+], fontsize=16)
 # plt.xticks(x_openness_leves, fontsize=12)
-plt.ylabel('Precision', fontsize=14)
-plt.xlabel('Openness Level', fontsize=14)
+plt.ylabel('Precision', fontsize=18)
+plt.xlabel('Openness Level', fontsize=18)
 # plt.tight_layout()
 
 # Saving the ploting to File
